@@ -16,10 +16,10 @@
 - GitHub **Issues** are the backlog. Use the *User story* template: "As a ..., I want ..., so that ..." + acceptance criteria.
 - Labels: `type:story`, `type:bug`, `type:chore`, `type:asset`, `area:scene`, `area:gameplay`, `area:ui`, `area:tools`, `owner:human`, `owner:ai`, `blocked`, `needs-po`.
 - `needs-po` = agent needs a human decision; answer in the issue, then remove the label.
-- Board columns: Backlog → Ready → In progress → Review → Done (a GitHub Project; the repo works without it).
+- Board: GitHub Project "115A 3DGP Final" (https://github.com/users/hwupu/projects/2), linked to the repo. Columns: Backlog → Ready → In progress → Review → Done. New issues must be added to it (agents do this when creating issues: `gh project item-add 2 --owner hwupu --url <issue>`).
 
 ## Definition of Done
-Acceptance criteria met; opens without console errors on Windows and Mac; PR reviewed by one other person (or the PO for agent PRs); scenes/prefabs saved with no unrelated diffs; relevant docs/ADR/prompt log updated.
+Acceptance criteria met; opens without console errors on Windows and Mac; PR reviewed by one other person (or the PO for agent PRs); scenes/prefabs saved with no unrelated diffs; relevant prompt log updated.
 
 ## Working agreements
 - Small PRs, branch `feat/<issue>-slug`. Squash merge.

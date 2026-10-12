@@ -106,3 +106,8 @@ $RECYCLE.BIN/
 .claude/settings.local.json
 .claude/worktrees/
 CLAUDE.local.md
+
+# ---- Unity Asset Store packages (free AND paid): NEVER commit (license) ----
+# Import them locally into Assets/AssetStore/ (Package Manager > My Assets) and list them in docs/assets.md.
+/[Aa]ssets/AssetStore/
+/[Aa]ssets/AssetStore.meta

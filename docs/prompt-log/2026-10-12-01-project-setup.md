@@ -14,3 +14,11 @@
 
 ## Decisions / open questions
 - See ADRs. Open: game concept, collaborator usernames, repo visibility vs. asset licenses, LFS quota (see README).
+
+## Follow-up prompt (verbatim)
+> 1. yes, we should keep track of credits and never commit free and paid assets from Unity Assets.
+> 5. Change to GitHub Project board.
+
+### What the AI did
+- ADR-0006: Asset Store content git-ignored (`Assets/AssetStore/`), credits policy in `docs/assets.md` + `CREDITS.md`, rule in `CLAUDE.md`, README, PR checklist.
+- ADR-0007: created GitHub Project #2 with columns Backlog/Ready/In progress/Review/Done, linked to the repo, added issues #1-#4.

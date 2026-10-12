@@ -53,14 +53,20 @@ git push -u origin HEAD     # open a PR, link the issue
 ## Repository layout
 ```
 Assets/_Project/      our editor tools, scripts, scenes, prefabs
-Assets/ThirdParty/    imported store/free packs (untouched)
+Assets/ThirdParty/    redistributable non-Asset-Store packs only (CC0/CC-BY...)
+Assets/AssetStore/    Asset Store packs: LOCAL ONLY, git-ignored
 docs/decisions/       ADRs (major decisions)
 docs/prompt-log/      verbatim prompt log of AI sessions
 docs/scrum/           process, sprint files
-docs/assets.md        asset & license register
+docs/assets.md        asset policy & license register (+ CREDITS.md)
 CLAUDE.md / AGENTS.md rules for AI agents
 ```
 In Unity, run **Tools > 3DGP > Create Project Folders** once to create the standard folders.
+
+## Assets & credits
+- **Never commit Unity Asset Store assets, free or paid** (license + public repo). Import them locally into `Assets/AssetStore/`; the folder is git-ignored. Each member imports the same packs/versions listed in `docs/assets.md`.
+- Non-Asset-Store assets may be committed under `Assets/ThirdParty/` only if the license allows redistribution.
+- Every asset must be listed in `docs/assets.md` and `CREDITS.md`.
 
 ## Working with AI agents
 - Agents read `CLAUDE.md`, log sessions in `docs/prompt-log/`, and record major decisions in `docs/decisions/`.
@@ -68,4 +74,4 @@ In Unity, run **Tools > 3DGP > Create Project Folders** once to create the stand
 - Agents ask when unsure; answer on the issue (label `needs-po`).
 
 ## Process
-See [`docs/scrum/process.md`](docs/scrum/process.md): 1-week sprints, GitHub Issues + board, combined kickoff/review/retro.
+See [`docs/scrum/process.md`](docs/scrum/process.md): 1-week sprints, GitHub Issues + [Project board](https://github.com/users/hwupu/projects/2), combined kickoff/review/retro.
