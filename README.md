@@ -3,7 +3,9 @@
 Unity game built by a team of 3 using an **AI-native, lightweight Scrum** workflow.
 Humans are the Product Owners; AI agents act as Scrum Master first, then Developer.
 
-> Game concept: _TBD by the team in Sprint 0._
+> **Concept:** single-player 3D fantasy golf. A hamster hero rescues the hamster princess from Sir Grumblepaws across three levels (Sunny Garden, Windy Desert, Frozen Lake) while a hidden time bar fills and wakes the villain. See [`docs/references/proposal.md`](docs/references/proposal.md), [ADR-0008](docs/decisions/0008-game-concept.md) and the [roadmap](docs/scrum/roadmap.md).
+
+**Team (Product Owners):** Henry 吳普軒 ([@hwupu](https://github.com/hwupu)) · Bahadir Emre Koksal 柯昊瀚 ([@bahadir-koksal](https://github.com/bahadir-koksal)) · Pongpat Weesommai 余蓬勃 ([@empongpat](https://github.com/empongpat))
 
 ## Requirements
 | Tool | Version |

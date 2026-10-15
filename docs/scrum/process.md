@@ -8,6 +8,8 @@
 | Developers | Humans for scenes/assets; AI agents for code once PO switches them on |
 
 ## Cadence (1-week sprints)
+Sprint calendar and goals: [`roadmap.md`](roadmap.md). Sprint N ends on the course date of the matching milestone week.
+
 - **Sprint kickoff (≤20 min, with the humans):** review goal, pick issues from `Backlog`, set the sprint milestone. Agent drafts `docs/scrum/sprints/sprint-NN.md` beforehand.
 - **Async check-in:** update the sprint file / issue comments; no standup meeting.
 - **Sprint end (≤20 min):** demo what runs in Unity, accept/reject against acceptance criteria, short retro (1 keep, 1 change). Agent records it in the sprint file.
