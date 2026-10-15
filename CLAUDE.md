@@ -1,6 +1,6 @@
 # Agent Guide (read first)
 
-Course project: 535652 3D Game Programming Final (115A). Unity 6000.3.25f1, URP, Input System. Team of 3 humans; humans are the **Product Owner (PO)**. AI agents are **Scrum Master (SM)** first, **Developer** later (see `docs/scrum/process.md`).
+Course project: 535652 3D Game Programming Final (115A). Unity 6000.3.26f1, URP, Input System. Team of 3 humans; humans are the **Product Owner (PO)**. AI agents are **Scrum Master (SM)** first, **Developer** later (see `docs/scrum/process.md`).
 
 ## Non-negotiables
 1. **Ask the human** when a requirement, scope, art/gameplay choice, or licensing question is unclear. Don't guess on product decisions.

@@ -8,7 +8,7 @@ Humans are the Product Owners; AI agents act as Scrum Master first, then Develop
 ## Requirements
 | Tool | Version |
 |------|---------|
-| Unity Hub + Unity Editor | **6000.3.25f1** (exact; install via Hub, add Windows / Mac build support as needed) |
+| Unity Hub + Unity Editor | **6000.3.26f1** (exact; install via Hub, add Windows / Mac build support as needed) |
 | Git | 2.40+ |
 | Git LFS | 3.x |
 | IDE | Rider, Visual Studio 2022 (Windows), or VS Code / Rider (Mac) |
@@ -25,7 +25,7 @@ Humans are the Product Owners; AI agents act as Scrum Master first, then Develop
    cd 115A-535652-3DGP-Final
    git lfs pull        # only if assets look like tiny text pointer files
    ```
-3. **Open in Unity Hub** → *Add project from disk* → select the folder, using Editor **6000.3.25f1**. First import takes a few minutes (`Library/` is local and git-ignored).
+3. **Open in Unity Hub** → *Add project from disk* → select the folder, using Editor **6000.3.26f1**. First import takes a few minutes (`Library/` is local and git-ignored).
 4. **Editor settings** (already committed, don't change): *Edit > Project Settings > Editor* → Version Control = *Visible Meta Files*, Asset Serialization = *Force Text*.
 5. **Recommended: UnityYAMLMerge** for scene/prefab conflicts. Add to your *local* `.git/config` (the `.gitattributes` already points scenes/prefabs at it):
    ```ini
@@ -33,8 +33,8 @@ Humans are the Product Owners; AI agents act as Scrum Master first, then Develop
        name = Unity SmartMerge
        driver = "<UnityYAMLMerge path>" merge -p %O %B %A %A
    ```
-   - Mac: `/Applications/Unity/Hub/Editor/6000.3.25f1/Unity.app/Contents/Tools/UnityYAMLMerge`
-   - Windows: `C:\Program Files\Unity\Hub\Editor\6000.3.25f1\Editor\Data\Tools\UnityYAMLMerge.exe`
+   - Mac: `/Applications/Unity/Hub/Editor/6000.3.26f1/Unity.app/Contents/Tools/UnityYAMLMerge`
+   - Windows: `C:\Program Files\Unity\Hub\Editor\6000.3.26f1\Editor\Data\Tools\UnityYAMLMerge.exe`
 6. Windows only: `git config core.autocrlf false` (the repo normalizes to LF via `.gitattributes`).
 
 ## Daily workflow
