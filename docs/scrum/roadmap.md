@@ -14,12 +14,12 @@ Owners and sprint assignments are **provisional** (per the proposal) until confi
 | 5 | Nov 23 | Wk12 | Wind/ice/alert escalation and distinct level puzzle integration |
 | 6 | Nov 30 | Wk13 | FX, animation, sound, scoring, polish |
 | 7 | Dec 7 | Wk14 | Integration; QA |
-| 8 | Dec 14 | Wk15 | Demo 2: feature-complete three-level build |
-| 9 | Dec 28 | Wk16 | Final Demo: stable packaged build, presentation and evidence |
+| 8 | Dec 14 | Wk15 | Demo 2: feature-complete three-level game (played in Editor) |
+| 9 | Dec 28 | Wk16 | Final Demo: stable Editor demo, presentation and evidence |
 
 ## Backlog by sprint
 
-### Sprint 1 — Shared scene architecture, danger-state contract, level greyboxing starts (due Oct 26)
+### Sprint 1 - Contracts & greybox start
 - [#6](https://github.com/hwupu/115A-535652-3DGP-Final/issues/6) Shared contracts: ball, shot, score, camera, danger interfaces — Henry
 - [#7](https://github.com/hwupu/115A-535652-3DGP-Final/issues/7) DangerManager: time bar model and Normal/Warning/Critical/Failed states — Pongpat
 - [#8](https://github.com/hwupu/115A-535652-3DGP-Final/issues/8) Editor tool: Tools > 3DGP > Create Level Scene Skeleton — Henry
@@ -28,7 +28,7 @@ Owners and sprint assignments are **provisional** (per the proposal) until confi
 - [#11](https://github.com/hwupu/115A-535652-3DGP-Final/issues/11) Greybox Level 3 - Frozen Lake scene — Pongpat
 - [#12](https://github.com/hwupu/115A-535652-3DGP-Final/issues/12) Choose placeholder asset sources and record licenses — Henry
 
-### Sprint 2 — Ball physics, club profiles, camera MVP (due Nov 2)
+### Sprint 2 - Ball, clubs, camera
 - [#13](https://github.com/hwupu/115A-535652-3DGP-Final/issues/13) Input System actions for aim, power, club switch, view switch — Henry
 - [#14](https://github.com/hwupu/115A-535652-3DGP-Final/issues/14) BallController: Rigidbody ball, hit impulse, rest detection, reset — Henry
 - [#15](https://github.com/hwupu/115A-535652-3DGP-Final/issues/15) Shot sequence: yaw aim + cycling power bar — Henry
@@ -37,7 +37,7 @@ Owners and sprint assignments are **provisional** (per the proposal) until confi
 - [#18](https://github.com/hwupu/115A-535652-3DGP-Final/issues/18) Cup/hole detection, stroke counter, level complete event — Pongpat
 - [#19](https://github.com/hwupu/115A-535652-3DGP-Final/issues/19) Camera MVP: aim view, ball-follow view, smooth transitions — Bahadir
 
-### Sprint 3 — Three scenes; Warning/Critical triggers and puzzle prototypes (due Nov 9)
+### Sprint 3 - Three scenes & prototypes
 - [#20](https://github.com/hwupu/115A-535652-3DGP-Final/issues/20) HUD: time progress bar, Warning/Critical icon, power bar, stroke count — Henry
 - [#21](https://github.com/hwupu/115A-535652-3DGP-Final/issues/21) L1: Cat alert state machine and noise gauge — Henry
 - [#22](https://github.com/hwupu/115A-535652-3DGP-Final/issues/22) L1: Branch/lever trigger and water-splash trap prototype — Henry
@@ -46,20 +46,20 @@ Owners and sprint assignments are **provisional** (per the proposal) until confi
 - [#25](https://github.com/hwupu/115A-535652-3DGP-Final/issues/25) L3: Ice friction zones and ricochet walls — Pongpat
 - [#26](https://github.com/hwupu/115A-535652-3DGP-Final/issues/26) L3: Puzzle state manager (switch chain) and clockwork guardian prototype — Pongpat
 
-### Sprint 4 — DEMO 1: playable loop + three distinct greybox levels (due Nov 16)
+### Sprint 4 - DEMO 1
 - [#27](https://github.com/hwupu/115A-535652-3DGP-Final/issues/27) Level flow: retry, level complete, scene-selection menu — Pongpat
 - [#28](https://github.com/hwupu/115A-535652-3DGP-Final/issues/28) Tutorial UI prompts for Level 1 — Henry
-- [#29](https://github.com/hwupu/115A-535652-3DGP-Final/issues/29) DEMO 1 integration build and rehearsal (Nov 16) — Bahadir
+- [#29](https://github.com/hwupu/115A-535652-3DGP-Final/issues/29) DEMO 1 integration and in-Editor rehearsal (Nov 16) — Bahadir
 - [#30](https://github.com/hwupu/115A-535652-3DGP-Final/issues/30) Main menu and basic game flow — Henry
 
-### Sprint 5 — Wind/ice/alert escalation and distinct level puzzle integration (due Nov 23)
+### Sprint 5 - Escalation & puzzles
 - [#31](https://github.com/hwupu/115A-535652-3DGP-Final/issues/31) L1: Danger escalation - cat wakes, searches near trap, escapes — Henry
 - [#32](https://github.com/hwupu/115A-535652-3DGP-Final/issues/32) L2: Danger escalation - sandstorm, gust strength, visibility — Bahadir
 - [#33](https://github.com/hwupu/115A-535652-3DGP-Final/issues/33) L3: Danger escalation - ice cracks and slippery danger zones — Pongpat
 - [#34](https://github.com/hwupu/115A-535652-3DGP-Final/issues/34) L2: Navigation and A* path finding for scarabs — Bahadir
 - [#35](https://github.com/hwupu/115A-535652-3DGP-Final/issues/35) Integrate distinct level puzzles end to end — Pongpat
 
-### Sprint 6 — FX, animation, sound, scoring, polish (due Nov 30)
+### Sprint 6 - FX, anim, sound, polish
 - [#36](https://github.com/hwupu/115A-535652-3DGP-Final/issues/36) Hamster hierarchical animation (idle, aim, swing) — Henry
 - [#37](https://github.com/hwupu/115A-535652-3DGP-Final/issues/37) Cat, scarab and clockwork guardian animations — Bahadir
 - [#38](https://github.com/hwupu/115A-535652-3DGP-Final/issues/38) Garden gate portal and level transition — Henry
@@ -71,20 +71,20 @@ Owners and sprint assignments are **provisional** (per the proposal) until confi
 - [#44](https://github.com/hwupu/115A-535652-3DGP-Final/issues/44) Save & Load progress — Pongpat
 - [#45](https://github.com/hwupu/115A-535652-3DGP-Final/issues/45) Environmental effect on character (wind/ice affects hamster and ball) — Bahadir
 
-### Sprint 7 — Integration; QA (due Dec 7)
+### Sprint 7 - Integration & QA
 - [#46](https://github.com/hwupu/115A-535652-3DGP-Final/issues/46) Balance and tuning pass: time budgets and shot costs — Pongpat
 - [#47](https://github.com/hwupu/115A-535652-3DGP-Final/issues/47) Accessibility: HUD contrast, non-color-only hazards, volume — Henry
-- [#48](https://github.com/hwupu/115A-535652-3DGP-Final/issues/48) Full playthrough QA on Windows and Mac — Bahadir
-- [#49](https://github.com/hwupu/115A-535652-3DGP-Final/issues/49) Performance profiling pass — Bahadir
+- [#48](https://github.com/hwupu/115A-535652-3DGP-Final/issues/48) Full playthrough QA in the Unity Editor — Bahadir
+- [#49](https://github.com/hwupu/115A-535652-3DGP-Final/issues/49) Performance profiling pass (Editor Play mode) — Bahadir
 
-### Sprint 8 — Demo 2: feature-complete three-level build (due Dec 14)
+### Sprint 8 - DEMO 2
 - [#50](https://github.com/hwupu/115A-535652-3DGP-Final/issues/50) Ending sequence: princess rescue and comic distraction — Pongpat
 - [#51](https://github.com/hwupu/115A-535652-3DGP-Final/issues/51) Story intro and between-level text — Henry
-- [#52](https://github.com/hwupu/115A-535652-3DGP-Final/issues/52) Feature freeze and DEMO 2 build (Dec 14) — Bahadir
+- [#52](https://github.com/hwupu/115A-535652-3DGP-Final/issues/52) Feature freeze and DEMO 2 in-Editor rehearsal (Dec 14) — Bahadir
 
-### Sprint 9 — Final Demo: stable packaged build, presentation and evidence (due Dec 28)
-- [#53](https://github.com/hwupu/115A-535652-3DGP-Final/issues/53) Final stable build: Windows (primary) and Mac packages — Bahadir
+### Sprint 9 - Final Demo
 - [#54](https://github.com/hwupu/115A-535652-3DGP-Final/issues/54) Final presentation, evidence and programming explanations — Henry
+- [#56](https://github.com/hwupu/115A-535652-3DGP-Final/issues/56) Final demo rehearsal from a clean clone (Editor) — Bahadir
 
 ## Course mini-project coverage (proposal §12)
 4.A.1 hierarchical animation, 4.A.2 navigation, 4.A.3 portals, 4.B.4 A*, 4.B.2 AI characters, 4.C.4 object interaction, 4.D.1 environmental effects, 4.D.3 particles, 4.E.1 save/load, 4.E.2 function selection, 4.E.3 game UI — each is referenced in the notes of the matching issue.

@@ -10,7 +10,7 @@
 ## Cadence (1-week sprints)
 Sprint calendar and goals: [`roadmap.md`](roadmap.md). Sprint N ends on the course date of the matching milestone week.
 
-- **Sprint kickoff (≤20 min, with the humans):** review goal, pick issues from `Backlog`, set the sprint milestone. Agent drafts `docs/scrum/sprints/sprint-NN.md` beforehand.
+- **Sprint kickoff (≤20 min, with the humans):** review goal, pick issues from `Todo`, set the sprint milestone. Agent drafts `docs/scrum/sprints/sprint-NN.md` beforehand.
 - **Async check-in:** update the sprint file / issue comments; no standup meeting.
 - **Sprint end (≤20 min):** demo what runs in Unity, accept/reject against acceptance criteria, short retro (1 keep, 1 change). Agent records it in the sprint file.
 
@@ -18,10 +18,10 @@ Sprint calendar and goals: [`roadmap.md`](roadmap.md). Sprint N ends on the cour
 - GitHub **Issues** are the backlog. Use the *User story* template: "As a ..., I want ..., so that ..." + acceptance criteria.
 - Labels: `type:story`, `type:bug`, `type:chore`, `type:asset`, `area:scene`, `area:gameplay`, `area:ui`, `area:tools`, `owner:human`, `owner:ai`, `blocked`, `needs-po`.
 - `needs-po` = agent needs a human decision; answer in the issue, then remove the label.
-- Board: GitHub Project "115A 3DGP Final" (https://github.com/users/hwupu/projects/2), linked to the repo. Columns: Backlog → Ready → In progress → Review → Done. New issues must be added to it (agents do this when creating issues: `gh project item-add 2 --owner hwupu --url <issue>`).
+- Board: GitHub Project "115A 3DGP Final" (https://github.com/users/hwupu/projects/2), linked to the repo. Columns: **Todo → In Progress → Done** (ADR-0009). New issues must be added to it (agents do this when creating issues: `gh project item-add 2 --owner hwupu --url <issue>`).
 
 ## Definition of Done
-Acceptance criteria met; opens without console errors on Windows and Mac; PR reviewed by one other person (or the PO for agent PRs); scenes/prefabs saved with no unrelated diffs; relevant prompt log updated.
+Acceptance criteria met; opens and plays in the Unity Editor without console errors (Windows and Mac developers); PR reviewed by one other person (or the PO for agent PRs); scenes/prefabs saved with no unrelated diffs; relevant prompt log updated.
 
 ## Working agreements
 - Small PRs, branch `feat/<issue>-slug`. Squash merge.

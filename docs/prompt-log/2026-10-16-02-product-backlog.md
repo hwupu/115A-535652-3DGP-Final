@@ -13,3 +13,11 @@
 
 ## Assumptions to confirm
 - Sprint due date = the course date listed per week. Owners/sprint placement are provisional. Club set default: standard, iron, sledgehammer.
+
+## Follow-up prompt (verbatim)
+> lets just keep the board simple. Just ToDo, In Progress, and Done. And, sorry I  forgot to remove the build Windows/Mac parts. We will just play in Editor for Demo, so remove all the related tickets/tasks
+
+### What the AI did
+- Board Status options changed to Todo / In Progress / Done; all 53 items re-set (open -> Todo, closed -> Done).
+- Closed #53 (packaged builds) as not planned; rewrote #29, #48, #49, #52 for Editor Play mode; added #56 (final demo rehearsal from a clean clone).
+- ADR-0009, process/roadmap/milestone text updated. `docs/references/proposal.md` was left untouched (team-owned) and still mentions packaged builds.

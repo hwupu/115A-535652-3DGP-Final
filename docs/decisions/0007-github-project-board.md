@@ -5,3 +5,5 @@
 
 ## Decision
 Use the GitHub Project "115A 3DGP Final" (Backlog, Ready, In progress, Review, Done) linked to the repo as the sprint board; Issues remain the backlog items.
+
+> Superseded in part by ADR-0009: columns are now Todo, In Progress, Done.

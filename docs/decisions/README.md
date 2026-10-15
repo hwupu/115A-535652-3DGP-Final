@@ -12,3 +12,4 @@ Short records (Context, Decision, Consequences) of major decisions. Number seque
 | 0006 | Asset Store content is never committed; credits are mandatory | Accepted |
 | 0007 | GitHub Project board instead of labels-only boards | Accepted |
 | 0008 | Game concept: hamster fantasy golf (three levels) | Accepted |
+| 0009 | Demos run in the Unity Editor; three-column board | Accepted |
