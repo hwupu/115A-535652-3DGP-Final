@@ -64,14 +64,15 @@ Details per sprint: [`docs/scrum/roadmap.md`](docs/scrum/roadmap.md) and the [bo
 5. **Open in Unity Hub** (*Add project from disk*, Editor 6000.3.26f1). The first import takes a few minutes. Check that the **Magic** menu appears in the top bar.
 6. **Asset Store packs:** these are never in git, so each of us adds them by hand (*Window > Package Manager > My Assets*) into `Assets/AssetStore/`. Import the packs listed in [`docs/assets.md`](docs/assets.md). No packs listed yet? Skip this step.
 7. **Sign in:** run `gh auth login` and sign in to Claude Code (`claude`, then follow the login prompt).
-8. **Recommended, scene merge tool:** add to your local `.git/config`:
-   ```ini
-   [merge "unityyamlmerge"]
-       name = Unity SmartMerge
-       driver = "<UnityYAMLMerge path>" merge -p %O %B %A %A
+8. **Recommended, scene merge tool** (merges Unity scenes/prefabs smartly). Run in the repo folder:
+   ```bash
+   git config merge.unityyamlmerge.name "Unity SmartMerge"
+   # Mac
+   git config merge.unityyamlmerge.driver "'/Applications/Unity/Hub/Editor/6000.3.26f1/Unity.app/Contents/Helpers/UnityYAMLMerge' merge -p %O %B %A %A"
+   # Windows (forward slashes on purpose)
+   git config merge.unityyamlmerge.driver "'C:/Program Files/Unity/Hub/Editor/6000.3.26f1/Editor/Data/Tools/UnityYAMLMerge.exe' merge -p %O %B %A %A"
    ```
-   - Mac: `/Applications/Unity/Hub/Editor/6000.3.26f1/Unity.app/Contents/Tools/UnityYAMLMerge`
-   - Windows: `C:\Program Files\Unity\Hub\Editor\6000.3.26f1\Editor\Data\Tools\UnityYAMLMerge.exe`
+   Or ask Claude Code: *"Check if the scene merge tool is set up in my local git config; if not, set it up."*
 9. Windows only: `git config core.autocrlf false`.
 
 ## 🔄 Daily workflow

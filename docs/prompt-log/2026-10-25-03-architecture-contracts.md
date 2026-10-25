@@ -97,3 +97,8 @@ What the AI did:
 > it is looking good, final check if there has anything to update to CLAUDE.md? else, lets push and merge.
 
 What the AI did: CLAUDE.md got key dates, a detailed `Assets/_Project/` layout, the Blender-clip animation note and the Unity path for compile checks. Merged PR #86, then PR #87.
+
+## Follow-up 7 (2026-10-26)
+> can you check if i have done `scene merge tool: add to your local .git/config`? if not, set it up.
+
+What the AI did: it wasn't set up. Configured `merge.unityyamlmerge` in Henry's local git config with the Unity 6 Mac path `Unity.app/Contents/Helpers/UnityYAMLMerge` (the README's `Contents/Tools/` path doesn't exist in Unity 6). Tested the tool on scene copies. Fixed README step 8 to use `git config` commands (the ini snippet broke on Windows: git strips quotes and treats `\` as an escape).
