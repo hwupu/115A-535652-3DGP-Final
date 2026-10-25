@@ -43,3 +43,18 @@ What the AI did:
 - README: "Start here" onboarding (git identity for per-author LOC, Claude Code, reading order, manual Unity steps), "Where we are", Magic menu table, prompt cookbook.
 - CLAUDE.md: "How to work with the team" (ownership, Magic tool + "In Unity" steps + verify, compile check, decisions).
 - Merged `feat/85-magic-scaffolding` into this branch so README/CLAUDE.md edits don't conflict with PR #86.
+
+## Follow-up 3 (2026-10-26)
+> time bar is visible and should be at the upper left of canvas. upper right should be menu button. oncy menu dialog open, game should pause. menu items undecided.
+>
+> for "Read, in this order (15 min):", i don't think any human will read lengthy documents. it is for AI agents. just provide simple brief on the workflow, what has been setup (which i did in this ticket), where to find the files, how can they get started with their first ticket. thinking it like a onboarding message for new commer.
+>
+> that says, we are not going to update README frequent, especially for the steps i did, and needed once, such as "Where we are" table and "Magic menu (Editor tools)" table. they are not going to repeat those steps (neither will I too), so no need to repeat. all we need to know is the method (editor tools will be provided for time saving, all we need to do is to follow step by step guide). Focus on future roadmap.
+>
+> you just prepend the Start here section, but some are repeated in the sections below. please restructure README to make it human readable
+
+What the AI did:
+- Architecture: HUD layout table (§4.8: time bar upper left, menu button upper right, power meter left), `LevelManager.SetPaused` / `PausedChanged`; menu items as an open question.
+- Issues #20, #77, #27 updated.
+- README rewritten for humans: Welcome (how we work, Magic tools + step-by-step guides, what's set up, where things are, first ticket), Roadmap, One-time setup, Daily workflow, Prompts. Removed the status and Magic tables and duplicate sections.
+- CLAUDE.md: README is for humans; no one-time steps or status tables there.

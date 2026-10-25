@@ -37,7 +37,8 @@ Sources: proposal §6 (gameplay, danger system, clubs) and §7 (level independen
 3. **In flight.** The camera follows the ball. **The timer is paused.** Input is locked except god keys.
 4. **Ball stops.** The timer resumes. The avatar **teleports** to the ball (next shooting position); back to step 1.
 5. **Out of bounds / invalid area.** The ball goes back to the **nearest valid position** (its last position on valid ground) and play continues.
-6. **Win:** the ball reaches the level goal (a cup for now; could be another target later). **Lose:** the timer reaches 0 while the player is aiming (it can't run out during flight, because it's paused).
+6. **Menu.** A **menu button at the upper right** opens the menu dialog; while it's open the **game is paused** (physics, timer, input). Menu items are undecided (#77).
+7. **Win:** the ball reaches the level goal (a cup for now; could be another target later). **Lose:** the timer reaches 0 while the player is aiming (it can't run out during flight, because it's paused).
 
 ## 4. Contracts
 The signatures are the agreement. Names may still change in review; after approval they change only by PR.
@@ -214,15 +215,28 @@ public class LevelManager : MonoBehaviour
     public LevelPhase Phase { get; }
 
     public void StartLevel(); public void Retry(); public void LoadNext();
+    public bool IsPaused { get; }
+    public void SetPaused(bool paused);   // menu dialog: Time.timeScale = 0, DangerManager.Pause, shot input off
 
     public event Action LevelStarted;
     public event Action<LevelResult> LevelCompleted;
     public event Action LevelFailed;
+    public event Action<bool> PausedChanged;
 }
 ```
 `LevelManager` does the wiring: `ShotTaken` → `DangerManager.ApplyShot`, `ScoreKeeper.CountStroke`, `GolferAvatar.PlaySwing`; `GolfBall.CameToRest` → `DangerManager.OnBallAtRest`, `GolferAvatar.TeleportTo`; `LevelGoal.Reached` → completion; `DangerState.Failed` → failure. It reports results to `GameSession`. The proposal's generic "complete hole" fallback is a god key (#71) that calls the same completion path.
 
-### 4.8 Game session — Henry
+### 4.8 HUD layout — Henry (menu dialog: Pongpat)
+| Screen position | Element | Source |
+|---|---|---|
+| Upper left | **Time bar** (visible) + Warning/Critical icon | `DangerManager.Progress01`, `StateChanged` |
+| Upper right | **Menu button** → menu dialog; opening it pauses the game | `LevelManager.SetPaused` |
+| Left side, vertical | Power meter with the running marker | `ShotController.PowerMarker01` |
+| Elsewhere (TBD) | Club name, stroke count, later XP bar and minimap (#78) | `ShotController`, `ScoreKeeper`, `GameSession` |
+
+Plain uGUI for now (sprites later). The menu dialog and its items are #77 (items undecided).
+
+### 4.9 Game session — Henry
 ```csharp
 public class GameSession : MonoBehaviour   // DontDestroyOnLoad, created by the first scene that needs it
 {
@@ -278,7 +292,9 @@ sequenceDiagram
 - The goal is generic (`LevelGoal`); a cup for now.
 - `GameSession` is owned by Henry.
 - No "ideal one-shot range" mark on the power meter for now (maybe later).
+- HUD: time bar visible at the upper left; menu button at the upper right; opening the menu pauses the game. Menu items undecided.
 
 ## 7. Open questions
 - Real name and look of the Mysterious tool.
+- Menu dialog items (#77).
 - Last shot: if a shot's cost takes the timer to 0, does the shot still play out (draft: yes, win if it reaches the goal, fail when it stops), or does the level fail at once?
