@@ -1,5 +1,5 @@
 # 0005-editor-tools-for-scenes — Scene setup via Editor tools
-- Status: Accepted
+- Status: Accepted; menu name and tool structure amended by [0011](0011-magic-menu-editor-tools.md) (now **Magic**, `Assets/_Project/Editor/Magic/`)
 - Date: 2026-10-12
 - Deciders: Product Owner (team) with Claude as scrum master
 
