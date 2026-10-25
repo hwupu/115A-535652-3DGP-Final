@@ -24,7 +24,7 @@ This compares `docs/references/proposal.md`, `docs/scrum/roadmap.md` and the bac
 | LOC per member | Report tool | #82 |
 | Report and evidence | Story | #83 |
 | Slides and presentation rules | Added to presentation story | #54 |
-| Mini-exercises | Proposal §12 assignment; standalone scenes, generic Core code; demos Nov 16 and Dec 21 | #57–#68, #69 |
+| Mini-exercises | Proposal §12 assignment; standalone scenes, generic Core code; demos Nov 16 and Dec 14 (Dec 21 = buffer) | #57–#68, #69 |
 | Our own Form B "Others" items | Proposed in the tracker | #84 |
 | Walk mode | Not adopted | — |
 | pptx template, title, Group ID | Ignored here (handled by the team) | — |

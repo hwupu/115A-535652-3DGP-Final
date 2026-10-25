@@ -1,6 +1,6 @@
 # 4.E.1 Save & Load — Pongpat
 
-Issue: #68 · Demo: Dec 21
+Issue: #68 · Demo: Dec 14
 Scene: `Scenes/4E1_SaveLoad.unity` · Guide: `docs/mini-exercises.md`
 
 ## What's new (developed for this exercise)

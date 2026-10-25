@@ -42,8 +42,8 @@ Hi! Here's how we work and how to get going.
 | Nov 23 | Sprint 5: escalation and puzzles, character leveling |
 | Nov 30 | Sprint 6: particles, animation, sound |
 | Dec 7 | Sprint 7: art pass, integration and QA |
-| **Dec 14** | 🎮 **DEMO 2**: feature-complete game |
-| **Dec 21** | 🧪 **Mini-exercises 3 and 4** |
+| **Dec 14** | 🎮 **DEMO 2**: feature-complete game; 🧪 **mini-exercises 3 and 4** |
+| Dec 21 | 🛟 Buffer week |
 | **Dec 28** | 🏆 **Final demo**: presentation, report, live demo |
 
 Details per sprint: [`docs/scrum/roadmap.md`](docs/scrum/roadmap.md) and the [board](https://github.com/users/hwupu/projects/2).

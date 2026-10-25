@@ -1,6 +1,6 @@
 # 4.D.3 Character particle effects — Pongpat
 
-Issue: #67 · Demo: Dec 21
+Issue: #67 · Demo: Dec 14
 Scene: `Scenes/4D3_CharacterParticleEffects.unity` · Guide: `docs/mini-exercises.md`
 
 ## What's new (developed for this exercise)

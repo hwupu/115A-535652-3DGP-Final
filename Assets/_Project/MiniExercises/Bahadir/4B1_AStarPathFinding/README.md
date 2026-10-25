@@ -1,6 +1,6 @@
 # 4.B.1 A* path finding — Bahadir
 
-Issue: #63 · Demo: Dec 21
+Issue: #63 · Demo: Dec 14
 Scene: `Scenes/4B1_AStarPathFinding.unity` · Guide: `docs/mini-exercises.md`
 
 ## What's new (developed for this exercise)

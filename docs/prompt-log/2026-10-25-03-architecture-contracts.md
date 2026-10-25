@@ -83,3 +83,12 @@ What the AI did:
 What the AI did:
 - README: team line removed; Sprint 0/1 in the roadmap; tools all required (agentic IDE, Claude Code, gh); step 6 kept (Asset Store packs are never in git, each member adds them by hand; skip if none listed); step 7 = sign in to gh and Claude Code; pull/rebase reminder; Repository layout with "Why `_Project`?"; Assets & credits section; emoji.
 - CLAUDE.md: team table (names, GitHub, level, mini-exercise folder).
+
+## Follow-up 5 (2026-10-26)
+> sorry, "Mini-exercises 3 and 4" is on Dec 14, together with DEMO 2
+>
+> Dec 21 serve as buffer
+
+What the AI did:
+- Mini-3/mini-4 demo moved from Dec 21 to **Dec 14** (with DEMO 2); Dec 21 = buffer week. Updated README, roadmap (key dates, risks, backlog line moved under Sprint 8), `docs/mini-exercises.md`, gap analysis, ADR-0010 (correction note), `MiniExerciseCatalog.cs`, the six generated mini-exercise READMEs.
+- Issues #59, #60, #63, #64, #67, #68: titles/bodies say Dec 14, milestone moved Sprint 9 → Sprint 8.

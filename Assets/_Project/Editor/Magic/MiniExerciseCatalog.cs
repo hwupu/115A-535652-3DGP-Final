@@ -130,16 +130,16 @@ namespace Project3DGP.EditorTools
         {
             new Assignment("Henry", "4.C.4", 57, "Nov 16"),
             new Assignment("Henry", "4.E.3", 58, "Nov 16"),
-            new Assignment("Henry", "4.A.1", 59, "Dec 21"),
-            new Assignment("Henry", "4.A.3", 60, "Dec 21"),
+            new Assignment("Henry", "4.A.1", 59, "Dec 14"),
+            new Assignment("Henry", "4.A.3", 60, "Dec 14"),
             new Assignment("Bahadir", "4.A.2", 61, "Nov 16"),
             new Assignment("Bahadir", "4.D.1", 62, "Nov 16"),
-            new Assignment("Bahadir", "4.B.1", 63, "Dec 21"),
-            new Assignment("Bahadir", "4.B.2", 64, "Dec 21"),
+            new Assignment("Bahadir", "4.B.1", 63, "Dec 14"),
+            new Assignment("Bahadir", "4.B.2", 64, "Dec 14"),
             new Assignment("Pongpat", "4.E.2", 65, "Nov 16"),
             new Assignment("Pongpat", "4.C.4", 66, "Nov 16"),
-            new Assignment("Pongpat", "4.D.3", 67, "Dec 21"),
-            new Assignment("Pongpat", "4.E.1", 68, "Dec 21"),
+            new Assignment("Pongpat", "4.D.3", 67, "Dec 14"),
+            new Assignment("Pongpat", "4.E.1", 68, "Dec 14"),
         };
 
         public static Exercise Find(string code) => Exercises.First(e => e.Code == code);
