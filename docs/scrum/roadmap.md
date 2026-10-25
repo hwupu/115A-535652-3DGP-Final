@@ -1,8 +1,75 @@
-# Roadmap & Product Backlog
+# Release Plan (master plan) & Product Backlog
 
-Source of truth for work items is **GitHub Issues** (labels `type:*`, `level:*`, `area:*`); sprints are **milestones**; the board is [GitHub Project #2](https://github.com/users/hwupu/projects/2). This file is a readable snapshot of the plan, derived from `docs/references/proposal.md` §9 (milestones) and §12 (workload), aligned with the course rubrics (`docs/references/course/`, ADR-0010).
+**Status: DRAFT for PO review** (2026-10-25). Review it together before Sprint 1 planning. Once accepted, change the status to "Accepted <date>" and record major changes in an ADR.
 
-Owners and sprint assignments are **provisional** (per the proposal) until confirmed at planning. A sprint ends on the course date shown.
+In Scrum terms this file combines the **Product Goal**, a **release plan** (the dates and targets this term must hit) and a readable snapshot of the **Product Backlog**. The source of truth for work items is still **GitHub Issues** (labels `type:*`, `level:*`, `area:*`). Sprints are **milestones**, and the board is [GitHub Project #2](https://github.com/users/hwupu/projects/2). Inputs: `docs/references/proposal.md` (vision), `docs/references/course/` (grading rules), `docs/scrum/grading-gap-analysis.md`, ADR-0008/0009/0010.
+
+## 1. Product Goal
+A complete, single-player hamster fantasy golf game with **three distinct levels** (one per member), played **in the Unity Editor**. It must be finishable in a live demo and must hit **"above average" on every Form B core item**. Alongside it, each member delivers **4 individual mini-exercises** as standalone scenes.
+
+## 2. Release targets (what "done" means for the term)
+| Area | Target | Tracked in |
+|---|---|---|
+| Levels | 3 levels, different scenes **and monsters** (L3 guardian is not a cat) | #9–#11, #26 |
+| Form B core items | 6 pts each: leveling 5×5, ≥ 100 objects per level, 5 particles + 4 sounds **per member**, full textures, ≥ 5 misc, ≥ 5 GUI, ≥ 5 FSMs (≥ 4 states each), ≥ 5 NPC skills, ≥ 5 environment interactions, mouse + keyboard | #84 |
+| Form B "Others" | **Accepted:** golf shot system, hidden time-budget danger system. Others proposed, to be discussed | #84 |
+| Enhancements | Own artwork ≥ 3, lighting ≥ 3 per level, scene effects ≥ 5. Simulation and composition optional | #74–#76, #80, #81 |
+| Mini-exercises | 12 total (4 per member), standalone scenes, generic Core code | #57–#68, `docs/mini-exercises.md` |
+| Individual LOC | Aim for ≥ 1500 (bonus starts), stretch ≥ 3000 per member | #82 |
+| Final deliverables | Slides (template), report PDF (template), video(s), source zip, Forms A/B filled by hand | #54, #83 |
+
+## 3. Key dates
+| Date | Event |
+|---|---|
+| Oct 26 | Sprint 1 ends (contracts + greybox start) |
+| **Nov 16** | **Demo 1** (playable loop, 3 greybox levels) **+ mini-exercise demo 1** (mini-1, mini-2 per member) |
+| Dec 14 | **Demo 2**: feature-complete, feature freeze |
+| **Dec 21** | **Mini-exercise demo 2** (mini-3, mini-4 per member) |
+| Dec 28 | **Final presentation and live demo**; E3 upload (deadline TBC) |
+
+## 4. Phases
+| Phase | Sprints | Outcome |
+|---|---|---|
+| A. Foundation | 1–2 | Shared contracts, ball/shot/club/camera, greybox scenes, mini-exercise scaffolding |
+| B. Playable | 3–4 | Each level playable with its hazard prototype; Demo 1; first two mini-exercises |
+| C. Content | 5–6 | Danger escalation, leveling, puzzles, FX/animation/audio per member |
+| D. Complete | 7–8 | Art passes, menus, HUD additions, FSM docs, QA; Demo 2 and feature freeze |
+| E. Deliver | 9 | Last two mini-exercises, report, slides, video, rehearsal |
+
+## 5. Workload per member (open issues, provisional)
+| Sprint | Henry | Bahadir | Pongpat | Shared |
+|---|---|---|---|---|
+| 1 | 4 | 1 | 2 | |
+| 2 | 5 | 1 | 2 | |
+| 3 | 3 | 2 | 2 | |
+| 4 | 2 + 2 mini | 2 + 2 mini | 1 + 2 mini | |
+| 5 | 2 | 2 | 2 | |
+| 6 | 4 | 4 | 4 | |
+| 7 | 4 | 3 | 3 | 2 |
+| 8 | 1 | 1 | 1 | |
+| 9 | 2 + 2 mini | 1 + 2 mini | 2 mini | 1 |
+| **Total** | **~31** | **~21** | **~21** | 3 |
+
+## 6. Review points for the PO (before running Sprint 1)
+1. **Henry is overloaded** (~10 more issues, mostly shared code in Sprints 1–2). Candidates to move: #13 input → Bahadir (camera owner), #30 main menu → Pongpat (reuses his 4.E.2 #65), #16 or #70 → Bahadir or Pongpat. #69 and #82 are AI-heavy chores.
+2. **Sprint 1 ends tomorrow (Oct 26) and hasn't started.** Option: shift sprint goals by one week (re-date milestones) or merge Sprints 1–2. Demo 1 on Nov 16 is fixed.
+3. **Sprint 4 is the crunch:** Demo 1 and two mini-exercises per member land on the same day. Suggest starting mini-1 in Sprint 2 and mini-2 in Sprint 3 (milestone stays Sprint 4).
+4. **Sprint 9 crunch:** mini-3 and mini-4 (Dec 21) overlap report and slides. Suggest building them in Sprints 6–7, since several reuse game work (#36, #38, #34, #24, #41, #44).
+5. Confirm owners, the club/skill list and XP curve (#70), the L3 guardian creature (#26, Pongpat), and the remaining "Others" items (#84).
+6. Sprint 0 leftovers: #1 still open; #3 overlaps #12 (close #3 into #12?).
+7. Deferred: walk mode (ask Henry), teaser video length, optional enhancements (#81).
+
+## 7. Top risks
+| Risk | Mitigation |
+|---|---|
+| Rubric items missed at grading | Tracker #84 reviewed at each sprint end |
+| Live demo fails or can't finish | God keys #71, rehearsals #29 #52 #56 |
+| Mini-exercise questions from TAs | Hand refinement and "TA modification points" in every mini PR |
+| Uneven LOC or contribution | Rebalance owners (§6.1); LOC report #82 |
+| Evidence missing for report and slides | Capture at each sprint end (process.md, #83) |
+
+## 8. Sprint plan
+Owners and sprint assignments are **provisional** until confirmed at planning. A sprint ends on the course date shown.
 
 | Sprint | Due | Proposal week | Goal |
 |---|---|---|---|

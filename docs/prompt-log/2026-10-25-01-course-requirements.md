@@ -51,3 +51,12 @@
 ### Open
 - Sprint 0 leftovers: #1 (clone with LFS) and #3 (asset sources, overlaps #12) are still open and the Sprint 0 milestone is past due.
 - Walk mode: ask Henry later. Teaser video length: deferred.
+
+## Follow-up prompt (verbatim)
+> we can add Golf shot system and Hidden time-budget danger system. the rest i'm not sure. maybe you can note it down in the tickets first, can discusss later.
+>
+> We need a master plan for use to review before we run the sprint. I'm not sure what it called. reqirments? roadmap?
+
+### What the AI did
+- #84: "Others" items 1–2 accepted; 3–8 marked to discuss. Comments added on #7, #15, #16 (accepted) and #8, #17, #19, #23, #25, #42, #47 (candidates).
+- `docs/scrum/roadmap.md` restructured into the **Release Plan (master plan)**, status DRAFT for PO review: Product Goal, release targets, key dates, phases, workload per member, review points, risks, then the sprint plan and backlog snapshot.
