@@ -29,3 +29,17 @@ What the AI did:
 - Rewrote `docs/architecture.md` with the gameplay loop, clubs table, aim cone, seconds-based timer, `InvalidZone` reset, generic `LevelGoal`, `GolferAvatar` (box placeholder) and `GameSession` (Henry).
 - New issues #88 (avatar, Sprint 2) and #89 (GameSession, Sprint 3); updated #7, #13, #14, #15, #16, #18, #19, #20, #36 (animation clip list), #59 (4.A.1 hamster-with-tools idea), #70.
 - Interpretation to confirm: the level fails only at timeout, even mid-roll.
+
+## Follow-up 2 (2026-10-26)
+> we haven't decide the thrid tool, lets use codename mysterious for now. timer can pause when ball is in flight, please update draft. Also, please update README, include onboarding for other teammates to pickup current progress, and provide sample prompt they can use for breifing, or pick their next ticket? include other helpful prompts is welcomed. update CLAUDE.md if needed. similar to how i ask you to provide editor tools to run (Magic), and provide step by step guide for manual Unity setup.
+>
+> FYI, we will do #59 by follow its grading requirment, but it stay with that mini-exercise. for this project, we prefer to use animation clips in blender. and it will be easy to handle in Unity for animation states too. We may need handoff document on clips and timing. I plan to use Blender MCP for assistant, so we can handle it during that ticket.
+>
+> let me know if there has anything missing, so that we can close this ticket?
+
+What the AI did:
+- Architecture: third tool codename **Mysterious**; timer pauses during flight (`DangerManager.OnBallAtRest` resumes); Blender clips for the hamster; new open question on the last shot when its cost reaches 0.
+- Issues: #7 (pause), #16 (Mysterious), #36 (Blender clips + Animator, handoff doc `docs/art/hamster-animation-handoff.md`, retitled), #59 (stays standalone), #88. `docs/mini-exercises.md` reuse row for 4.A.1 updated.
+- README: "Start here" onboarding (git identity for per-author LOC, Claude Code, reading order, manual Unity steps), "Where we are", Magic menu table, prompt cookbook.
+- CLAUDE.md: "How to work with the team" (ownership, Magic tool + "In Unity" steps + verify, compile check, decisions).
+- Merged `feat/85-magic-scaffolding` into this branch so README/CLAUDE.md edits don't conflict with PR #86.

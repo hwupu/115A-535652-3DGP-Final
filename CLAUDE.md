@@ -15,6 +15,13 @@ Hamster fantasy golf, 3 levels, one owner each (Henry/@hwupu Garden, Bahadir/@ba
 7. Work on a branch (`feat/<issue>-slug`), open a PR, link the issue. Don't push to `main` directly (after initial setup).
 8. Keep it small and fast: 3 people, short sprints, minimal ceremony.
 
+## How to work with the team
+- **Onboarding and prompts:** README "Start here" and "Prompts for Claude Code". Keep the "Where we are" table current when a milestone-level item lands.
+- **Code ownership:** implement contracts exactly as in `docs/architecture.md`; changing one needs a PR reviewed by everyone it affects. Work only on the requesting member's code. LOC is graded **per git author**, so commits are made in that member's checkout under their identity (agent adds the Co-Authored-By line).
+- **Unity Editor work = Magic tool + manual steps.** When a task needs Editor changes: (1) write a Magic menu tool (rule 3, ADR-0011) if setup is repeatable, (2) end your reply with a numbered **"In Unity"** guide: which menu to click, what dialogs mean, what to check (Console `[Magic]` lines, Hierarchy, Build Settings), (3) after the human says it's done, **verify the generated files** (git status, scene/asset contents, `Editor.log` errors) before committing. Empty folders need a `.gitkeep` so their `.meta` doesn't orphan.
+- **Compile check:** if the Editor is closed, `Unity -batchmode -nographics -quit -projectPath . -logFile <log>` and grep the log for `error CS`. Never run it while the project is open.
+- **Product decisions** go in the issue (and `docs/architecture.md` §6 when they change a contract), plus the prompt log. Ask, don't guess.
+
 ## Layout
 - `Assets/_Project/` — all our own content (Editor, Scenes, Prefabs, ...; run Magic > Setup > Create Project Folders). Third-party assets stay untouched in `Assets/ThirdParty/<Pack>` (redistributable only) or `Assets/AssetStore/` (local only).
 - `docs/` — process, ADRs, prompt log, scrum artifacts.

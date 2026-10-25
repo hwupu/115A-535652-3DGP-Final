@@ -34,10 +34,10 @@ Sources: proposal §6 (gameplay, danger system, clubs) and §7 (level independen
 ## 3. Gameplay loop (PO, 2026-10-26)
 1. **Aiming.** The avatar stands at the ball. The player **holds the right mouse button and drags** to orbit the camera around the ball. An **aim cone** starts at the ball and points along the camera's horizontal forward; its width is the club's accuracy. A **vertical power meter on the left** of the screen has a marker that **keeps running up and down**. Number keys / mouse wheel switch clubs.
 2. **Shot.** **Left click** shoots with the power under the marker (between the club's min and max). The real direction is random inside the cone. The timer loses the level's shot cost (e.g., 10 s).
-3. **In flight.** The camera follows the ball. Input is locked except god keys.
-4. **Ball stops.** The avatar **teleports** to the ball (next shooting position); back to step 1.
+3. **In flight.** The camera follows the ball. **The timer is paused.** Input is locked except god keys.
+4. **Ball stops.** The timer resumes. The avatar **teleports** to the ball (next shooting position); back to step 1.
 5. **Out of bounds / invalid area.** The ball goes back to the **nearest valid position** (its last position on valid ground) and play continues.
-6. **Win:** the ball reaches the level goal (a cup for now; could be another target later). **Lose:** the timer reaches 0, even while the ball is rolling.
+6. **Win:** the ball reaches the level goal (a cup for now; could be another target later). **Lose:** the timer reaches 0 while the player is aiming (it can't run out during flight, because it's paused).
 
 ## 4. Contracts
 The signatures are the agreement. Names may still change in review; after approval they change only by PR.
@@ -109,7 +109,7 @@ public class ShotController : MonoBehaviour
 |---|---|---|---|
 | Standard golf club | mid | mid | the only club at the start (#70) |
 | Sledgehammer | high | low (wide cone) | loud (Level 1 noise) |
-| Third tool (TBD, e.g., putter) | low | high (narrow cone) | name and look to be decided |
+| **Mysterious** (codename; real tool TBD) | low | high (narrow cone) | name and look to be decided |
 
 ### 4.3 Golfer avatar — Henry
 ```csharp
@@ -122,7 +122,7 @@ public class GolferAvatar : MonoBehaviour
     public void PlayCelebrate(); public void PlayFail();
 }
 ```
-The avatar prefab keeps the visual in a child (`Visual/`): a **box for now**, later the Blender hamster with an Animator. Game code only calls the methods above, so replacing the model doesn't change any other script. Animation clips needed: see #36.
+The avatar prefab keeps the visual in a child (`Visual/`): a **box for now**, later the Blender hamster with an Animator. Game code only calls the methods above, so replacing the model doesn't change any other script. Animation clips needed and the clip/timing handoff: see #36.
 
 ### 4.4 Camera — Bahadir
 ```csharp
@@ -160,15 +160,17 @@ public class DangerManager : MonoBehaviour
     public bool IsRunning { get; }
 
     public void Begin();                  // LevelManager on level start
-    public void Pause(); public void Resume();
-    public void ApplyShot(ShotInfo shot); // wired to ShotController.ShotTaken: -ShotCostSeconds
+    public void Pause(); public void Resume(); // also used by the pause menu
+    public void ApplyShot(ShotInfo shot); // wired to ShotController.ShotTaken: -ShotCostSeconds, then pauses
+    public void OnBallAtRest();           // wired to GolfBall.CameToRest: resumes (or fails, see below)
     public void ResetDanger();            // retry
 
     public event Action<DangerState> StateChanged;   // level escalation + HUD icon
     public event Action<float> ProgressJumped;        // after a shot (HUD jump effect)
 }
 ```
-`Failed` is raised when `RemainingSeconds` reaches 0, even if the ball is still rolling.
+The timer **pauses while the ball is in flight** (from `ShotTaken` until `CameToRest`) and runs while the player aims. `Failed` is raised when `RemainingSeconds` reaches 0 while running.
+If a shot's cost takes the timer to 0, that last shot still plays out: reaching the goal wins; otherwise `Failed` is raised when the ball comes to rest (draft, see open questions).
 
 ### 4.6 Goal and score — Pongpat
 ```csharp
@@ -218,7 +220,7 @@ public class LevelManager : MonoBehaviour
     public event Action LevelFailed;
 }
 ```
-`LevelManager` does the wiring: `ShotTaken` → `DangerManager.ApplyShot`, `ScoreKeeper.CountStroke`, `GolferAvatar.PlaySwing`; `GolfBall.CameToRest` → `GolferAvatar.TeleportTo`; `LevelGoal.Reached` → completion; `DangerState.Failed` → failure. It reports results to `GameSession`. The proposal's generic "complete hole" fallback is a god key (#71) that calls the same completion path.
+`LevelManager` does the wiring: `ShotTaken` → `DangerManager.ApplyShot`, `ScoreKeeper.CountStroke`, `GolferAvatar.PlaySwing`; `GolfBall.CameToRest` → `DangerManager.OnBallAtRest`, `GolferAvatar.TeleportTo`; `LevelGoal.Reached` → completion; `DangerState.Failed` → failure. It reports results to `GameSession`. The proposal's generic "complete hole" fallback is a god key (#71) that calls the same completion path.
 
 ### 4.8 Game session — Henry
 ```csharp
@@ -249,13 +251,14 @@ sequenceDiagram
     S->>S: aim cone follows AimYaw, power marker cycles
     P->>S: left click
     S->>B: Hit(velocity in cone, power from marker)
-    S-->>D: ShotTaken -> ApplyShot (-ShotCostSeconds)
+    S-->>D: ShotTaken -> ApplyShot (-ShotCostSeconds, pause timer)
     S-->>K: ShotTaken -> CountStroke
     S-->>A: ShotTaken -> PlaySwing
     S-->>C: ShotTaken -> Follow view
     alt ball enters InvalidZone / falls out
         B->>B: ResetToLastValid
     end
+    B-->>D: CameToRest -> OnBallAtRest (resume timer)
     B-->>A: CameToRest -> TeleportTo(ball)
     B-->>C: CameToRest -> Aim view
     alt ball reaches goal
@@ -269,10 +272,13 @@ sequenceDiagram
 ## 6. Decided (PO, 2026-10-26)
 - Shot cost is set **per level** (`DangerConfig.ShotCostSeconds`), not per club. The timer is in seconds; start time per level is set by hand by difficulty.
 - The level fails only on timeout. Out of bounds / invalid area never fails; the ball returns to the nearest valid position.
+- The timer pauses while the ball is in flight.
+- Third tool codename: **Mysterious** (low range, high accuracy) until the real tool is decided.
+- The game's hamster uses **Blender animation clips** driven by an Animator (#36). Mini-exercise 4.A.1 (#59) stays a standalone exercise and is not reused for the hamster.
 - The goal is generic (`LevelGoal`); a cup for now.
 - `GameSession` is owned by Henry.
 - No "ideal one-shot range" mark on the power meter for now (maybe later).
 
 ## 7. Open questions
-- Name and look of the third tool (low range, high accuracy).
-- Does the timer pause while the ball is in flight? Draft: no, it keeps running.
+- Real name and look of the Mysterious tool.
+- Last shot: if a shot's cost takes the timer to 0, does the shot still play out (draft: yes, win if it reaches the goal, fail when it stops), or does the level fail at once?

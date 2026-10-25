@@ -134,7 +134,7 @@ Owners and sprint assignments are **provisional** until confirmed at planning. A
 - [#70](https://github.com/hwupu/115A-535652-3DGP-Final/issues/70) Character leveling: XP, >= 5 levels, club/skill unlocks — Henry
 
 ### Sprint 6 - FX, anim, sound, polish
-- [#36](https://github.com/hwupu/115A-535652-3DGP-Final/issues/36) Hamster hierarchical animation (idle, aim, swing) — Henry
+- [#36](https://github.com/hwupu/115A-535652-3DGP-Final/issues/36) Hamster animation: Blender clips + Animator states and handoff doc — Henry
 - [#37](https://github.com/hwupu/115A-535652-3DGP-Final/issues/37) Cat, scarab and clockwork guardian animations — Bahadir
 - [#38](https://github.com/hwupu/115A-535652-3DGP-Final/issues/38) Garden gate portal and level transition — Henry
 - [#39](https://github.com/hwupu/115A-535652-3DGP-Final/issues/39) Particle effects: impact sparks, confetti, water splash — Henry

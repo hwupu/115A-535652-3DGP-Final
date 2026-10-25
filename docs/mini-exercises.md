@@ -40,7 +40,7 @@ The set per member is fixed (proposal §12). The **order is provisional**: a mem
 |---|---|
 | Henry 4.C.4 | #22 L1 lever/branch, ball knocking props |
 | Henry 4.E.3 | #20 HUD, HUD additions (XP bar, minimap) |
-| Henry 4.A.1 | #36 hamster hierarchical animation, rotating obstacles |
+| Henry 4.A.1 | Stays standalone: the game's hamster uses Blender clips (#36). Optional: rotating obstacles |
 | Henry 4.A.3 | #38 garden gate portal |
 | Bahadir 4.A.2 | Character controller base for 4.D.1 and 4.B.x; #34 |
 | Bahadir 4.D.1 | #23 wind, #45 environmental effects |
