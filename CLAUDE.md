@@ -15,6 +15,8 @@ Student IDs are in the proposal. Ask who you're working with at the start of a s
 
 Vision: `docs/references/proposal.md`. Plan: `docs/scrum/roadmap.md`. Shared contracts and code ownership: `docs/architecture.md`. Grading rules (rubrics, report, individual mini-exercises): `docs/references/course/` — check work against them; gaps in `docs/scrum/grading-gap-analysis.md`. Individual mini-exercises (4 per member, standalone scenes, generic Core code): follow `docs/mini-exercises.md`. Backlog = GitHub issues; sprints = milestones; board = GitHub Project #2 (Status: Todo, In Progress, Done; add new issues to it and set Todo). Owners in issues are provisional until sprint planning.
 
+Key dates: **Nov 16** Demo 1 + mini-exercises 1–2 · **Dec 14** Demo 2 (feature freeze) + mini-exercises 3–4 · Dec 21 buffer · **Dec 28** final presentation and live demo.
+
 ## Non-negotiables
 1. **Ask the human** when a requirement, scope, art/gameplay choice, or licensing question is unclear. Don't guess on product decisions.
 2. **Log it.** Every session that changes the repo adds/updates a file in `docs/prompt-log/` (see its README). Every major decision gets an ADR in `docs/decisions/`.
@@ -29,9 +31,16 @@ Vision: `docs/references/proposal.md`. Plan: `docs/scrum/roadmap.md`. Shared con
 - **README is for humans:** a short welcome, roadmap, one-time setup, daily workflow, layout, assets & credits, and prompts. Team names stay out of the README (they're here). Don't add one-time setup steps, status tables or tool lists there; detail belongs in `docs/` and issues. Update the README roadmap only when dates change.
 - **Code ownership:** implement contracts exactly as in `docs/architecture.md`; changing one needs a PR reviewed by everyone it affects. Work only on the requesting member's code. LOC is graded **per git author**, so commits are made in that member's checkout under their identity (agent adds the Co-Authored-By line).
 - **Unity Editor work = Magic tool + manual steps.** When a task needs Editor changes: (1) write a Magic menu tool (rule 3, ADR-0011) if setup is repeatable, (2) end your reply with a numbered **"In Unity"** guide: which menu to click, what dialogs mean, what to check (Console `[Magic]` lines, Hierarchy, Build Settings), (3) after the human says it's done, **verify the generated files** (git status, scene/asset contents, `Editor.log` errors) before committing. Empty folders need a `.gitkeep` so their `.meta` doesn't orphan.
-- **Compile check:** if the Editor is closed, `Unity -batchmode -nographics -quit -projectPath . -logFile <log>` and grep the log for `error CS`. Never run it while the project is open.
+- **Compile check:** if the Editor is closed (no `Temp/UnityLockfile`), `<Unity>` = `/Applications/Unity/Hub/Editor/6000.3.26f1/Unity.app/Contents/MacOS/Unity` on Mac: `<Unity> -batchmode -nographics -quit -projectPath . -logFile <log>` and grep the log for `error CS`. Never run it while the project is open.
 - **Product decisions** go in the issue (and `docs/architecture.md` §6 when they change a contract), plus the prompt log. Ask, don't guess.
 
 ## Layout
-- `Assets/_Project/` — all our own content (Editor, Scenes, Prefabs, ...; run Magic > Setup > Create Project Folders). Third-party assets stay untouched in `Assets/ThirdParty/<Pack>` (redistributable only) or `Assets/AssetStore/` (local only).
-- `docs/` — process, ADRs, prompt log, scrum artifacts.
+- `Assets/_Project/` — all our own content:
+  - `Scenes/` — `MainMenu`, `L1_Garden`, `L2_Desert`, `L3_Lake`, `Ending` (Build Settings order); only the owner edits a scene.
+  - `Scripts/Core/` (`Project3DGP.Core`, generic, no game types) and `Scripts/Game/` (`Project3DGP.Game`, refs Core; folders per `docs/architecture.md`, level code in `Levels/<Garden|Desert|Lake>/`).
+  - `MiniExercises/<Member>/<Code>_<Name>/` — one asmdef per member (`Project3DGP.MiniEx.<Member>`, refs Core only). Exercise plan for the scaffolding tool: `Editor/Magic/MiniExerciseCatalog.cs` (update it if the plan changes).
+  - `Editor/Magic/` — all Editor tools, including helpers for mini-exercises (an exercise folder is runtime-only).
+  - `Prefabs/`, `Materials/`, `Art/`, `Audio/`, `UI/`.
+- Third-party assets stay untouched in `Assets/ThirdParty/<Pack>` (redistributable only) or `Assets/AssetStore/` (local only).
+- Animation: the hamster uses Blender clips + Animator (#36), placeholder box until then (#88); the clip/timing handoff doc is written during #36 (Blender MCP).
+- `docs/` — architecture, course rules, process, ADRs, prompt log, scrum artifacts.

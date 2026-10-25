@@ -92,3 +92,8 @@ What the AI did:
 What the AI did:
 - Mini-3/mini-4 demo moved from Dec 21 to **Dec 14** (with DEMO 2); Dec 21 = buffer week. Updated README, roadmap (key dates, risks, backlog line moved under Sprint 8), `docs/mini-exercises.md`, gap analysis, ADR-0010 (correction note), `MiniExerciseCatalog.cs`, the six generated mini-exercise READMEs.
 - Issues #59, #60, #63, #64, #67, #68: titles/bodies say Dec 14, milestone moved Sprint 9 → Sprint 8.
+
+## Follow-up 6 (2026-10-26)
+> it is looking good, final check if there has anything to update to CLAUDE.md? else, lets push and merge.
+
+What the AI did: CLAUDE.md got key dates, a detailed `Assets/_Project/` layout, the Blender-clip animation note and the Unity path for compile checks. Merged PR #86, then PR #87.
