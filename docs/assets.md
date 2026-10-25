@@ -14,3 +14,4 @@ This is a non-commercial class project (decided in #12). **There is no allow lis
 ## Register
 | Asset | Author / Publisher | Source URL | Version | License | In git? | Path | Added by |
 |-------|--------------------|-----------|---------|---------|---------|------|----------|
+| README cover image ("Hole in One for Her Heart") | Henry (@hwupu), generated with Google Gemini | — (AI-generated) | 2026-10-19 | AI-generated, own use | Yes (LFS, 0.9 MB) | `docs/images/cover.jpg` | Henry |
