@@ -1,5 +1,7 @@
 # 🐹⛳ 115A-535652 3D Game Programming — Final Project
 
+![Hole in One for Her Heart: a crowned hamster golfer tees off while the hamster princess waits by the cat at hole 18](docs/images/cover.jpg)
+
 **Hamster fantasy golf** in Unity. A hamster hero rescues the hamster princess from Sir Grumblepaws 🐱 across three levels (🌻 Sunny Garden, 🏜️ Windy Desert, 🧊 Frozen Lake) before the time bar runs out and wakes the villain.
 
 ## 👋 Welcome
