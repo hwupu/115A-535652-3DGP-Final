@@ -11,3 +11,6 @@ Short records (Context, Decision, Consequences) of major decisions. Number seque
 | 0005 | Scenes are authored in-Editor; agents assist via Tools menu, not runtime | Accepted |
 | 0006 | Asset Store content is never committed; credits are mandatory | Accepted |
 | 0007 | GitHub Project board instead of labels-only boards | Accepted |
+| 0008 | Game concept: hamster fantasy golf (three levels) | Accepted |
+| 0009 | Demos run in the Unity Editor; three-column board | Accepted |
+| 0010 | Mini-exercises as standalone scenes; plan aligned with course rubrics | Accepted |

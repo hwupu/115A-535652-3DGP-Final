@@ -10,3 +10,7 @@
 - [ ] Agent: first `Tools > 3DGP` scene helpers once the concept is known
 
 ## Notes / retro
+
+## Update 2026-10-16
+- Game concept decided (proposal + ADR-0008); issue #2 closed.
+- Product backlog created as GitHub issues, grouped by sprint milestones: see `docs/scrum/roadmap.md`.
