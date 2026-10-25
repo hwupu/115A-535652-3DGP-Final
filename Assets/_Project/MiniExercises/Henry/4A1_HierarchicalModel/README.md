@@ -1,6 +1,6 @@
 # 4.A.1 Animation of a hierarchical model — Henry
 
-Issue: #59 · Demo: Dec 21
+Issue: #59 · Demo: Dec 14
 Scene: `Scenes/4A1_HierarchicalModel.unity` · Guide: `docs/mini-exercises.md`
 
 ## What's new (developed for this exercise)

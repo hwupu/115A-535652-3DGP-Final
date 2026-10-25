@@ -23,8 +23,8 @@ A complete, single-player hamster fantasy golf game with **three distinct levels
 |---|---|
 | Oct 26 | Sprint 1 ends (contracts + greybox start) |
 | **Nov 16** | **Demo 1** (playable loop, 3 greybox levels) **+ mini-exercise demo 1** (mini-1, mini-2 per member) |
-| Dec 14 | **Demo 2**: feature-complete, feature freeze |
-| **Dec 21** | **Mini-exercise demo 2** (mini-3, mini-4 per member) |
+| **Dec 14** | **Demo 2**: feature-complete, feature freeze **+ mini-exercise demo 2** (mini-3, mini-4 per member) |
+| Dec 21 | Buffer week |
 | Dec 28 | **Final presentation and live demo**; E3 upload (deadline TBC) |
 
 ## 4. Phases
@@ -54,7 +54,7 @@ A complete, single-player hamster fantasy golf game with **three distinct levels
 1. **Henry is overloaded** (~10 more issues, mostly shared code in Sprints 1–2). Candidates to move: #13 input → Bahadir (camera owner), #30 main menu → Pongpat (reuses his 4.E.2 #65), #16 or #70 → Bahadir or Pongpat. #69 and #82 are AI-heavy chores.
 2. **Sprint 1 ends tomorrow (Oct 26) and hasn't started.** Option: shift sprint goals by one week (re-date milestones) or merge Sprints 1–2. Demo 1 on Nov 16 is fixed.
 3. **Sprint 4 is the crunch:** Demo 1 and two mini-exercises per member land on the same day. Suggest starting mini-1 in Sprint 2 and mini-2 in Sprint 3 (milestone stays Sprint 4).
-4. **Sprint 9 crunch:** mini-3 and mini-4 (Dec 21) overlap report and slides. Suggest building them in Sprints 6–7, since several reuse game work (#36, #38, #34, #24, #41, #44).
+4. **Sprint 8 crunch:** mini-3 and mini-4 land on Dec 14 together with Demo 2. Suggest building them in Sprints 6–7, since several reuse game work (#38, #34, #24, #41, #44). Dec 21 is a buffer week.
 5. Confirm owners, the club/skill list and XP curve (#70), the L3 guardian creature (#26, Pongpat), and the remaining "Others" items (#84).
 6. Sprint 0 leftovers: #1 still open; #3 overlaps #12 (close #3 into #12?).
 7. Deferred: walk mode (ask Henry), teaser video length, optional enhancements (#81).
@@ -102,6 +102,7 @@ Owners and sprint assignments are **provisional** until confirmed at planning. A
 - [#14](https://github.com/hwupu/115A-535652-3DGP-Final/issues/14) BallController: Rigidbody ball, hit impulse, rest detection, reset — Henry
 - [#15](https://github.com/hwupu/115A-535652-3DGP-Final/issues/15) Shot sequence: yaw aim + cycling power bar — Henry
 - [#16](https://github.com/hwupu/115A-535652-3DGP-Final/issues/16) Club profiles (Power / Control / Accuracy) and club selection — Henry
+- [#88](https://github.com/hwupu/115A-535652-3DGP-Final/issues/88) Golfer avatar: placeholder box, teleport to ball, tool swap hooks — Henry
 - [#17](https://github.com/hwupu/115A-535652-3DGP-Final/issues/17) Surface physics materials and terrain presets — Pongpat
 - [#18](https://github.com/hwupu/115A-535652-3DGP-Final/issues/18) Cup/hole detection, stroke counter, level complete event — Pongpat
 - [#19](https://github.com/hwupu/115A-535652-3DGP-Final/issues/19) Camera MVP: aim view, ball-follow view, smooth transitions — Bahadir
@@ -110,6 +111,7 @@ Owners and sprint assignments are **provisional** until confirmed at planning. A
 - [#20](https://github.com/hwupu/115A-535652-3DGP-Final/issues/20) HUD: time progress bar, Warning/Critical icon, power bar, stroke count — Henry
 - [#21](https://github.com/hwupu/115A-535652-3DGP-Final/issues/21) L1: Cat alert state machine and noise gauge — Henry
 - [#22](https://github.com/hwupu/115A-535652-3DGP-Final/issues/22) L1: Branch/lever trigger and water-splash trap prototype — Henry
+- [#89](https://github.com/hwupu/115A-535652-3DGP-Final/issues/89) GameSession: cross-scene data (unlocked clubs, XP, results, settings) — Henry
 - [#23](https://github.com/hwupu/115A-535652-3DGP-Final/issues/23) L2: WindController and wind compass — Bahadir
 - [#24](https://github.com/hwupu/115A-535652-3DGP-Final/issues/24) L2: Scarab patrol prototype and target-switch gate — Bahadir
 - [#25](https://github.com/hwupu/115A-535652-3DGP-Final/issues/25) L3: Ice friction zones and ricochet walls — Pongpat
@@ -132,7 +134,7 @@ Owners and sprint assignments are **provisional** until confirmed at planning. A
 - [#70](https://github.com/hwupu/115A-535652-3DGP-Final/issues/70) Character leveling: XP, >= 5 levels, club/skill unlocks — Henry
 
 ### Sprint 6 - FX, anim, sound, polish
-- [#36](https://github.com/hwupu/115A-535652-3DGP-Final/issues/36) Hamster hierarchical animation (idle, aim, swing) — Henry
+- [#36](https://github.com/hwupu/115A-535652-3DGP-Final/issues/36) Hamster animation: Blender clips + Animator states and handoff doc — Henry
 - [#37](https://github.com/hwupu/115A-535652-3DGP-Final/issues/37) Cat, scarab and clockwork guardian animations — Bahadir
 - [#38](https://github.com/hwupu/115A-535652-3DGP-Final/issues/38) Garden gate portal and level transition — Henry
 - [#39](https://github.com/hwupu/115A-535652-3DGP-Final/issues/39) Particle effects: impact sparks, confetti, water splash — Henry
@@ -163,13 +165,13 @@ Owners and sprint assignments are **provisional** until confirmed at planning. A
 - [#50](https://github.com/hwupu/115A-535652-3DGP-Final/issues/50) Ending sequence: princess rescue and comic distraction — Pongpat
 - [#51](https://github.com/hwupu/115A-535652-3DGP-Final/issues/51) Story intro and between-level text — Henry
 - [#52](https://github.com/hwupu/115A-535652-3DGP-Final/issues/52) Feature freeze and DEMO 2 in-Editor rehearsal (Dec 14) — Bahadir
+- Mini-exercise demo **Dec 14** (mini-3, mini-4): [#59](https://github.com/hwupu/115A-535652-3DGP-Final/issues/59) Henry 4.A.1, [#60](https://github.com/hwupu/115A-535652-3DGP-Final/issues/60) Henry 4.A.3, [#63](https://github.com/hwupu/115A-535652-3DGP-Final/issues/63) Bahadir 4.B.1, [#64](https://github.com/hwupu/115A-535652-3DGP-Final/issues/64) Bahadir 4.B.2, [#67](https://github.com/hwupu/115A-535652-3DGP-Final/issues/67) Pongpat 4.D.3, [#68](https://github.com/hwupu/115A-535652-3DGP-Final/issues/68) Pongpat 4.E.1
 
 ### Sprint 9 - Final Demo
 - [#54](https://github.com/hwupu/115A-535652-3DGP-Final/issues/54) Final presentation, evidence and programming explanations — Henry
 - [#56](https://github.com/hwupu/115A-535652-3DGP-Final/issues/56) Final demo rehearsal from a clean clone (Editor) — Bahadir
 - [#83](https://github.com/hwupu/115A-535652-3DGP-Final/issues/83) Final report (template) and evidence — all
 - [#84](https://github.com/hwupu/115A-535652-3DGP-Final/issues/84) Form B coverage tracker and proposed 'Others' items — Henry
-- Mini-exercise demo **Dec 21** (mini-3, mini-4): [#59](https://github.com/hwupu/115A-535652-3DGP-Final/issues/59) Henry 4.A.1, [#60](https://github.com/hwupu/115A-535652-3DGP-Final/issues/60) Henry 4.A.3, [#63](https://github.com/hwupu/115A-535652-3DGP-Final/issues/63) Bahadir 4.B.1, [#64](https://github.com/hwupu/115A-535652-3DGP-Final/issues/64) Bahadir 4.B.2, [#67](https://github.com/hwupu/115A-535652-3DGP-Final/issues/67) Pongpat 4.D.3, [#68](https://github.com/hwupu/115A-535652-3DGP-Final/issues/68) Pongpat 4.E.1
 
 ## Course mini-exercises (ADR-0010)
 Individual, 4 per member, each in its own standalone scene with generic code in Core (`docs/mini-exercises.md`). Henry: 4.C.4, 4.E.3, 4.A.1, 4.A.3 · Bahadir: 4.A.2, 4.D.1, 4.B.1, 4.B.2 · Pongpat: 4.E.2, 4.C.4, 4.D.3, 4.E.1. Demos Nov 16 (first two) and Dec 21 (last two).

@@ -3,13 +3,16 @@
 The rules are in [`references/course/mini-exercises.md`](references/course/mini-exercises.md). The decision behind this guide is [ADR-0010](decisions/0010-mini-exercises-and-grading-alignment.md). Each exercise has a GitHub issue labelled `area:mini-exercise`.
 
 ## Assignment and schedule
-| Member | Mini-1 (Nov 16) | Mini-2 (Nov 16) | Mini-3 (Dec 21) | Mini-4 (Dec 21) |
+| Member | Mini-1 (Nov 16) | Mini-2 (Nov 16) | Mini-3 (Dec 14) | Mini-4 (Dec 14) |
 |---|---|---|---|---|
 | Henry (@hwupu) | 4.C.4 Object interaction | 4.E.3 Game UI | 4.A.1 Hierarchical model | 4.A.3 Game portals |
 | Bahadir (@bahadir-koksal) | 4.A.2 Character navigation | 4.D.1 Environment effects | 4.B.1 A\* path finding | 4.B.2 AI characters |
 | Pongpat (@empongpat) | 4.E.2 Function selection | 4.C.4 Object interaction | 4.D.3 Character particle effects | 4.E.1 Save & Load |
 
-The set per member is fixed (proposal §12). The **order is provisional**: a member may swap which two go first. If they do, update the issue milestones (Sprint 4 = Nov 16 demo, Sprint 9 = Dec 21 demo).
+The set per member is fixed (proposal §12). The **order is provisional**: a member may swap which two go first. If they do, update the issue milestones (Sprint 4 = Nov 16 demo, Sprint 8 = Dec 14 demo, together with DEMO 2).
+
+## Scaffolding
+**Magic > Mini-Exercises > Create All Planned** creates the folder, README (with the requirement checklist) and demo scene for all 12 planned exercises, plus each member's asmdef. **New Exercise...** creates one (e.g., after a swap). The plan lives in `Assets/_Project/Editor/Magic/MiniExerciseCatalog.cs`; update it if the plan changes.
 
 ## Scaffolding
 **Magic > Mini-Exercises > Create All Planned** creates the folder, README (with the requirement checklist) and demo scene for all 12 planned exercises, plus each member's asmdef. **New Exercise...** creates one (e.g., after a swap). The plan lives in `Assets/_Project/Editor/Magic/MiniExerciseCatalog.cs`; update it if the plan changes.
@@ -40,7 +43,7 @@ The set per member is fixed (proposal §12). The **order is provisional**: a mem
 |---|---|
 | Henry 4.C.4 | #22 L1 lever/branch, ball knocking props |
 | Henry 4.E.3 | #20 HUD, HUD additions (XP bar, minimap) |
-| Henry 4.A.1 | #36 hamster hierarchical animation, rotating obstacles |
+| Henry 4.A.1 | Stays standalone: the game's hamster uses Blender clips (#36). Optional: rotating obstacles |
 | Henry 4.A.3 | #38 garden gate portal |
 | Bahadir 4.A.2 | Character controller base for 4.D.1 and 4.B.x; #34 |
 | Bahadir 4.D.1 | #23 wind, #45 environmental effects |

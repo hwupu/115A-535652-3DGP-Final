@@ -1,6 +1,6 @@
 # 4.A.3 Game portals — Henry
 
-Issue: #60 · Demo: Dec 21
+Issue: #60 · Demo: Dec 14
 Scene: `Scenes/4A3_GamePortals.unity` · Guide: `docs/mini-exercises.md`
 
 ## What's new (developed for this exercise)

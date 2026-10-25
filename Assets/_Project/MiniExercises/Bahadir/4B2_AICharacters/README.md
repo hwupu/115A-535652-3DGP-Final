@@ -1,6 +1,6 @@
 # 4.B.2 AI characters — Bahadir
 
-Issue: #64 · Demo: Dec 21
+Issue: #64 · Demo: Dec 14
 Scene: `Scenes/4B2_AICharacters.unity` · Guide: `docs/mini-exercises.md`
 
 ## What's new (developed for this exercise)
