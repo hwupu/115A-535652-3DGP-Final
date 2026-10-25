@@ -87,7 +87,7 @@ git push -u origin HEAD               # open a PR that links the issue
 - ⬇️ **Pull and rebase often** (at least daily, and before you push). Small, fresh branches mean fewer conflicts.
 - 🎬 **Only edit your own scenes.** Shared pieces go in prefabs.
 - 📎 Commit `.meta` files together with their assets.
-- 📦 Keep big files small: the free LFS quota is 1 GB.
+- 📦 Keep big files small: commit only the assets in use (1 GB LFS quota).
 
 ## 📁 Repository layout
 ```
@@ -101,8 +101,9 @@ CLAUDE.md             rules for AI agents
 
 ## 🎨 Assets & credits
 - 🚫 **Never commit Unity Asset Store assets**, free or paid. Their licenses forbid sharing them and this repo is public. They go in `Assets/AssetStore/` (git-ignored).
-- ✅ Other assets (Kenney, Quaternius, Poly Haven, ...) may go in `Assets/ThirdParty/` **only if the license allows redistribution**.
-- 📝 **Every asset you obtain gets a row** in [`docs/assets.md`](docs/assets.md) and [`CREDITS.md`](CREDITS.md): name, author, link, license. We need this for the report's reference list.
+- ✅ Other assets go in `Assets/ThirdParty/`. CC0 and CC-BY (Kenney, Quaternius, Poly Haven, ...) are preferred; anything else is fair use for this class project.
+- 📝 **No row, no commit.** Every asset gets a row in [`docs/assets.md`](docs/assets.md) and [`CREDITS.md`](CREDITS.md): name, author, link, license. We need this for the report's reference list.
+- 📦 **Commit only what we use.** Our free LFS quota is 1 GB, so copy in only the models, textures and sounds the game needs, never a whole pack.
 - ❓ Not sure about a license? Ask before committing.
 
 ## 💬 Prompts for Claude Code
