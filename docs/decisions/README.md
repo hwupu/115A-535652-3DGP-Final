@@ -13,3 +13,4 @@ Short records (Context, Decision, Consequences) of major decisions. Number seque
 | 0007 | GitHub Project board instead of labels-only boards | Accepted |
 | 0008 | Game concept: hamster fantasy golf (three levels) | Accepted |
 | 0009 | Demos run in the Unity Editor; three-column board | Accepted |
+| 0010 | Mini-exercises as standalone scenes; plan aligned with course rubrics | Accepted |

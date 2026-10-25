@@ -1,6 +1,33 @@
 # Grading gap analysis (2026-10-25)
 
-This compares `docs/references/proposal.md`, `docs/scrum/roadmap.md` and the backlog with the instructor's requirements in `docs/references/course/`. It is a **draft for the PO**: nothing in the backlog has been changed yet. Items marked **PO** need a human decision.
+This compares `docs/references/proposal.md`, `docs/scrum/roadmap.md` and the backlog with the instructor's requirements in `docs/references/course/`. The PO decided on 2026-10-25 (ADR-0010). The resolutions are in the table below, and the backlog has been updated. The tracker is #84. The sections after the table are the original analysis.
+
+## Resolutions (2026-10-25)
+| Gap | Decision | Issue(s) |
+|---|---|---|
+| C1 AI vs "on your own" | Keep the AI-native workflow; each member refines the code by hand afterwards and does their own 4 exercises | ADR-0010, `docs/mini-exercises.md` |
+| C2 two cat monsters | The L3 guardian must not be a cat; Pongpat decides | #26, #37 |
+| C3 character leveling | Start with the standard club; unlock other clubs and skills by leveling; collectibles give XP | #70, #16 |
+| C4 NPC skills | Non-violent skills noted per NPC (team target ≥ 5) | #21, #24, #26 |
+| C5 numbering / simulation | 4.B.1 numbering fixed in issues; simulation and composition are optional | #34, #81 |
+| C6 video length | Ignored for now | — |
+| C7 proposal says packaged build | Unchanged (team-owned proposal) | — |
+| C8 god keys | Added | #71 |
+| Particles ≥ 5 per member | Per-level FX stories updated | #39, #40, #41 |
+| Sounds ≥ 4 per member | Audio split per owner | #42, #72, #73 |
+| ≥ 100 objects, textures, lighting, scene effects | Art pass per level | #9–#11, #74, #75, #76 |
+| Misc items ≥ 5 | Settings, character selection, pause | #77 |
+| GUI ≥ 5 | XP bar, minimap, club highlight | #78 |
+| FSMs ≥ 5 × ≥ 4 states | Inventory and diagrams | #79 |
+| Own artwork | ≥ 1 per member | #80 |
+| Mouse + keyboard | Added to input story | #13 |
+| LOC per member | Report tool | #82 |
+| Report and evidence | Story | #83 |
+| Slides and presentation rules | Added to presentation story | #54 |
+| Mini-exercises | Proposal §12 assignment; standalone scenes, generic Core code; demos Nov 16 and Dec 21 | #57–#68, #69 |
+| Our own Form B "Others" items | Proposed in the tracker | #84 |
+| Walk mode | Not adopted | — |
+| pptx template, title, Group ID | Ignored here (handled by the team) | — |
 
 Legend: ✅ covered · ⚠️ partly / at risk · ❌ missing · ⛔ conflict
 

@@ -12,7 +12,7 @@ Sprint calendar and goals: [`roadmap.md`](roadmap.md). Sprint N ends on the cour
 
 - **Sprint kickoff (≤20 min, with the humans):** review goal, pick issues from `Todo`, set the sprint milestone. Agent drafts `docs/scrum/sprints/sprint-NN.md` beforehand.
 - **Async check-in:** update the sprint file / issue comments; no standup meeting.
-- **Sprint end (≤20 min):** demo what runs in Unity, accept/reject against acceptance criteria, short retro (1 keep, 1 change). Agent records it in the sprint file.
+- **Sprint end (≤20 min):** demo what runs in Unity, accept/reject against acceptance criteria, short retro (1 keep, 1 change). Capture evidence for the report and slides (screenshots, FX/SFX clips, FSM diagrams; see #83). Agent records it in the sprint file.
 
 ## Work items
 - GitHub **Issues** are the backlog. Use the *User story* template: "As a ..., I want ..., so that ..." + acceptance criteria.
