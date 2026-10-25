@@ -102,3 +102,8 @@ What the AI did: CLAUDE.md got key dates, a detailed `Assets/_Project/` layout, 
 > can you check if i have done `scene merge tool: add to your local .git/config`? if not, set it up.
 
 What the AI did: it wasn't set up. Configured `merge.unityyamlmerge` in Henry's local git config with the Unity 6 Mac path `Unity.app/Contents/Helpers/UnityYAMLMerge` (the README's `Contents/Tools/` path doesn't exist in Unity 6). Tested the tool on scene copies. Fixed README step 8 to use `git config` commands (the ini snippet broke on Windows: git strips quotes and treats `\` as an escape).
+
+## Follow-up 8 (2026-10-26)
+> Bahadir and Pongpat are approved. exclude the last-shot decision, if it is in, player still win.
+
+What the AI did: marked `docs/architecture.md` approved; recorded the last-shot rule (the shot plays out; if it goes in, the player wins) and removed it from the open questions; updated #7; closed #6.
