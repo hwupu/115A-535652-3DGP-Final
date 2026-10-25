@@ -1,6 +1,6 @@
-# Architecture and shared contracts (DRAFT, #6)
+# Architecture and shared contracts (#6)
 
-Status: **draft for review**. All three members must approve the PR (#6). After that, change a contract only through a PR reviewed by everyone it affects.
+Status: **approved** by Henry, Bahadir and Pongpat (2026-10-26, #6). Change a contract only through a PR reviewed by everyone it affects.
 
 Sources: proposal §6 (gameplay, danger system, clubs) and §7 (level independence); PO decisions of 2026-10-26 (shot controls, clubs, timer, goal); ADR-0005, ADR-0010, ADR-0011.
 
@@ -171,7 +171,7 @@ public class DangerManager : MonoBehaviour
 }
 ```
 The timer **pauses while the ball is in flight** (from `ShotTaken` until `CameToRest`) and runs while the player aims. `Failed` is raised when `RemainingSeconds` reaches 0 while running.
-If a shot's cost takes the timer to 0, that last shot still plays out: reaching the goal wins; otherwise `Failed` is raised when the ball comes to rest (draft, see open questions).
+If a shot's cost takes the timer to 0, that last shot still plays out: **if it goes in, the player wins**; otherwise `Failed` is raised when the ball comes to rest.
 
 ### 4.6 Goal and score — Pongpat
 ```csharp
@@ -287,6 +287,7 @@ sequenceDiagram
 - Shot cost is set **per level** (`DangerConfig.ShotCostSeconds`), not per club. The timer is in seconds; start time per level is set by hand by difficulty.
 - The level fails only on timeout. Out of bounds / invalid area never fails; the ball returns to the nearest valid position.
 - The timer pauses while the ball is in flight.
+- Last shot: if a shot's cost takes the timer to 0, the shot still plays out; if it goes in, the player wins.
 - Third tool codename: **Mysterious** (low range, high accuracy) until the real tool is decided.
 - The game's hamster uses **Blender animation clips** driven by an Animator (#36). Mini-exercise 4.A.1 (#59) stays a standalone exercise and is not reused for the hamster.
 - The goal is generic (`LevelGoal`); a cup for now.
@@ -297,4 +298,3 @@ sequenceDiagram
 ## 7. Open questions
 - Real name and look of the Mysterious tool.
 - Menu dialog items (#77).
-- Last shot: if a shot's cost takes the timer to 0, does the shot still play out (draft: yes, win if it reaches the goal, fail when it stops), or does the level fail at once?
