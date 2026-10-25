@@ -6,8 +6,20 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: Assets/_Project/Scenes/MainMenu.unity
+    guid: 81106951b24eb4805a8e909ed4202066
+  - enabled: 1
+    path: Assets/_Project/Scenes/L1_Garden.unity
+    guid: 73fc05dc19f1b43bd9f189420bd114ed
+  - enabled: 1
+    path: Assets/_Project/Scenes/L2_Desert.unity
+    guid: 1c115c274853c4a33bfe64d3eeb12ea0
+  - enabled: 1
+    path: Assets/_Project/Scenes/L3_Lake.unity
+    guid: c67078cb3f365451ca51926ae65ef42a
+  - enabled: 1
+    path: Assets/_Project/Scenes/Ending.unity
+    guid: 330bfca5ebf1e403d89d5554702815ba
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

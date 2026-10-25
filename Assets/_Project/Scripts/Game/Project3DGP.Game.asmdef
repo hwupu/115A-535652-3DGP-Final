@@ -1,0 +1,14 @@
+{
+    "name": "Project3DGP.Game",
+    "rootNamespace": "Project3DGP.Game",
+    "references": ["Project3DGP.Core", "Unity.InputSystem", "UnityEngine.UI", "Unity.TextMeshPro", "Unity.AI.Navigation"],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

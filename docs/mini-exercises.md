@@ -11,20 +11,23 @@ The rules are in [`references/course/mini-exercises.md`](references/course/mini-
 
 The set per member is fixed (proposal §12). The **order is provisional**: a member may swap which two go first. If they do, update the issue milestones (Sprint 4 = Nov 16 demo, Sprint 9 = Dec 21 demo).
 
+## Scaffolding
+**Magic > Mini-Exercises > Create All Planned** creates the folder, README (with the requirement checklist) and demo scene for all 12 planned exercises, plus each member's asmdef. **New Exercise...** creates one (e.g., after a swap). The plan lives in `Assets/_Project/Editor/Magic/MiniExerciseCatalog.cs`; update it if the plan changes.
+
 ## Rules for agents working on a mini-exercise
 1. **Work for the assigned member only**, on a branch `feat/<issue>-mini-<code>-<slug>`. The member's git identity commits the work, because LOC is counted per author.
 2. **Generate a clear, readable first version, then hand over.** The member refines it by hand and must be able to explain and modify it live for the TAs. Keep the code simple and well-named, avoid cleverness, and add short comments on the technique (the math or algorithm). In the PR, list the "TA modification points": parameters or functions the TA is likely to ask to change.
 3. **Self-contained folder and scene.** Each exercise lives in its own folder with its own demo scene and runs on its own:
    ```
    Assets/_Project/MiniExercises/<Member>/<Code>_<Name>/   e.g. Henry/4A1_HierarchicalModel/
-     Scripts/   (asmdef Project3DGP.MiniEx.<Member>, references Project3DGP.Core only)
+     Scripts/   (covered by the member's asmdef Project3DGP.MiniEx.<Member> in MiniExercises/<Member>/, references Project3DGP.Core only)
      Scenes/<Code>_<Name>.unity
      Prefabs/, Materials/ ...
      README.md  (what's new, controls, requirement checklist, references)
    ```
 4. **Generic, reusable technique code goes into Core:** `Assets/_Project/Scripts/Core/` (asmdef `Project3DGP.Core`, namespace `Project3DGP.Core.*`). No golf or level types, no scene assumptions, configuration through serialized fields or ScriptableObjects. The game (`Project3DGP.Game`) and the mini-exercises both reference Core, **never each other**.
 5. **Meet every requirement number explicitly** (e.g., ≥ 3 portals, ≥ 100 obstacles, ≥ 30 agents) and keep a requirement checklist in the exercise README. Add key bindings where the exercise asks for them, using the Input System.
-6. **Loop-spawned objects are allowed** in mini-exercise scenes (exception in ADR-0010). The base environment is still authored in the Editor. Scene setup helpers go under **Tools > 3DGP > Mini-Exercises** (Editor scripts).
+6. **Loop-spawned objects are allowed** in mini-exercise scenes (exception in ADR-0010). The base environment is still authored in the Editor. Scene setup helpers go under **Magic > Mini-Exercises** (Editor scripts in `Assets/_Project/Editor/Magic/`, not inside the exercise folder, because the member asmdef is runtime-only).
 7. **No overlap with assignments**, and mark what's new: the README states which parts are newly developed for this exercise.
 8. **Third-party code or samples:** modify them with at least 3 new features, add a self-written loop that creates at least 20 objects, and list the links in the README. Assets follow CLAUDE.md rule 6 (license confirmed, credited).
 9. **4.C.4 is done by both Henry and Pongpat.** Their implementations must be separate. Don't let one reuse the other's exercise code.

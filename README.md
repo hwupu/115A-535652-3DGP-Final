@@ -63,7 +63,7 @@ docs/scrum/           process, sprint files
 docs/assets.md        asset policy & license register (+ CREDITS.md)
 CLAUDE.md / AGENTS.md rules for AI agents
 ```
-In Unity, run **Tools > 3DGP > Create Project Folders** once to create the standard folders.
+In Unity, run **Magic > Setup > Create Project Folders** once to create the standard folders.
 
 ## Assets & credits
 - **Never commit Unity Asset Store assets, free or paid** (license + public repo). Import them locally into `Assets/AssetStore/`; the folder is git-ignored. Each member imports the same packs/versions listed in `docs/assets.md`.
@@ -72,7 +72,7 @@ In Unity, run **Tools > 3DGP > Create Project Folders** once to create the stand
 
 ## Working with AI agents
 - Agents read `CLAUDE.md`, log sessions in `docs/prompt-log/`, and record major decisions in `docs/decisions/`.
-- **Scenes are built in the Editor**, not at runtime. Agents help through menu items under **Tools > 3DGP** (see `Assets/_Project/Editor/`). Ask an agent for a tool, then run it from the menu.
+- **Scenes are built in the Editor**, not at runtime. Agents help through menu items under **Magic** (see `Assets/_Project/Editor/Magic/`). Ask an agent for a tool, then run it from the menu.
 - Agents ask when unsure; answer on the issue (label `needs-po`).
 
 ## Process
