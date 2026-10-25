@@ -3,7 +3,7 @@
 Course project: 535652 3D Game Programming Final (115A). Unity 6000.3.26f1, URP, Input System. Team of 3 humans; humans are the **Product Owner (PO)**. AI agents are **Scrum Master (SM)** first, **Developer** later (see `docs/scrum/process.md`).
 
 ## Project context
-Hamster fantasy golf, 3 levels, one owner each (Henry/@hwupu Garden, Bahadir/@bahadir-koksal Desert, Pongpat/@empongpat Lake). Vision: `docs/references/proposal.md`. Plan: `docs/scrum/roadmap.md`. Backlog = GitHub issues; sprints = milestones; board = GitHub Project #2 (Status: Todo, In Progress, Done; add new issues to it and set Todo). Owners in issues are provisional until sprint planning.
+Hamster fantasy golf, 3 levels, one owner each (Henry/@hwupu Garden, Bahadir/@bahadir-koksal Desert, Pongpat/@empongpat Lake). Vision: `docs/references/proposal.md`. Plan: `docs/scrum/roadmap.md`. Grading rules (rubrics, report, individual mini-exercises): `docs/references/course/` — check work against them; gaps in `docs/scrum/grading-gap-analysis.md`. Backlog = GitHub issues; sprints = milestones; board = GitHub Project #2 (Status: Todo, In Progress, Done; add new issues to it and set Todo). Owners in issues are provisional until sprint planning.
 
 ## Non-negotiables
 1. **Ask the human** when a requirement, scope, art/gameplay choice, or licensing question is unclear. Don't guess on product decisions.
