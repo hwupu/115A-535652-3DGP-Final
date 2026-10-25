@@ -18,6 +18,7 @@ namespace Project3DGP.EditorTools
         // Menu priorities: a gap of more than 10 adds a separator.
         public const int SetupPriority = 0;
         public const int ScenesPriority = 100;
+        public const int LevelPriority = 150;
         public const int MiniExercisesPriority = 200;
 
         public static void Log(string message) => Debug.Log("[Magic] " + message);
