@@ -100,6 +100,7 @@ Owners and sprint assignments are **provisional** until confirmed at planning. A
 - [#14](https://github.com/hwupu/115A-535652-3DGP-Final/issues/14) BallController: Rigidbody ball, hit impulse, rest detection, reset — Henry
 - [#15](https://github.com/hwupu/115A-535652-3DGP-Final/issues/15) Shot sequence: yaw aim + cycling power bar — Henry
 - [#16](https://github.com/hwupu/115A-535652-3DGP-Final/issues/16) Club profiles (Power / Control / Accuracy) and club selection — Henry
+- [#88](https://github.com/hwupu/115A-535652-3DGP-Final/issues/88) Golfer avatar: placeholder box, teleport to ball, tool swap hooks — Henry
 - [#17](https://github.com/hwupu/115A-535652-3DGP-Final/issues/17) Surface physics materials and terrain presets — Pongpat
 - [#18](https://github.com/hwupu/115A-535652-3DGP-Final/issues/18) Cup/hole detection, stroke counter, level complete event — Pongpat
 - [#19](https://github.com/hwupu/115A-535652-3DGP-Final/issues/19) Camera MVP: aim view, ball-follow view, smooth transitions — Bahadir
@@ -109,6 +110,7 @@ Owners and sprint assignments are **provisional** until confirmed at planning. A
 - [#20](https://github.com/hwupu/115A-535652-3DGP-Final/issues/20) HUD: time progress bar, Warning/Critical icon, power bar, stroke count — Henry
 - [#21](https://github.com/hwupu/115A-535652-3DGP-Final/issues/21) L1: Cat alert state machine and noise gauge — Henry
 - [#22](https://github.com/hwupu/115A-535652-3DGP-Final/issues/22) L1: Branch/lever trigger and water-splash trap prototype — Henry
+- [#89](https://github.com/hwupu/115A-535652-3DGP-Final/issues/89) GameSession: cross-scene data (unlocked clubs, XP, results, settings) — Henry
 - [#23](https://github.com/hwupu/115A-535652-3DGP-Final/issues/23) L2: WindController and wind compass — Bahadir
 - [#24](https://github.com/hwupu/115A-535652-3DGP-Final/issues/24) L2: Scarab patrol prototype and target-switch gate — Bahadir
 - [#25](https://github.com/hwupu/115A-535652-3DGP-Final/issues/25) L3: Ice friction zones and ricochet walls — Pongpat
