@@ -58,3 +58,28 @@ What the AI did:
 - Issues #20, #77, #27 updated.
 - README rewritten for humans: Welcome (how we work, Magic tools + step-by-step guides, what's set up, where things are, first ticket), Roadmap, One-time setup, Daily workflow, Prompts. Removed the status and Magic tables and duplicate sections.
 - CLAUDE.md: README is for humans; no one-time steps or status tables there.
+
+## Follow-up 4 (2026-10-26)
+> move `Team: Henry 吳普軒 (@hwupu, Garden) · Bahadir Emre Koksal 柯昊瀚 (@bahadir-koksal, Desert) · Pongpat Weesommai 余蓬勃 (@empongpat, Lake)` to CLAUDE.md, AI agent may need to know who and what id we are, but I don't want to show in README, too obvious.
+>
+> Include sprint 0 and 1, just for record.
+>
+> `... an IDE (Rider / Visual Studio / VS Code), and optionally the GitHub CLI gh.` change to Agentic IDE, Claude Code, and gh are required.
+>
+> i'm not sure if step 6 is needed? it should handle automatically? if not, say it is okay to skip if there has none in the list yet.
+>
+> 7. we mentioned it is required in step 1, so maybe change to auth, for both claude code and gh.
+>
+> remind teammates to pull/rebase often.
+>
+> the rest are good.
+>
+> I'll include little Repository layout, and brief example why our codes live inside _Project
+>
+> we should have the Assets & credits section, it is good reminder to not commit Unity Asset Store assets, and need to keep track for every assets obtained for credits.
+>
+> make it fun, please add emoji
+
+What the AI did:
+- README: team line removed; Sprint 0/1 in the roadmap; tools all required (agentic IDE, Claude Code, gh); step 6 kept (Asset Store packs are never in git, each member adds them by hand; skip if none listed); step 7 = sign in to gh and Claude Code; pull/rebase reminder; Repository layout with "Why `_Project`?"; Assets & credits section; emoji.
+- CLAUDE.md: team table (names, GitHub, level, mini-exercise folder).
