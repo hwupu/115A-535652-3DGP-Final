@@ -25,7 +25,7 @@ Sources: proposal §6 (gameplay, danger system, clubs) and §7 (level independen
 ## 2. Rules
 1. **Components talk through the public API below and C# events**, not by reaching into each other's fields.
 2. **One `LevelManager` per level scene** holds serialized references to the shared components of that scene. Level-specific scripts get what they need from it. The only cross-scene object is `GameSession` (Henry).
-3. **The shared components are prefabs** (`Prefabs/Shared/`). The level skeleton tool (#8, Magic > Level) drops them into a scene and wires them to the `LevelManager`.
+3. **The shared components are prefabs** (`Prefabs/Shared/`). The level skeleton tool (#8, Magic > Level, §4.10) gives every level the same slots; once the prefabs exist, it drops them in and wires them to the `LevelManager`.
 4. **Level escalation listens to `DangerManager.StateChanged`**. Cat, sandstorm and ice cracks each live in their level folder, not in `DangerManager`.
 5. **Tunable numbers live in ScriptableObjects** (`ClubProfile`, `DangerConfig`), so balancing (#46) doesn't need code changes. Each level has its own `DangerConfig`.
 6. Input goes through the Input System actions (#13). Only `ShotController` (shoot, club switch) and `CameraRig` (orbit) read gameplay input.
@@ -248,6 +248,28 @@ public class GameSession : MonoBehaviour   // DontDestroyOnLoad, created by the 
     // Settings (volume, ...) for #77. Save/load (#44, Pongpat) serializes this data.
 }
 ```
+
+### 4.10 Level scene hierarchy (#8)
+Every level scene has the same root objects. **Magic > Level > Create Level Scene Skeleton** adds any that are missing, and **Magic > Level > Validate Level Scene** lists what's missing. The list itself is in `Editor/Magic/LevelSkeleton.cs`.
+
+```
+Systems                 LevelManager, DangerManager, ScoreKeeper, ShotController (owners' prefabs, Sprint 3)
+Cameras                 Main Camera, CameraRig (Bahadir)
+Environment             static only
+├── Lighting            Directional Light, Global Volume, sky
+├── Course              playable greybox; Ground (50 x 50 m plane)
+├── Boundary            walls or edges that keep the ball in
+└── Props               decoration (counts toward the >= 100 objects, #74)
+Gameplay                what the ball and player interact with
+├── BallSpawn           the tee
+├── Player              GolfBall + GolferAvatar (Henry)
+├── Goal/Cup            flat cylinder with a trigger (Pongpat's Cup)
+├── Hazards             cat / wind / ice (level-specific scripts)
+└── InvalidZones        InvalidZone triggers: water, out of bounds
+UI                      HUD canvas, menu dialog
+```
+
+The tool moves only the default `Main Camera`, `Directional Light` and `Global Volume` from the scene root into their group, keeping their world position; it never changes anything else. Until the prefabs exist, the slots are empty placeholders. Later the tool will add each owner's prefab into its slot.
 
 ## 5. Event flow of one shot
 ```mermaid
