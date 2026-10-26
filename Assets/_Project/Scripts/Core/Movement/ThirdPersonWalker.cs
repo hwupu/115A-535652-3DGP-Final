@@ -1,21 +1,21 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace Project3DGP.MiniEx.Henry
+namespace Project3DGP.Core.Movement
 {
     /// <summary>
-    /// Keyboard walking for the hamster: WASD/arrows move relative to the camera, Shift runs, Space jumps.
-    /// A CharacterController has no Rigidbody, so gravity and jumping are integrated here by hand.
-    /// Pushing obstacles is done by RigidbodyPusher (Core) on the same object.
+    /// Keyboard walking for a third-person character: WASD/arrows move relative to the camera, Shift runs,
+    /// Space jumps. A CharacterController has no Rigidbody, so gravity and jumping are integrated here by hand.
+    /// Used by Henry's mini-exercises (the hamster); add RigidbodyPusher on the same object to push things.
     /// </summary>
     [RequireComponent(typeof(CharacterController))]
-    public class HamsterWalker : MonoBehaviour
+    public class ThirdPersonWalker : MonoBehaviour
     {
         [SerializeField] float walkSpeed = 3f;      // m/s
         [SerializeField] float runSpeed = 6f;       // m/s while holding Shift
         [SerializeField] float jumpHeight = 1.2f;   // m
         [SerializeField] float gravity = -20f;      // m/s^2, stronger than real (-9.81) so jumps feel snappy
-        [Tooltip("How fast the hamster turns to face its walking direction (degrees per second).")]
+        [Tooltip("How fast the character turns to face its walking direction (degrees per second).")]
         [SerializeField] float turnSpeed = 720f;
         [SerializeField] Transform cameraTransform;
 

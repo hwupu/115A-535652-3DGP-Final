@@ -1,13 +1,13 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace Project3DGP.MiniEx.Henry
+namespace Project3DGP.Core.Cameras
 {
     /// <summary>
     /// Orbit camera that follows a target. Hold the right mouse button and drag to orbit, scroll to zoom.
     /// The position is a point on a sphere around the target: focus - (rotation * forward) * distance.
     /// </summary>
-    public class FollowCamera : MonoBehaviour
+    public class OrbitFollowCamera : MonoBehaviour
     {
         [SerializeField] Transform target;
         [SerializeField] float distance = 10f;      // radius of the sphere around the target (m)
@@ -18,7 +18,7 @@ namespace Project3DGP.MiniEx.Henry
         [SerializeField] float mouseSensitivity = 0.2f;
         [SerializeField] float zoomSensitivity = 0.01f;
 
-        // LateUpdate runs after every Update, so the hamster has already moved this frame -> no jitter.
+        // LateUpdate runs after every Update, so the target has already moved this frame -> no jitter.
         void LateUpdate()
         {
             if (target == null)
@@ -43,7 +43,7 @@ namespace Project3DGP.MiniEx.Henry
             // Spherical position: rotate "forward" by (pitch, yaw), then step BACK from the focus point
             // by `distance`. The camera keeps the same rotation, so it always looks at the focus.
             var rotation = Quaternion.Euler(pitch, yaw, 0f);
-            var focus = target.position + Vector3.up * 0.5f;   // look at the hamster's body, not its feet
+            var focus = target.position + Vector3.up * 0.5f;   // look at the body, not the feet
             transform.SetPositionAndRotation(focus - rotation * Vector3.forward * distance, rotation);
         }
     }

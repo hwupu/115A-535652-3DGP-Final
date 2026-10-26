@@ -1,5 +1,7 @@
 using System.IO;
+using Project3DGP.Core.Cameras;
 using Project3DGP.Core.Interaction;
+using Project3DGP.Core.Movement;
 using Project3DGP.MiniEx.Henry;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -66,12 +68,12 @@ namespace Project3DGP.EditorTools
             }
 
             var camera = Find(scene, "Main Camera");
-            if (camera != null && !camera.TryGetComponent(out FollowCamera _))
+            if (camera != null && !camera.TryGetComponent(out OrbitFollowCamera _))
             {
-                var follow = Undo.AddComponent<FollowCamera>(camera);
+                var follow = Undo.AddComponent<OrbitFollowCamera>(camera);
                 SetReference(follow, "target", hamster.transform);
-                SetReference(hamster.GetComponent<HamsterWalker>(), "cameraTransform", camera.transform);
-                MagicMenuUtil.Log("Added FollowCamera to Main Camera (target: Hamster)");
+                SetReference(hamster.GetComponent<ThirdPersonWalker>(), "cameraTransform", camera.transform);
+                MagicMenuUtil.Log("Added OrbitFollowCamera to Main Camera (target: Hamster)");
                 created++;
             }
 
@@ -90,7 +92,7 @@ namespace Project3DGP.EditorTools
             controller.radius = 0.3f;
             controller.center = new Vector3(0f, 0.4f, 0f);
             controller.stepOffset = 0.2f;
-            hamster.AddComponent<HamsterWalker>();
+            hamster.AddComponent<ThirdPersonWalker>();
             hamster.AddComponent<RigidbodyPusher>();
 
             var visual = new GameObject("Visual");
@@ -105,7 +107,7 @@ namespace Project3DGP.EditorTools
             // Face the gap between two domino lines.
             hamster.transform.rotation = Quaternion.Euler(0f, 18f, 0f);
             Undo.RegisterCreatedObjectUndo(hamster, "Create Hamster");
-            MagicMenuUtil.Log("Created Hamster (HamsterWalker + RigidbodyPusher)");
+            MagicMenuUtil.Log("Created Hamster (ThirdPersonWalker + RigidbodyPusher)");
             return hamster;
         }
 
