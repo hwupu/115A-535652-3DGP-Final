@@ -14,9 +14,6 @@ The set per member is fixed (proposal §12). The **order is provisional**: a mem
 ## Scaffolding
 **Magic > Mini-Exercises > Create All Planned** creates the folder, README (with the requirement checklist) and demo scene for all 12 planned exercises, plus each member's asmdef. **New Exercise...** creates one (e.g., after a swap). The plan lives in `Assets/_Project/Editor/Magic/MiniExerciseCatalog.cs`; update it if the plan changes.
 
-## Scaffolding
-**Magic > Mini-Exercises > Create All Planned** creates the folder, README (with the requirement checklist) and demo scene for all 12 planned exercises, plus each member's asmdef. **New Exercise...** creates one (e.g., after a swap). The plan lives in `Assets/_Project/Editor/Magic/MiniExerciseCatalog.cs`; update it if the plan changes.
-
 ## Rules for agents working on a mini-exercise
 1. **Work for the assigned member only**, on a branch `feat/<issue>-mini-<code>-<slug>`. The member's git identity commits the work, because LOC is counted per author.
 2. **Generate a clear, readable first version, then hand over.** The member refines it by hand and must be able to explain and modify it live for the TAs. Keep the code simple and well-named, avoid cleverness, and add short comments on the technique (the math or algorithm). In the PR, list the "TA modification points": parameters or functions the TA is likely to ask to change.
