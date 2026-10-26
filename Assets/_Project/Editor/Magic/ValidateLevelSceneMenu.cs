@@ -18,11 +18,11 @@ namespace Project3DGP.EditorTools
             var problems = new List<string>();
 
             foreach (var slot in LevelSkeleton.Slots)
-                if (LevelSkeleton.Find(scene, slot.Path) == null)
+                if (!LevelSkeleton.Exists(scene, slot))
                     problems.Add($"Missing {slot.Path}: {slot.Purpose}");
 
             var cup = LevelSkeleton.Find(scene, "Gameplay/Goal/Cup");
-            if (cup != null && !(cup.TryGetComponent(out Collider collider) && collider.isTrigger))
+            if (cup != null && !System.Array.Exists(cup.GetComponents<Collider>(), c => c.isTrigger))
                 problems.Add("Gameplay/Goal/Cup needs a trigger collider.");
 
             if (Object.FindObjectsByType<Camera>(FindObjectsSortMode.None).Length == 0)

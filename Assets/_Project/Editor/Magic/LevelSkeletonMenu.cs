@@ -28,7 +28,7 @@ namespace Project3DGP.EditorTools
 
             foreach (var slot in LevelSkeleton.Slots)
             {
-                if (LevelSkeleton.Find(scene, slot.Path) != null)
+                if (LevelSkeleton.Exists(scene, slot))
                     continue;
 
                 var go = CreateObject(slot);
