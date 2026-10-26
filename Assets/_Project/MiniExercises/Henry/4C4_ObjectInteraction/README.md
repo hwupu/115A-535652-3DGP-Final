@@ -12,7 +12,7 @@ A hamster walks around a walled arena. **10 domino lines × 10 tiles = 100 obsta
 - Respawn at the starting spot only when it is free (`Physics.CheckBox`); blocked tiles wait and retry every frame.
 - Random placement without overlap (`NonOverlapPlacement`, rejection sampling with `Physics.CheckBox`): written first, now commented out in `DominoArena.TryRespawn` because respawning at home was chosen.
 - Domino-line layout in a fan around the centre, constant obstacle count with respawn at home, and a HUD that counts obstacle-to-obstacle collisions (`DominoArena`, `ArenaHud`).
-- Camera-relative walking with jump (`HamsterWalker`) and an orbit follow camera (`FollowCamera`).
+- Camera-relative walking with jump (`ThirdPersonWalker`) and an orbit follow camera (`OrbitFollowCamera`), moved to Core in #58 so 4.E.3 reuses them.
 
 ## Controls
 | Key | Action |
@@ -34,6 +34,7 @@ A hamster walks around a walled arena. **10 domino lines × 10 tiles = 100 obsta
 ## Reusable code in Core
 - `Project3DGP.Core.Interaction.RigidbodyPusher` + `IPushReceiver`: any CharacterController that should push props (golfer bumping garden props, #22).
 - `Project3DGP.Core.Interaction.VanishAfterHit`: props that disappear after being hit.
+- `Project3DGP.Core.Movement.ThirdPersonWalker`, `Project3DGP.Core.Cameras.OrbitFollowCamera`: walking and camera (shared with 4.E.3).
 - `Project3DGP.Core.Spawning.NonOverlapPlacement`: random spawning without overlap (pickups, hazards). Not used by the demo right now.
 
 ## TA modification points
@@ -46,7 +47,7 @@ A hamster walks around a walled arena. **10 domino lines × 10 tiles = 100 obsta
 | Vanish delay, on/off | `DominoArena` → `Vanish Delay`, `Vanish Enabled` (or V in Play mode) |
 | Respawn at home vs random | `DominoArena.TryRespawn()`: home check active, random version commented out (uncomment it and the `respawnArea`/`maxTries` fields) |
 | Respawn gap | `DominoArena` → `Respawn Padding` |
-| Walk / run speed, jump height | `HamsterWalker` on **Hamster** |
+| Walk / run speed, jump height | `ThirdPersonWalker` on **Hamster** |
 | Hit colour | `DominoArena` → `Hit Color` |
 
 ## References
