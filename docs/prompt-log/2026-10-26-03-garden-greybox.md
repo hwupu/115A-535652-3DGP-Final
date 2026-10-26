@@ -28,3 +28,7 @@
   - Models are replaceable prefabs.
 - Terrain sculpting and art are deferred until the code runs (#74).
 - Open: tutorial texts and mentor (#28); gate open condition (#38).
+
+## Follow-up: terrain data in LFS
+- Found after the merge: Unity always saves `TerrainData` as binary, but `*.asset` is set to `text eol=lf` in `.gitattributes`. A commit from Windows could corrupt the file through line-ending conversion. The committed copy was checked and is intact.
+- Added `*TerrainData.asset` to LFS in `.gitattributes` and renormalized the L1 terrain data.
