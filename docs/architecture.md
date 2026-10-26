@@ -232,6 +232,7 @@ public class LevelManager : MonoBehaviour
 | Upper left | **Time bar** (visible) + Warning/Critical icon | `DangerManager.Progress01`, `StateChanged` |
 | Upper right | **Menu button** → menu dialog; opening it pauses the game | `LevelManager.SetPaused` |
 | Left side, vertical | Power meter with the running marker | `ShotController.PowerMarker01` |
+| Bottom | **Dialog bar** (tutorial prompts in L1, story lines); non-blocking, skippable | `GardenTutorial` (#28), generic dialog box in `Core/UI` |
 | Elsewhere (TBD) | Club name, stroke count, later XP bar and minimap (#78) | `ShotController`, `ScoreKeeper`, `GameSession` |
 
 Plain uGUI for now (sprites later). The menu dialog and its items are #77 (items undecided).
@@ -269,7 +270,9 @@ Gameplay                what the ball and player interact with
 UI                      HUD canvas, menu dialog
 ```
 
-The tool moves only the default `Main Camera`, `Directional Light` and `Global Volume` from the scene root into their group, keeping their world position; it never changes anything else. Until the prefabs exist, the slots are empty placeholders. Later the tool will add each owner's prefab into its slot.
+The tool moves only the default `Main Camera`, `Directional Light` and `Global Volume` from the scene root into their group, keeping their world position; it never changes anything else. Until the prefabs exist, the slots are empty placeholders. Later the tool will add each owner's prefab into its slot (#95).
+
+**Placeholder prefabs** (*Magic > Prefabs > Create Placeholder Prefabs*, `Prefabs/Course|Nature|Characters/`): each prefab has a root that holds the colliders (and later the scripts), plus a `Visual` child that holds the meshes. To use a real model, open the prefab and replace `Visual`; every placed copy updates. **Terrain** (*Magic > Level > Create Level Terrain*): 50 × 50 m with its surface at y = 0 and 2 m of depth below for ponds. Layers are Grass, Fairway, Sand and Snow; the data is in `Art/Terrain/<Scene>_TerrainData.asset`.
 
 ## 5. Event flow of one shot
 ```mermaid

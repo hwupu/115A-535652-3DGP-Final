@@ -20,9 +20,12 @@ namespace Project3DGP.EditorTools
             public Vector3 Scale = Vector3.one;
             public bool Trigger;     // make the primitive's collider a trigger
             public string Purpose;   // shown by Validate
+            public string SatisfiedBy; // another path that counts as this slot (e.g., Terrain instead of Ground)
         }
 
         // Parents come before their children. Order = order in the Hierarchy.
+        public const string TerrainPath = "Environment/Course/Terrain";
+
         public static readonly Slot[] Slots =
         {
             new Slot { Path = "Systems", Purpose = "Level managers (no visuals)" },
@@ -40,7 +43,7 @@ namespace Project3DGP.EditorTools
             new Slot
             {
                 Path = "Environment/Course/Ground", Shape = Shape.Plane, Scale = new Vector3(5f, 1f, 5f),
-                Purpose = "Ground plane (50 x 50 m)",
+                Purpose = "Ground plane (50 x 50 m), or a Terrain", SatisfiedBy = TerrainPath,
             },
             new Slot { Path = "Environment/Boundary", Purpose = "Walls or edges that keep the ball in" },
             new Slot { Path = "Environment/Props", Purpose = "Decoration (counts toward >= 100 objects, #74)" },
@@ -84,6 +87,10 @@ namespace Project3DGP.EditorTools
             }
             return null;
         }
+
+        /// <summary>True if the slot, or the object that can stand in for it, is in the scene.</summary>
+        public static bool Exists(Scene scene, Slot slot) =>
+            Find(scene, slot.Path) != null || (slot.SatisfiedBy != null && Find(scene, slot.SatisfiedBy) != null);
 
         public static string ParentPath(string path)
         {
