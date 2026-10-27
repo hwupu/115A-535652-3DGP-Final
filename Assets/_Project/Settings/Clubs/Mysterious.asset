@@ -19,4 +19,4 @@ MonoBehaviour:
   MarkerCycleSeconds: 2
   LaunchPitch: 30
   Noise: 0.1
-  ToolPrefab: {fileID: 0}
+  ToolPrefab: {fileID: 123625984478244930, guid: ae93eaf684e994a7281a118f20b6e847, type: 3}
