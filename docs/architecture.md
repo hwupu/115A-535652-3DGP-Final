@@ -115,6 +115,8 @@ Implementation (#15): `ShotMath` holds the formula (speed = Lerp(Min, Max, power
 | Sledgehammer | high | low (wide cone) | loud (Level 1 noise) |
 | **Mysterious** (codename; real tool TBD) | low | high (narrow cone) | name and look to be decided |
 
+Shipped defaults (#16, `Settings/Clubs/`, tune in the Inspector): Standard 4–16 m/s, cone 10°, marker 1.6 s, pitch 25°, noise 0.3 · Sledgehammer 8–26 m/s, cone 30°, marker 1.2 s, pitch 20°, noise 1 · Mysterious 2–10 m/s, cone 3°, marker 2 s, pitch 30°, noise 0.1. Keys 1–3 pick the slot in `AvailableClubs` order, the wheel steps through it (wraps); only while `Aiming`.
+
 ### 4.3 Golfer avatar — Henry
 ```csharp
 public class GolferAvatar : MonoBehaviour

@@ -6,14 +6,19 @@ using UnityEngine;
 namespace Project3DGP.EditorTools
 {
     /// <summary>
-    /// Magic > Game > Create Club Profiles (#15): creates the missing ClubProfile assets in Settings/Clubs.
-    /// #15 ships the Standard club; #16 adds the Sledgehammer and the Mysterious tool to the list below.
-    /// Existing assets are never changed (balancing happens in the Inspector).
+    /// Magic > Game > Create Club Profiles (#15, #16): creates the missing ClubProfile assets in Settings/Clubs:
+    /// Standard, Sledgehammer and Mysterious (architecture §4.2). Existing assets are never changed
+    /// (balancing happens in the Inspector, #46).
     /// </summary>
     public static class ClubProfilesMenu
     {
         public const string Folder = "Assets/_Project/Settings/Clubs";
         public const string StandardPath = Folder + "/Standard.asset";
+        public const string SledgehammerPath = Folder + "/Sledgehammer.asset";
+        public const string MysteriousPath = Folder + "/Mysterious.asset";
+
+        /// <summary>All clubs in slot order (keys 1, 2, 3).</summary>
+        public static readonly string[] AllPaths = { StandardPath, SledgehammerPath, MysteriousPath };
 
         [MenuItem(MagicMenuUtil.Root + "Game/Create Club Profiles", priority = MagicMenuUtil.GamePriority + 20)]
         public static void CreateAll()
@@ -21,6 +26,10 @@ namespace Project3DGP.EditorTools
             MagicMenuUtil.EnsureFolder(Folder);
             // Standard golf club: mid range, mid accuracy (architecture §4.2). The only club at the start (#70).
             Ensure(StandardPath, "Standard Club", minSpeed: 4f, maxSpeed: 16f, cone: 10f, cycle: 1.6f, pitch: 25f, noise: 0.3f);
+            // Sledgehammer: high range, low accuracy (wide cone), a faster marker (harder to time), loud.
+            Ensure(SledgehammerPath, "Sledgehammer", minSpeed: 8f, maxSpeed: 26f, cone: 30f, cycle: 1.2f, pitch: 20f, noise: 1f);
+            // Mysterious (codename, real tool TBD): low range, high accuracy (narrow cone), a slow calm marker, quiet.
+            Ensure(MysteriousPath, "Mysterious", minSpeed: 2f, maxSpeed: 10f, cone: 3f, cycle: 2f, pitch: 30f, noise: 0.1f);
             AssetDatabase.SaveAssets();
         }
 

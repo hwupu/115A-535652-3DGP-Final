@@ -5,6 +5,7 @@ using Project3DGP.Game.Controls;
 using Project3DGP.Game.Golf;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 using UnityEngine.TestTools;
 
 namespace Project3DGP.Game.Tests
@@ -16,13 +17,14 @@ namespace Project3DGP.Game.Tests
     public class ShotControllerTests : InputTestFixture
     {
         Mouse _mouse;
+        Keyboard _keyboard;
         InputActionAsset _actions;
         GolfInput _input;
-        ClubProfile _club;
+        ClubProfile _club, _club2, _club3;
         GameObject _ground, _ballObject, _shotObject;
         GolfBall _ball;
         ShotController _shot;
-        int _shots;
+        int _shots, _clubChanges;
         ShotInfo _lastShot;
 
         public override void Setup()
@@ -30,7 +32,7 @@ namespace Project3DGP.Game.Tests
             base.Setup();
             Time.timeScale = 4f;
             _mouse = InputSystem.AddDevice<Mouse>();
-            InputSystem.AddDevice<Keyboard>();
+            _keyboard = InputSystem.AddDevice<Keyboard>();
 
             _actions = InputActionAsset.FromJson(File.ReadAllText("Assets/_Project/Settings/Input/GolfControls.inputactions"));
             _input = ScriptableObject.CreateInstance<GolfInput>();
@@ -39,6 +41,8 @@ namespace Project3DGP.Game.Tests
             _club = ScriptableObject.CreateInstance<ClubProfile>();
             _club.MinSpeed = 2f;
             _club.MaxSpeed = 6f;
+            _club2 = ScriptableObject.CreateInstance<ClubProfile>();
+            _club3 = ScriptableObject.CreateInstance<ClubProfile>();
 
             _ground = GameObject.CreatePrimitive(PrimitiveType.Plane);
             _ground.transform.localScale = new Vector3(3f, 1f, 3f);
@@ -51,11 +55,12 @@ namespace Project3DGP.Game.Tests
             _shotObject = new GameObject("Shot");
             _shotObject.SetActive(false);   // wire before Awake / OnEnable
             _shot = _shotObject.AddComponent<ShotController>();
-            _shot.Configure(_input, _ball, new[] { _club });
+            _shot.Configure(_input, _ball, new[] { _club, _club2, _club3 });
             _shotObject.SetActive(true);
 
-            _shots = 0;
+            _shots = _clubChanges = 0;
             _shot.ShotTaken += info => { _shots++; _lastShot = info; };
+            _shot.ClubChanged += _ => _clubChanges++;
         }
 
         public override void TearDown()
@@ -66,6 +71,8 @@ namespace Project3DGP.Game.Tests
             Object.Destroy(_ground);
             Object.Destroy(_input);
             Object.Destroy(_club);
+            Object.Destroy(_club2);
+            Object.Destroy(_club3);
             Object.Destroy(_actions);
             base.TearDown();
         }
@@ -78,6 +85,56 @@ namespace Project3DGP.Game.Tests
             yield return null;
             Release(_mouse.leftButton);
             yield return null;
+        }
+
+        IEnumerator Tap(KeyControl key)
+        {
+            Press(key);
+            yield return null;
+            Release(key);
+            yield return null;
+        }
+
+        IEnumerator Scroll(float y)
+        {
+            Set(_mouse.scroll.y, y);
+            yield return null;
+            Set(_mouse.scroll.y, 0f);
+            yield return null;
+            yield return new WaitForSecondsRealtime(0.2f);   // past GolfInput's wheel cooldown (unscaled 0.15 s)
+        }
+
+        [UnityTest]
+        public IEnumerator NumberKeys_SelectClubSlots()
+        {
+            yield return Tap(_keyboard.digit3Key);
+            Assert.That(_shot.CurrentClub, Is.SameAs(_club3));
+            yield return Tap(_keyboard.digit2Key);
+            Assert.That(_shot.CurrentClub, Is.SameAs(_club2));
+            Assert.That(_clubChanges, Is.EqualTo(2), "ClubChanged raised for each change");
+
+            yield return Tap(_keyboard.digit2Key);   // same club again: no event
+            Assert.That(_clubChanges, Is.EqualTo(2));
+        }
+
+        [UnityTest]
+        public IEnumerator Wheel_StepsThroughClubs_AndWrapsAround()
+        {
+            yield return Scroll(-120f);   // wheel down = next
+            Assert.That(_shot.CurrentClub, Is.SameAs(_club2));
+            yield return Scroll(120f);    // wheel up = previous
+            Assert.That(_shot.CurrentClub, Is.SameAs(_club));
+            yield return Scroll(120f);    // previous from the first = the last
+            Assert.That(_shot.CurrentClub, Is.SameAs(_club3));
+        }
+
+        [UnityTest]
+        public IEnumerator ClubCannotChange_InFlight()
+        {
+            yield return Click();
+            Assert.That(_shot.Phase, Is.EqualTo(ShotPhase.InFlight));
+            yield return Tap(_keyboard.digit2Key);
+            Assert.That(_shot.CurrentClub, Is.SameAs(_club), "still the club the shot was taken with");
         }
 
         [UnityTest]
