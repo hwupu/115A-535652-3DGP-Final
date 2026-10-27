@@ -8,8 +8,8 @@ using UnityEngine.UI;
 namespace Project3DGP.EditorTools
 {
     /// <summary>
-    /// Magic > Game > Open Shot Test Area (#15): the ball test green plus the real shot sequence: ShotController
-    /// (Standard club), the AimCone at the ball and a vertical power meter on the left of a uGUI canvas.
+    /// Magic > Game > Open Shot Test Area (#15, #16): the ball test green plus the real shot sequence: ShotController
+    /// (all 3 clubs: keys 1-3 / wheel), the AimCone at the ball and a vertical power meter on the left of a uGUI canvas.
     /// New, UNSAVED scene; close it without saving.
     /// </summary>
     public static class ShotTestSceneMenu
@@ -20,7 +20,6 @@ namespace Project3DGP.EditorTools
             ClubProfilesMenu.CreateAll();
             if (!GolfBallTestSceneMenu.OpenArea(out var input, out var ball, out _))
                 return;
-            var club = AssetDatabase.LoadAssetAtPath<ClubProfile>(ClubProfilesMenu.StandardPath);   // after NewScene
 
             var shotObject = new GameObject("ShotController");
             shotObject.SetActive(false);   // wire first, so OnEnable sees the references
@@ -28,9 +27,11 @@ namespace Project3DGP.EditorTools
             var shotSo = new SerializedObject(shot);
             shotSo.FindProperty("input").objectReferenceValue = input;
             shotSo.FindProperty("ball").objectReferenceValue = ball;
+            // Load the clubs after NewScene (it unloads unused assets). All 3 for testing; unlocking is #70.
             var clubs = shotSo.FindProperty("clubs");
-            clubs.arraySize = 1;
-            clubs.GetArrayElementAtIndex(0).objectReferenceValue = club;
+            clubs.arraySize = ClubProfilesMenu.AllPaths.Length;
+            for (var i = 0; i < ClubProfilesMenu.AllPaths.Length; i++)
+                clubs.GetArrayElementAtIndex(i).objectReferenceValue = AssetDatabase.LoadAssetAtPath<ClubProfile>(ClubProfilesMenu.AllPaths[i]);
             shotSo.ApplyModifiedPropertiesWithoutUndo();
             shotObject.SetActive(true);
 

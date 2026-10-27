@@ -11,7 +11,8 @@ namespace Project3DGP.Game.Golf
     ///   Aiming   : the power marker runs up and down (Core PingPongGauge); the aim follows the camera's yaw
     ///   click    : power = marker position, direction = random inside the club's cone, ball.Hit(velocity)
     ///   InFlight : clicks are ignored until the ball raises CameToRest, then back to Aiming
-    /// Club switching (keys / wheel) comes with #16; SelectClub already works.
+    /// Club switching (#16): keys 1-3 pick a slot, the wheel steps through the list (wrapping around).
+    /// Only while Aiming: the club can't change in mid-flight.
     /// </summary>
     public class ShotController : MonoBehaviour
     {
@@ -48,6 +49,8 @@ namespace Project3DGP.Game.Golf
         {
             input.Acquire();
             input.Shoot += OnShoot;
+            input.ClubSlotSelected += OnClubSlotSelected;
+            input.ClubCycled += OnClubCycled;
             ball.CameToRest += OnBallCameToRest;
             if (Phase == ShotPhase.Aiming)
                 _marker.Begin();
@@ -56,6 +59,8 @@ namespace Project3DGP.Game.Golf
         void OnDisable()
         {
             input.Shoot -= OnShoot;
+            input.ClubSlotSelected -= OnClubSlotSelected;
+            input.ClubCycled -= OnClubCycled;
             input.Release();
             ball.CameToRest -= OnBallCameToRest;
         }
@@ -70,6 +75,25 @@ namespace Project3DGP.Game.Golf
             // Control: the club decides how fast the marker runs (one up-and-down = MarkerCycleSeconds).
             _marker.CyclesPerSecond = 1f / Mathf.Max(0.1f, club.MarkerCycleSeconds);
             ClubChanged?.Invoke(club);
+        }
+
+        bool CanChangeClub => InputEnabled && Phase == ShotPhase.Aiming && clubs.Count > 0;
+
+        // Keys 1-3 -> slot 0-2. A slot without a club (e.g. still locked, #70) is ignored.
+        void OnClubSlotSelected(int slot)
+        {
+            if (CanChangeClub && slot >= 0 && slot < clubs.Count)
+                SelectClub(clubs[slot]);
+        }
+
+        // Wheel: step -1 / +1 through the list. The modulo wraps around: next after the last is the first.
+        void OnClubCycled(int step)
+        {
+            if (!CanChangeClub)
+                return;
+            var index = clubs.IndexOf(CurrentClub);
+            var next = ((index + step) % clubs.Count + clubs.Count) % clubs.Count;   // "+ Count" keeps it positive
+            SelectClub(clubs[next]);
         }
 
         void OnShoot()
