@@ -20,11 +20,12 @@ namespace Project3DGP.EditorTools
                 return;
             }
 
-            var input = GolfInputAssetMenu.Create();
-            if (input == null)
+            if (GolfInputAssetMenu.Create() == null)
                 return;
 
             EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
+            // Load AFTER NewScene: opening a scene unloads unused assets and would empty an earlier reference.
+            var input = AssetDatabase.LoadAssetAtPath<GolfInput>(GolfInputAssetMenu.InputPath);
             var overlay = new GameObject("GolfInputDebug").AddComponent<GolfInputDebugOverlay>();
             var so = new SerializedObject(overlay);
             so.FindProperty("input").objectReferenceValue = input;
