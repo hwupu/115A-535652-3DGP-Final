@@ -50,6 +50,16 @@ Hi! Here's how we work and how to get going.
 
 Details per sprint: [`docs/scrum/roadmap.md`](docs/scrum/roadmap.md) and the [board](https://github.com/users/hwupu/projects/2).
 
+## 🎮 Controls
+| Action | Default |
+|---|---|
+| Orbit the camera around the ball | Hold right mouse button + move the mouse |
+| Shoot (power under the marker) | Left click |
+| Switch club | `1` `2` `3`, or mouse wheel (up = previous, down = next) |
+| Switch camera view | `V` |
+| Pause menu | `Esc` |
+| Retry | `R` |
+
 ## 🛠️ One-time setup
 1. **Install (all required):** Unity Hub + Unity **6000.3.26f1** (exact version), Git 2.40+, Git LFS 3.x, an agentic IDE (e.g., Rider, VS Code or Cursor), **Claude Code**, and the GitHub CLI **`gh`**.
 2. **Git LFS:** `brew install git-lfs` (Mac) or `winget install GitHub.GitLFS` (Windows), then `git lfs install`.
