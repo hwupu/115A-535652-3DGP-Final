@@ -107,6 +107,7 @@ public class ShotController : MonoBehaviour
 }
 ```
 `AimCone` draws the cone at the ball (e.g., two lines or a flat mesh), pointing along `CameraRig.AimYaw`, width = `CurrentClub.AimConeDegrees`. Visible only while `Aiming`.
+Implementation (#15): `ShotMath` holds the formula (speed = Lerp(Min, Max, power); yaw = aim + spread x cone/2; pitch = `LaunchPitch`). The marker is a Core `PingPongGauge` (one cycle = `MarkerCycleSeconds`). Club assets live in `Settings/Clubs/` (Magic > Game > Create Club Profiles). **TEMP(#19):** until `CameraRig` exists, the aim yaw comes from `Golf/TemporaryAimYaw.cs` (main camera's horizontal forward); delete that file and use `CameraRig.AimYaw` in `ShotController` and `AimCone` once #19 is merged (comment on #15 / #19).
 
 | Club | Range (Min..Max speed) | Accuracy (cone) | Notes |
 |---|---|---|---|
