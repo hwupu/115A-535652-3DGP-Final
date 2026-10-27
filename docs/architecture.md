@@ -66,6 +66,7 @@ public class GolfBall : MonoBehaviour            // Rigidbody + SphereCollider
 public class InvalidZone : MonoBehaviour { }   // trigger volume: water, outside the course, ...
 ```
 Physics: a Rigidbody sphere with friction **rolls by itself** (PhysX spins it from contact friction; no fake animation). PhysX has no rolling resistance, so the ball uses linear/angular damping plus a rest threshold (speed below X for Y seconds → stop and raise `CameToRest`). Surfaces differ by `PhysicsMaterial` (#17). Falling below a kill height also counts as out of bounds.
+Implementation (#14, PO 2026-10-27): **at rest the ball is kinematic**, so `AddExternalForce` (wind, ice, traps) only acts while it moves. Stopped = speed < 0.15 m/s for 0.5 s, or a 20 s timeout (`Core/Motion/RestDetector`). `LastValidPosition` = the newest ground contact (sampled every 0.1 s, last second) that is clear of every `InvalidZone`, else where the ball last stopped. Out of bounds: `WentOutOfBounds` → reset → `CameToRest` (so the camera, timer and avatar treat it like a normal stop). Prefab: `Prefabs/Shared/GolfBall.prefab` (Magic > Game > Create Golf Ball Prefab).
 
 ### 4.2 Shot, aim cone and clubs — Henry
 ```csharp
