@@ -1,5 +1,6 @@
 using Project3DGP.Core.UI;
 using Project3DGP.Game.Golf;
+using Project3DGP.Game.Player;
 using Project3DGP.Game.UI;
 using UnityEditor;
 using UnityEngine;
@@ -9,7 +10,7 @@ namespace Project3DGP.EditorTools
 {
     /// <summary>
     /// Magic > Game > Open Shot Test Area (#15, #16): the ball test green plus the real shot sequence: ShotController
-    /// (all 3 clubs: keys 1-3 / wheel), the AimCone at the ball and a vertical power meter on the left of a uGUI canvas.
+    /// (all 3 clubs: keys 1-3 / wheel), the golfer avatar (#88, with test wiring), the AimCone at the ball and a vertical power meter on the left of a uGUI canvas.
     /// New, UNSAVED scene; close it without saving.
     /// </summary>
     public static class ShotTestSceneMenu
@@ -18,6 +19,7 @@ namespace Project3DGP.EditorTools
         static void Open()
         {
             ClubProfilesMenu.CreateAll();
+            var hasAvatar = GolferAvatarPrefabMenu.Create() != null;   // needs the Hamster placeholder prefab
             if (!GolfBallTestSceneMenu.OpenArea(out var input, out var ball, out _))
                 return;
 
@@ -47,7 +49,22 @@ namespace Project3DGP.EditorTools
             coneSo.ApplyModifiedPropertiesWithoutUndo();
 
             BuildPowerMeter(shot);
+            if (hasAvatar)
+                AddAvatar(shot, ball);
             MagicMenuUtil.Log("Opened an unsaved shot test area. Press Play; close it without saving.");
+        }
+
+        // The golfer avatar (#88) + the test wiring that stands in for LevelManager (#27).
+        static void AddAvatar(ShotController shot, GolfBall ball)
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(GolferAvatarPrefabMenu.AvatarPath);   // after NewScene
+            var avatar = ((GameObject)PrefabUtility.InstantiatePrefab(prefab)).GetComponent<GolferAvatar>();
+            var wiring = new GameObject("GolferAvatarTestWiring").AddComponent<GolferAvatarTestWiring>();
+            var so = new SerializedObject(wiring);
+            so.FindProperty("shot").objectReferenceValue = shot;
+            so.FindProperty("ball").objectReferenceValue = ball;
+            so.FindProperty("avatar").objectReferenceValue = avatar;
+            so.ApplyModifiedPropertiesWithoutUndo();
         }
 
         // Canvas > PowerMeter (left, vertical) > Fill + Label, read by PowerMeterView through a Core BarView.
