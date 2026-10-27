@@ -12,6 +12,7 @@ namespace Project3DGP.EditorTools
     /// Magic > Prefabs > Create Placeholder Prefabs (#9): primitive stand-ins for models, made only if missing.
     /// Every prefab is a root with the colliders plus a "Visual" child with the meshes (no colliders).
     /// To use a real model later, open the prefab and replace "Visual"; scene instances update everywhere.
+    /// #88 adds the hero hamster, the princess and the three tools (Prefabs/Characters, Prefabs/Tools).
     /// </summary>
     public static class PlaceholderPrefabsMenu
     {
@@ -27,6 +28,11 @@ namespace Project3DGP.EditorTools
             ("Nature/Bush", BuildBush),
             ("Nature/Rock", BuildRock),
             ("Characters/Cat", BuildCat),
+            ("Characters/Hamster", BuildHamster),
+            ("Characters/Princess", BuildPrincess),
+            ("Tools/StandardClub", BuildStandardClub),
+            ("Tools/Sledgehammer", BuildSledgehammer),
+            ("Tools/Mysterious", BuildMysterious),
         };
 
         [MenuItem(MagicMenuUtil.Root + "Prefabs/Create Placeholder Prefabs", priority = MagicMenuUtil.PrefabsPriority)]
@@ -172,6 +178,87 @@ namespace Project3DGP.EditorTools
             box.size = new Vector3(1f, 1.2f, 2.4f);
         }
 
+        // ---- Hamsters (#88). Shapes borrowed from mini-exercise 4.A.1; built in "hamster units" inside a Visual
+        // scaled x HamsterScale (about 1.3 m tall), facing +Z, feet at the root. No collider: the ball passes through.
+        // To use the Blender model later, replace the Visual child (keep a "ToolSocket" in the right hand).
+        const float HamsterScale = 1.5f;
+        static readonly Color Fur = new(0.85f, 0.6f, 0.35f);
+
+        // The hero: plain hamster holding a tool in the right hand (ShoulderR > HandR > ToolSocket).
+        static void BuildHamster(GameObject root) => HamsterBody(root, PlaceholderMaterials.Get("Hamster", Fur));
+
+        // The princess: lighter fur, a gold crown and a pink skirt.
+        static void BuildPrincess(GameObject root)
+        {
+            var visual = HamsterBody(root, PlaceholderMaterials.Get("HamsterPrincess", new Color(0.95f, 0.85f, 0.7f)));
+            Part(visual, PrimitiveType.Cylinder, "Crown", new Vector3(0f, 0.86f, 0.03f), new Vector3(0.16f, 0.04f, 0.16f),
+                PlaceholderMaterials.Get("Gold", new Color(1f, 0.8f, 0.2f)));
+            Part(visual, PrimitiveType.Cylinder, "Skirt", new Vector3(0f, 0.18f, 0f), new Vector3(0.66f, 0.1f, 0.66f),
+                PlaceholderMaterials.Get("Pink", new Color(1f, 0.55f, 0.75f)));
+        }
+
+        static Transform HamsterBody(GameObject root, Material fur)
+        {
+            var dark = PlaceholderMaterials.Get("HamsterDark", new Color(0.2f, 0.12f, 0.1f));
+            var visual = Visual(root);
+            visual.localScale = Vector3.one * HamsterScale;
+            Part(visual, PrimitiveType.Capsule, "Body", new Vector3(0f, 0.4f, 0f), new Vector3(0.6f, 0.4f, 0.6f), fur);
+            Part(visual, PrimitiveType.Sphere, "EarL", new Vector3(-0.15f, 0.78f, 0.05f), Vector3.one * 0.15f, fur);
+            Part(visual, PrimitiveType.Sphere, "EarR", new Vector3(0.15f, 0.78f, 0.05f), Vector3.one * 0.15f, fur);
+            Part(visual, PrimitiveType.Sphere, "EyeL", new Vector3(-0.09f, 0.6f, 0.26f), Vector3.one * 0.06f, dark);
+            Part(visual, PrimitiveType.Sphere, "EyeR", new Vector3(0.09f, 0.6f, 0.26f), Vector3.one * 0.06f, dark);
+            Part(visual, PrimitiveType.Sphere, "Nose", new Vector3(0f, 0.5f, 0.3f), Vector3.one * 0.08f, dark);
+            Part(visual, PrimitiveType.Sphere, "LegL", new Vector3(-0.15f, 0.06f, 0.08f), Vector3.one * 0.16f, fur);
+            Part(visual, PrimitiveType.Sphere, "LegR", new Vector3(0.15f, 0.06f, 0.08f), Vector3.one * 0.16f, fur);
+            var armL = Part(visual, PrimitiveType.Capsule, "ArmL", new Vector3(-0.33f, 0.38f, 0.05f), new Vector3(0.08f, 0.13f, 0.08f), fur);
+            armL.localRotation = Quaternion.Euler(0f, 0f, -15f);
+
+            // Right arm as pivots (like 4.A.1's A_Shoulder > B_Wrist), so a swing can rotate the shoulder later (#36).
+            var shoulder = Pivot(visual, "ShoulderR", new Vector3(0.15f, 0.55f, 0.32f));
+            Part(shoulder, PrimitiveType.Capsule, "ArmR", new Vector3(0f, -0.12f, 0f), new Vector3(0.08f, 0.13f, 0.08f), fur);
+            var hand = Pivot(shoulder, "HandR", new Vector3(0f, -0.25f, 0f));
+            Part(hand, PrimitiveType.Sphere, "Hand", Vector3.zero, Vector3.one * 0.1f, fur);
+            Pivot(hand, "ToolSocket", new Vector3(0f, 0.01f, 0f));   // GolferAvatar.SetTool puts the tool here
+            return visual;
+        }
+
+        // ---- Tools (#16, #88): held at the grip (the root), pointing down -Y, sized in hamster units
+        // (the hamster's Visual scales them with it). ClubProfile.ToolPrefab points here.
+
+        static void BuildStandardClub(GameObject root)
+        {
+            var metal = PlaceholderMaterials.Get("Metal", new Color(0.75f, 0.78f, 0.82f));
+            var visual = Visual(root);
+            Part(visual, PrimitiveType.Cylinder, "Shaft", new Vector3(0f, -0.15f, 0f), new Vector3(0.02f, 0.15f, 0.02f), metal);
+            Part(visual, PrimitiveType.Cube, "Head", new Vector3(0f, -0.285f, 0.03f), new Vector3(0.04f, 0.03f, 0.1f), metal);
+        }
+
+        static void BuildSledgehammer(GameObject root)
+        {
+            var visual = Visual(root);
+            visual.localRotation = Quaternion.Euler(0f, 90f, 0f);   // head across the swing, so its face hits the ball
+            Part(visual, PrimitiveType.Cylinder, "Handle", new Vector3(0f, -0.13f, 0f), new Vector3(0.025f, 0.13f, 0.025f), PlaceholderMaterials.Wood);
+            Part(visual, PrimitiveType.Cube, "Head", new Vector3(0f, -0.26f, 0f), new Vector3(0.08f, 0.08f, 0.16f),
+                PlaceholderMaterials.Get("Iron", new Color(0.25f, 0.25f, 0.28f)));
+        }
+
+        // Codename tool (real name/look TBD): a purple wand with a glowing orb (unlit = looks like it glows).
+        static void BuildMysterious(GameObject root)
+        {
+            var visual = Visual(root);
+            Part(visual, PrimitiveType.Cylinder, "Wand", new Vector3(0f, -0.14f, 0f), new Vector3(0.018f, 0.14f, 0.018f), PlaceholderMaterials.Portal);
+            Part(visual, PrimitiveType.Sphere, "Orb", new Vector3(0f, -0.3f, 0f), Vector3.one * 0.07f,
+                PlaceholderMaterials.Get("MagicGlow", new Color(0.85f, 0.7f, 1f), "Universal Render Pipeline/Unlit"));
+        }
+
+        static Transform Pivot(Transform parent, string name, Vector3 position)
+        {
+            var pivot = new GameObject(name).transform;
+            pivot.SetParent(parent, false);
+            pivot.localPosition = position;
+            return pivot;
+        }
+
         static Transform Visual(GameObject root)
         {
             var visual = new GameObject("Visual").transform;
@@ -179,7 +266,7 @@ namespace Project3DGP.EditorTools
             return visual;
         }
 
-        static void Part(Transform parent, PrimitiveType type, string name, Vector3 position, Vector3 scale, Material material)
+        static Transform Part(Transform parent, PrimitiveType type, string name, Vector3 position, Vector3 scale, Material material)
         {
             var go = GameObject.CreatePrimitive(type);
             Object.DestroyImmediate(go.GetComponent<Collider>());
@@ -188,6 +275,7 @@ namespace Project3DGP.EditorTools
             go.transform.localPosition = position;
             go.transform.localScale = scale;
             go.GetComponent<MeshRenderer>().sharedMaterial = material;
+            return go.transform;
         }
     }
 }

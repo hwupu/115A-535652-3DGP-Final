@@ -34,6 +34,7 @@ The set per member is fixed (proposal §12). The **order is provisional**: a mem
 10. **Real-time performance:** test it in Play mode. Avoid per-frame allocations in simulations.
 11. **Export for E3:** the folder must be exportable on its own (e.g., Assets > Export Package of the folder plus Core).
 12. When an exercise is done, note in its issue which parts can be reused in the game and link the game story that reuses them.
+13. **Don't break finished exercises (PO, 2026-10-27).** The game project is the main project, but a change to anything a mini-exercise depends on (Core code, shared Editor helpers, Input/Project settings, layers/tags) must be reflected in the affected exercises in the same PR: update their code/scene/setup tool and re-check them in Play mode, so they still run for the E3 upload and the demo. If keeping an exercise working would hold back the game, ask the PO.
 
 ## Reuse in the game (where the game story lives)
 | Exercise | Reuse target |
