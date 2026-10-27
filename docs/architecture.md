@@ -8,7 +8,8 @@ Sources: proposal §6 (gameplay, danger system, clubs) and §7 (level independen
 | Area | Owner | Components | Folder (`Assets/_Project/Scripts/Game/`) | Issues |
 |---|---|---|---|---|
 | Ball | Henry | `GolfBall`, `InvalidZone` | `Golf/` | #14 |
-| Shot + clubs | Henry | `ShotController`, `AimCone`, `ClubProfile` | `Golf/` | #13, #15, #16, #70 |
+| Input | Henry | `GolfInput` (+ `GolfControls.inputactions` in `Settings/Input/`) | `Controls/` | #13 |
+| Shot + clubs | Henry | `ShotController`, `AimCone`, `ClubProfile` | `Golf/` | #15, #16, #70 |
 | Golfer avatar | Henry | `GolferAvatar` (placeholder box for now) | `Player/` | #88, #36 |
 | Cross-scene data | Henry | `GameSession` | `Session/` | #89 |
 | Camera | Bahadir | `CameraRig` | `Camera/` | #19 |
@@ -28,7 +29,7 @@ Sources: proposal §6 (gameplay, danger system, clubs) and §7 (level independen
 3. **The shared components are prefabs** (`Prefabs/Shared/`). The level skeleton tool (#8, Magic > Level, §4.10) gives every level the same slots; once the prefabs exist, it drops them in and wires them to the `LevelManager`.
 4. **Level escalation listens to `DangerManager.StateChanged`**. Cat, sandstorm and ice cracks each live in their level folder, not in `DangerManager`.
 5. **Tunable numbers live in ScriptableObjects** (`ClubProfile`, `DangerConfig`), so balancing (#46) doesn't need code changes. Each level has its own `DangerConfig`.
-6. Input goes through the Input System actions (#13). Only `ShotController` (shoot, club switch) and `CameraRig` (orbit) read gameplay input.
+6. Input goes through the Input System actions via `GolfInput` (#13, §4.11). Only `ShotController` (shoot, club switch) and `CameraRig` (orbit, view) read gameplay input; `LevelManager` reads pause and retry.
 7. **Keep it simple:** Unity physics simulates the ball; the GUI is plain uGUI (sprites later); the avatar is a box until the Blender model exists.
 
 ## 3. Gameplay loop (PO, 2026-10-26)
@@ -273,6 +274,27 @@ UI                      HUD canvas, menu dialog
 The tool moves only the default `Main Camera`, `Directional Light` and `Global Volume` from the scene root into their group, keeping their world position; it never changes anything else. Until the prefabs exist, the slots are empty placeholders. Later the tool will add each owner's prefab into its slot (#95).
 
 **Placeholder prefabs** (*Magic > Prefabs > Create Placeholder Prefabs*, `Prefabs/Course|Nature|Characters/`): each prefab has a root that holds the colliders (and later the scripts), plus a `Visual` child that holds the meshes. To use a real model, open the prefab and replace `Visual`; every placed copy updates. **Terrain** (*Magic > Level > Create Level Terrain*): 50 × 50 m with its surface at y = 0 and 2 m of depth below for ponds. Layers are Grass, Fairway, Sand and Snow; the data is in `Art/Terrain/<Scene>_TerrainData.asset`.
+
+### 4.11 Input — Henry (#13)
+```csharp
+[CreateAssetMenu] public class GolfInput : ScriptableObject   // one shared asset: Settings/Input/GolfInput.asset
+{
+    public void Acquire();                 // in OnEnable; the first user turns the actions on
+    public void Release();                 // in OnDisable; the last user turns them off
+    public bool GameplayEnabled { get; set; }   // off during flight and pause; pause/retry stay on
+
+    public bool IsOrbiting { get; }        // right mouse held (CameraRig)
+    public Vector2 OrbitDelta { get; }     // mouse delta this frame while orbiting, else zero (CameraRig)
+
+    public event Action Shoot;             // left click (ShotController)
+    public event Action<int> ClubSlotSelected; // keys 1-3 -> 0..2 (ShotController)
+    public event Action<int> ClubCycled;   // wheel: -1 previous, +1 next (ShotController)
+    public event Action ToggleView;        // V (CameraRig, optional overview)
+    public event Action Pause;             // Esc (LevelManager)
+    public event Action Retry;             // R (LevelManager)
+}
+```
+Keyboard + mouse only (PO, 2026-10-27; no gamepad). Action maps: `Gameplay` (Orbit, Look, Shoot, Club1-3, ClubScroll, ToggleView) and `System` (Pause, Retry). Prefabs reference the same `GolfInput.asset` (Magic > Game > Create Golf Input Asset). Default keys are listed in the README.
 
 ## 5. Event flow of one shot
 ```mermaid
