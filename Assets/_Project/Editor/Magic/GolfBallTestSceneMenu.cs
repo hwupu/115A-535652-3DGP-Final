@@ -10,26 +10,48 @@ namespace Project3DGP.EditorTools
     /// <summary>
     /// Magic > Game > Open Ball Test Area (#14): opens a new, UNSAVED scene to try the GolfBall: a 60 m green
     /// with open edges (fall off = kill height), a ramp, a wall, a pond (InvalidZone), the ball prefab,
-    /// an orbit camera and the GolfBallDebugHitter. Nothing is saved; close it without saving.
+    /// an orbit camera and the GolfBallDebugHitter. OpenArea is reused by the shot test area (#15). Nothing is saved; close it without saving.
     /// </summary>
     public static class GolfBallTestSceneMenu
     {
         [MenuItem(MagicMenuUtil.Root + "Game/Open Ball Test Area", priority = MagicMenuUtil.GamePriority + 11)]
         static void Open()
         {
+            if (!OpenArea(out var input, out var ball, out var camera))
+                return;
+
+            var hitter = new GameObject("GolfBallDebug").AddComponent<GolfBallDebugHitter>();
+            var hitterSo = new SerializedObject(hitter);
+            hitterSo.FindProperty("input").objectReferenceValue = input;
+            hitterSo.FindProperty("ball").objectReferenceValue = ball;
+            hitterSo.FindProperty("aimCamera").objectReferenceValue = camera.transform;
+            hitterSo.ApplyModifiedPropertiesWithoutUndo();
+
+            MagicMenuUtil.Log("Opened an unsaved ball test area. Press Play; close it without saving.");
+        }
+
+        /// <summary>
+        /// Opens a new unsaved scene with the test green, the ball prefab and an orbit camera on the ball.
+        /// Shared by the ball and shot test areas. Returns false if cancelled or an asset is missing.
+        /// </summary>
+        internal static bool OpenArea(out GolfInput input, out GolfBall ball, out Camera camera)
+        {
+            input = null;
+            ball = null;
+            camera = null;
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
             {
                 MagicMenuUtil.Log("Cancelled: open scenes were not saved.");
-                return;
+                return false;
             }
 
             if (GolfInputAssetMenu.Create() == null || GolfBallPrefabMenu.Create() == null)
-                return;
+                return false;
 
             EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
             // Load the assets AFTER NewScene: opening a scene unloads unused assets, which would empty
             // references taken before it (the hitter's Input field ended up None).
-            var input = AssetDatabase.LoadAssetAtPath<GolfInput>(GolfInputAssetMenu.InputPath);
+            input = AssetDatabase.LoadAssetAtPath<GolfInput>(GolfInputAssetMenu.InputPath);
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(GolfBallPrefabMenu.PrefabPath);
 
             var ground = GameObject.CreatePrimitive(PrimitiveType.Plane);   // 10 m x 10 m at scale 1
@@ -55,26 +77,20 @@ namespace Project3DGP.EditorTools
             water.transform.localScale = new Vector3(6f, 0.02f, 6f);
             water.GetComponent<Renderer>().sharedMaterial = PlaceholderMaterials.Water;
 
-            var ball = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
-            ball.transform.position = new Vector3(0f, GolfBallPrefabMenu.Diameter / 2f, 0f);
+            var ballObject = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+            ballObject.transform.position = new Vector3(0f, GolfBallPrefabMenu.Diameter / 2f, 0f);
+            ball = ballObject.GetComponent<GolfBall>();
 
-            var camera = Camera.main;
+            camera = Camera.main;
             var orbit = camera.gameObject.AddComponent<OrbitFollowCamera>();
             var orbitSo = new SerializedObject(orbit);
-            orbitSo.FindProperty("target").objectReferenceValue = ball.transform;
+            orbitSo.FindProperty("target").objectReferenceValue = ballObject.transform;
             orbitSo.FindProperty("distance").floatValue = 8f;
             orbitSo.FindProperty("pitch").floatValue = 25f;
             orbitSo.ApplyModifiedPropertiesWithoutUndo();
 
-            var hitter = new GameObject("GolfBallDebug").AddComponent<GolfBallDebugHitter>();
-            var hitterSo = new SerializedObject(hitter);
-            hitterSo.FindProperty("input").objectReferenceValue = input;
-            hitterSo.FindProperty("ball").objectReferenceValue = ball.GetComponent<GolfBall>();
-            hitterSo.FindProperty("aimCamera").objectReferenceValue = camera.transform;
-            hitterSo.ApplyModifiedPropertiesWithoutUndo();
-
-            Selection.activeGameObject = ball;
-            MagicMenuUtil.Log("Opened an unsaved ball test area. Press Play; close it without saving.");
+            Selection.activeGameObject = ballObject;
+            return true;
         }
 
         static void Block(string name, Vector3 position, Vector3 scale, Quaternion rotation, Material material)
