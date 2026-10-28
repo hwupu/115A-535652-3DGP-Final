@@ -17,7 +17,9 @@ Sources: proposal §6 (gameplay, danger system, clubs) and §7 (level independen
 | Danger (timer) | Pongpat | `DangerManager`, `DangerConfig` | `Danger/` | #7 |
 | Goal + score | Pongpat | `LevelGoal`, `LevelGoals`, `Cup`, `ScoreKeeper`, `LevelResult` | `Scoring/` | #18, #43 |
 | Level flow | Pongpat | `LevelManager` | `Flow/` | #27 |
-| HUD | Henry | `Hud` (reads the contracts, never writes) | `UI/` | #20, #78 |
+| HUD + menus | Henry | `Hud`, pause / time-up / settings dialogs, main menu, ending screen (read the contracts; call only `ILevelFlow`, `ISaveStore`, `GameSession`) | `UI/` | #20, #30, #77, #78 |
+| Game-flow interfaces | Henry | `IDangerTimer`, `IStrokeCounter`, `ILevelFlow`, `ISaveStore` (the owners implement them) | `Danger/`, `Scoring/`, `Flow/`, `Session/` | #20 |
+| Save & load | Pongpat | implements `ISaveStore` (component on the GameSession prefab) | `Session/` | #44 |
 | Level-specific | level owner | cat / wind + scarabs / ice + guardian | `Levels/Garden`, `Levels/Desert`, `Levels/Lake` | per level |
 
 - Assembly: everything above is in `Project3DGP.Game` (namespace `Project3DGP.Game.<Folder>`). Generic, game-agnostic code (FSM base, timers, UI bars, ...) goes in `Project3DGP.Core` (ADR-0010).
@@ -39,7 +41,7 @@ Sources: proposal §6 (gameplay, danger system, clubs) and §7 (level independen
 3. **In flight.** The camera follows the ball. **The timer is paused.** Input is locked except god keys.
 4. **Ball stops.** The timer resumes. The avatar **teleports** to the ball (next shooting position); back to step 1.
 5. **Out of bounds / invalid area.** The ball goes back to the **nearest valid position** (its last position on valid ground) and play continues.
-6. **Menu.** A **menu button at the upper right** opens the menu dialog; while it's open the **game is paused** (physics, timer, input). Menu items are undecided (#77).
+6. **Menu.** A **menu button at the upper right** opens the menu dialog; while it's open the **game is paused** (physics, timer, input). Items and the other screens: §4.8.
 7. **Win:** the ball meets **all of the level's goals** (PO, 2026-10-28). A goal is anything the ball must reach or hit: the cup, a target spot on a branch, a lever. Each level decides which goals it has and how many. They can be met in any order, **except the cup, which is always last**: until every other goal is met it ignores the ball, which rolls over it like normal ground. When all goals are met, **the timer stops** (the level can no longer fail), the **gate/portal opens**, and the hamster **walks to it by itself** (no new controls). Then the next level loads. **Lose:** the timer reaches 0 while the player is aiming (it can't run out during flight, because it's paused).
 
 ## 4. Contracts
@@ -150,7 +152,7 @@ public class CameraRig : MonoBehaviour
 
 ### 4.5 Danger (timer) — Pongpat
 ```csharp
-public enum DangerState { Normal, Warning, Critical, Failed }
+public enum DangerState { Normal, Warning, Critical, Failed }   // in Danger/IDangerTimer.cs (Henry, #20)
 
 [CreateAssetMenu] public class DangerConfig : ScriptableObject   // one per level, set by hand
 {
@@ -160,7 +162,7 @@ public enum DangerState { Normal, Warning, Critical, Failed }
     public float CriticalBelowSeconds;
 }
 
-public class DangerManager : MonoBehaviour
+public class DangerManager : MonoBehaviour, IDangerTimer   // IDangerTimer = the read-only part (HUD, escalation)
 {
     public DangerState State { get; }
     public float RemainingSeconds { get; }
@@ -209,7 +211,7 @@ public readonly struct LevelResult
     public readonly int Score;               // formula in #43
 }
 
-public class ScoreKeeper : MonoBehaviour
+public class ScoreKeeper : MonoBehaviour, IStrokeCounter    // IStrokeCounter = Strokes + StrokesChanged (HUD)
 {
     public int Strokes { get; }
     public void CountStroke(ShotInfo shot);   // wired to ShotController.ShotTaken
@@ -224,9 +226,9 @@ Implementation (#22): the `LevelGoal` base is in `Scoring/LevelGoal.cs`, written
 
 ### 4.7 Level flow — Pongpat
 ```csharp
-public enum LevelPhase { Intro, Playing, Completed, Failed }
+public enum LevelPhase { Intro, Playing, Completed, Failed }   // in Flow/ILevelFlow.cs (Henry, #20)
 
-public class LevelManager : MonoBehaviour
+public class LevelManager : MonoBehaviour, ILevelFlow   // ILevelFlow = what the HUD and dialogs use
 {
     [SerializeField] GolfBall ball;          [SerializeField] ShotController shot;
     [SerializeField] GolferAvatar avatar;    [SerializeField] CameraRig cameraRig;
@@ -236,7 +238,9 @@ public class LevelManager : MonoBehaviour
     public GolfBall Ball { get; }  /* ...read-only accessors for each reference... */
     public LevelPhase Phase { get; }
 
+    public IDangerTimer Danger { get; } public IStrokeCounter Strokes { get; }   // ILevelFlow
     public void StartLevel(); public void Retry(); public void LoadNext();
+    public void GoToMainMenu();          // unpause, load MainMenu
     public bool IsPaused { get; }
     public void SetPaused(bool paused);   // menu dialog: Time.timeScale = 0, DangerManager.Pause, shot input off
 
@@ -259,16 +263,40 @@ public class LevelExit : MonoBehaviour   // the gate (L1) / portal: closed until
 }
 ```
 
-### 4.8 HUD layout — Henry (menu dialog: Pongpat)
+### 4.8 HUD, menus and screens — Henry (PO, 2026-10-28)
+The UI is built against four small interfaces (Henry, #20), so it works and is tested before the owners' code exists. The owners implement them: `DangerManager : IDangerTimer` (#7), `ScoreKeeper : IStrokeCounter` (#18), `LevelManager : ILevelFlow` (#27), Save & Load `: ISaveStore` (#44).
+```csharp
+public interface IDangerTimer   { DangerState State; float RemainingSeconds; float Progress01; bool IsRunning;
+                                  event Action<DangerState> StateChanged; event Action<float> ProgressJumped; }
+public interface IStrokeCounter { int Strokes; event Action<int> StrokesChanged; }
+public interface ILevelFlow     { LevelPhase Phase; IDangerTimer Danger; IStrokeCounter Strokes; bool IsPaused;
+                                  void SetPaused(bool); void Retry(); void GoToMainMenu();
+                                  event LevelStarted, LevelCompleted(LevelResult), LevelFailed, PausedChanged(bool); }
+public interface ISaveStore     { bool HasSave; void Save(SaveGame); bool TryLoad(out SaveGame); }
+[Serializable] public class SaveGame { public string LevelScene; public GameSessionData Session; }
+```
+
+**HUD** (every level)
 | Screen position | Element | Source |
 |---|---|---|
-| Upper left | **Time bar** (visible) + Warning/Critical icon | `DangerManager.Progress01`, `StateChanged` |
-| Upper right | **Menu button** → menu dialog; opening it pauses the game | `LevelManager.SetPaused` |
+| Upper left | **Time bar** + **stage icon** (cat faces: asleep, eyes half open, ... one sprite per `DangerState`, art by Henry). No numbers. | `IDangerTimer.Progress01`, `StateChanged` |
+| Upper right | **Menu button** → pause dialog | `ILevelFlow.SetPaused` |
 | Left side, vertical | Power meter with the running marker | `ShotController.PowerMarker01` |
 | Bottom | **Dialog bar** (tutorial prompts in L1, story lines); non-blocking, skippable | `GardenTutorial` (#28), generic dialog box in `Core/UI` |
-| Elsewhere (TBD) | Club name, stroke count, later XP bar and minimap (#78) | `ShotController`, `ScoreKeeper`, `GameSession` |
+| Elsewhere (TBD) | Club name, stroke count, later XP bar and minimap (#78) | `ShotController`, `IStrokeCounter`, `GameSession` |
 
-Plain uGUI for now (sprites later). The menu dialog and its items are #77 (items undecided).
+**Screens and dialogs**
+| When | What | Buttons |
+|---|---|---|
+| Menu button | **Pause dialog** (game paused) | Resume, Retry level, Settings, Save, Main menu, Quit |
+| Save, a save exists | Confirm dialog | Overwrite, Cancel |
+| Time up | The level's fail scene plays (L1: the cat wakes up), then the **time-up dialog** | Retry (same level), Main menu, Close (= quit) |
+| Level complete, L1/L2 | No screen: the gate opens, the hamster walks there, the next level loads | — |
+| Level complete, L3 | **Ending** scene: totals of this run (strokes, time left, score) | Main menu, Close (= quit) |
+| MainMenu scene | **Main menu** | Start (new game → L1, no save), Continue (only if a save exists: loads it), Settings, Quit |
+| Settings (pause or main menu) | **Settings panel**: master, music, SFX volume (`GameSession.Data.Settings`) | Back |
+
+Saving is **manual** (pause dialog), **one slot**. A save holds the `GameSessionData` and the level scene; Continue restarts that level from the tee. Plain uGUI with placeholder looks; Henry's art replaces the sprites without code changes.
 
 ### 4.9 Game session — Henry
 ```csharp
@@ -380,9 +408,9 @@ sequenceDiagram
 - The goal is generic (`LevelGoal`). **2026-10-28:** a level can have several goals (cup, branch target spot, lever). All must be met, and the cup is always last. Then the timer stops, the gate/portal opens, and the hamster walks there by itself to load the next level. The water-splash trap and the Level 1 noise gauge are dropped.
 - `GameSession` is owned by Henry.
 - No "ideal one-shot range" mark on the power meter for now (maybe later).
-- HUD: time bar visible at the upper left; menu button at the upper right; opening the menu pauses the game. Menu items undecided.
+- HUD: time bar visible at the upper left; menu button at the upper right; opening the menu pauses the game.
+- **HUD, menus and saving (2026-10-28, §4.8):** time bar + cat-face stage icon, no numbers. Pause dialog: Resume, Retry level, Settings, Save, Main menu, Quit. Time up: fail scene, then Retry / Main menu / Close. No result screen in L1/L2; L3 → Ending with run totals. Main menu: Start, Continue, Settings, Quit. One manual save slot (pause dialog, asks before overwriting); a new game doesn't save; Continue restarts the saved level. Henry writes the interfaces and all UI (pause dialog moved from #77); Pongpat implements them in #7, #18, #27, #44.
 - **Level 1 has no noise mechanism** (2026-10-28): clubs have no noise value, and the cat follows only the danger timer: Normal = asleep, Warning = twitching, then suspicious (eyes half open), Critical = searching (sits up, watches the ball), Failed = **awake = game over**. Code: `Levels/Garden/CatAlertMachine` (FSM, #79) and `GardenCat` (#21); the cat listens to `DangerManager.StateChanged` (rule 4).
 
 ## 7. Open questions
 - Real name and look of the Mysterious tool.
-- Menu dialog items (#77).
