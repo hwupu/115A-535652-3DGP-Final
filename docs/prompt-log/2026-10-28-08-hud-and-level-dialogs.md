@@ -10,6 +10,8 @@
 
 > all green. i don't have cat-face sprites yet. commit the changed in L2 and L3 together.
 
+> ah, i see it is in #117 and #118. revert the L2 L3 files.
+
 ## What the AI did
 - After merging #116, opened **#117** (L2, Bahadir) and **#118** (L3, Pongpat): make the level playable with the Magic tools (skeleton, ball/shot/avatar, level exit). Commented on #27, #38 and #19.
 - Step 2, first part: the HUD and the level dialogs, built against the interfaces from #115:
@@ -22,7 +24,7 @@
 - Magic tools: *Magic > Game > Open UI Test Area* and *Magic > Level > Add HUD and Menus* (every level; shared builder `GameUiBuilder`).
 - Play-mode tests: `GameUiTests` (7).
 - Architecture §4.8 implementation note.
-- Henry ran the tools in all three levels: *Add HUD and Menus* in L1, L2 and L3, and in L2/L3 also the #117/#118 setup (skeleton, *Add Ball, Shot and Avatar*, *Add Level Exit*). Committed together; the owners still place the Gate where their level ends.
+- *Add HUD and Menus* ran in L1 (saved). L2 and L3 changes (HUD plus the #117/#118 setup) were committed, then reverted at Henry's request: the owners do the setup in #117/#118 and also run *Add HUD and Menus* there.
 
 ## Decisions / open questions
 - Henry: no cat-face sprites yet; the stage icon shows coloured squares until they are set in `HudView > Stage Sprites`.
