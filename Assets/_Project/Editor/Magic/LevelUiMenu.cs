@@ -1,3 +1,4 @@
+using Project3DGP.Core.UI;
 using Project3DGP.Game.UI;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -8,6 +9,7 @@ namespace Project3DGP.EditorTools
     /// <summary>
     /// Magic > Level > Add HUD and Menus (#20, architecture §4.8): the shared level UI, for every level scene.
     ///   UI/HUD         HudView: time bar + stage icon, strokes, menu button (on the power meter's canvas if it exists)
+    ///                  DialogBar: tutorial hints and story lines at the bottom (#28, #51)
     ///   UI/Menus       LevelMenus: pause, save confirm, settings and time-up dialogs
     ///   UI/EventSystem if the scene has none (Input System UI module)
     /// Both connect to the level's ILevelFlow (LevelManager, #27) at Start; until it is in the scene the timer and
@@ -44,6 +46,15 @@ namespace Project3DGP.EditorTools
                 var hud = GameUiBuilder.BuildHud(canvas, null);
                 Undo.RegisterCreatedObjectUndo(isNew ? canvas : hud.gameObject, "Add HUD");
                 MagicMenuUtil.Log($"Added the HUD (time bar, stage icon, strokes, menu button) to UI/{canvas.name}");
+                added++;
+            }
+
+            if (Object.FindAnyObjectByType<DialogBar>(FindObjectsInactive.Include) == null)
+            {
+                var hud = Object.FindAnyObjectByType<HudView>(FindObjectsInactive.Include);
+                var bar = GameUiBuilder.BuildDialogBar(hud.GetComponentInParent<Canvas>().gameObject);
+                Undo.RegisterCreatedObjectUndo(bar.gameObject, "Add DialogBar");
+                MagicMenuUtil.Log("Added the dialog bar (tutorial hints, story lines) to the HUD");
                 added++;
             }
 
