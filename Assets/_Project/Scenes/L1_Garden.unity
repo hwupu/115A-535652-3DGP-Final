@@ -5628,6 +5628,7 @@ GameObject:
   m_Component:
   - component: {fileID: 861870434}
   - component: {fileID: 861870435}
+  - component: {fileID: 861870436}
   m_Layer: 0
   m_Name: XpBar
   m_TagString: Untagged
@@ -5673,6 +5674,22 @@ MonoBehaviour:
   pulseScale: 1.4
   pulseSeconds: 0.8
   levelUpColor: {r: 1, g: 0.85, b: 0.2, a: 1}
+--- !u!114 &861870436
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 861870433}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a10c4c86037e748f4962aa49ef8bc636, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project3DGP.Game::Project3DGP.Game.UI.LevelUpNotice
+  dialog: {fileID: 0}
+  levelFormat: Level {0}!
+  unlockFormat: ' New: {0}'
+  seconds: 4
 --- !u!4 &861933003 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4013934506799853289, guid: 5f0a007df6772476ca6babfbc619f9b1, type: 3}
@@ -5689,6 +5706,63 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37dc4f200502a4d6ba57d1ba4e0e8278, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Project3DGP.Game::Project3DGP.Game.Player.GolferAvatar
+--- !u!1001 &865258421
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3553883910472774663, guid: 9cfd25c8bc9bf4d0980eebb21b56ad4a, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -15.03
+      objectReference: {fileID: 0}
+    - target: {fileID: 3553883910472774663, guid: 9cfd25c8bc9bf4d0980eebb21b56ad4a, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.00006
+      objectReference: {fileID: 0}
+    - target: {fileID: 3553883910472774663, guid: 9cfd25c8bc9bf4d0980eebb21b56ad4a, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -11.84
+      objectReference: {fileID: 0}
+    - target: {fileID: 3553883910472774663, guid: 9cfd25c8bc9bf4d0980eebb21b56ad4a, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3553883910472774663, guid: 9cfd25c8bc9bf4d0980eebb21b56ad4a, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3553883910472774663, guid: 9cfd25c8bc9bf4d0980eebb21b56ad4a, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3553883910472774663, guid: 9cfd25c8bc9bf4d0980eebb21b56ad4a, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3553883910472774663, guid: 9cfd25c8bc9bf4d0980eebb21b56ad4a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3553883910472774663, guid: 9cfd25c8bc9bf4d0980eebb21b56ad4a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3553883910472774663, guid: 9cfd25c8bc9bf4d0980eebb21b56ad4a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7135139023895436700, guid: 9cfd25c8bc9bf4d0980eebb21b56ad4a, type: 3}
+      propertyPath: m_Name
+      value: XpSeed
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 9cfd25c8bc9bf4d0980eebb21b56ad4a, type: 3}
 --- !u!1 &871537470
 GameObject:
   m_ObjectHideFlags: 0
@@ -7943,6 +8017,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 56f7e9d5e2f63422485ea3b76c5eac1d, type: 2}
   - {fileID: 11400000, guid: 62b5feb45a9e34a788e0269f89217d98, type: 2}
   - {fileID: 11400000, guid: 608e4457e9a214fbcb9ee14f94d89c55, type: 2}
+  clubsFromSession: 1
 --- !u!1 &1250440559
 GameObject:
   m_ObjectHideFlags: 0
@@ -13205,3 +13280,4 @@ SceneRoots:
   - {fileID: 1330829169}
   - {fileID: 385269130}
   - {fileID: 1505197478}
+  - {fileID: 865258421}

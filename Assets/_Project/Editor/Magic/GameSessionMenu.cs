@@ -63,6 +63,7 @@ namespace Project3DGP.EditorTools
                 starting.arraySize = 1;
                 starting.GetArrayElementAtIndex(0).objectReferenceValue = AssetDatabase.LoadAssetAtPath<ClubProfile>(ClubProfilesMenu.StandardPath);
                 so.ApplyModifiedPropertiesWithoutUndo();
+                LevelingMenu.FillUnlocks(so);   // placeholder unlock table (#70)
                 MagicMenuUtil.EnsureFolder(GolfBallPrefabMenu.Folder);
                 var prefab = PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
                 MagicMenuUtil.Log("Created " + PrefabPath + " (3 clubs, starts with Standard)");

@@ -34,7 +34,8 @@ namespace Project3DGP.EditorTools
             GameUiBuilder.EnsureEventSystem(null);
             var canvas = GameUiBuilder.NewCanvas("HUD", 0);
             GameUiBuilder.BuildHud(canvas, flow);
-            GameUiBuilder.BuildXpBar(canvas);
+            GameUiBuilder.BuildXpBar(canvas).gameObject.AddComponent<LevelUpNotice>();
+            GameUiBuilder.BuildDialogBar(canvas);
             GameUiBuilder.BuildMenus(flow);
 
             MagicMenuUtil.Log("Opened an unsaved UI test area. Press Play: S = shot, F = time up, X = +40 XP, Esc or Menu = pause. Close it without saving.");

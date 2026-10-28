@@ -13,6 +13,7 @@ Sources: proposal §6 (gameplay, danger system, clubs) and §7 (level independen
 | Golfer avatar | Henry | `GolferAvatar` (placeholder box for now) | `Player/` | #88, #36 |
 | Level exit | Henry | `LevelExit` (gate / portal) | `Flow/` | #38 |
 | Cross-scene data | Henry | `GameSession` | `Session/` | #89 |
+| Leveling | Henry | XP + unlock table on `GameSession`, `SkillProfile`, `LevelUnlock`, `XpCollectible` | `Session/` | #70 |
 | Camera | Bahadir | `CameraRig` | `Camera/` | #19 |
 | Danger (timer) | Pongpat | `DangerManager`, `DangerConfig` | `Danger/` | #7 |
 | Goal + score | Pongpat | `LevelGoal`, `LevelGoals`, `Cup`, `ScoreKeeper`, `LevelResult` | `Scoring/` | #18, #43 |
@@ -314,18 +315,20 @@ public class GameSession : MonoBehaviour   // DontDestroyOnLoad; the prefab is i
     public int MaxLevel { get; } public bool IsMaxLevel { get; }
     public int XpForLevel(int level);                           // total XP to reach it (Inspector: xpToReachLevel)
     public float LevelProgress01 { get; }                       // this level -> next, for the HUD (#78)
-    public void AddXp(int amount);                              // leveling (#70): holes, collectibles
+    public void AddXp(int amount);                              // leveling (#70): collectibles; RecordResult adds its own
     public bool Unlock(ClubProfile club);                       // leveling (#70)
+    public bool HasSkill(SkillProfile skill);                   // shot skills (#70) check this
+    public IEnumerable<LevelUnlock> UnlocksAt(int level);       // level-up notice
     public void SetProgress(int playerLevel, int xp);           // debug keys, tests
-    public bool RecordResult(LevelResult result);               // LevelManager (#27); true = new best
+    public bool RecordResult(LevelResult result);               // LevelManager (#27); true = new best; gives XP
     public LevelResult? GetBestResult(string levelId);
     public GameSessionData Data { get; }                        // save/load (#44): JsonUtility.ToJson(Data) ...
     public void Load(GameSessionData data);                     // ... and Load(FromJson<GameSessionData>(json))
     public event Action Changed;                                // HUD (#78), autosave
-    public event Action<int> LeveledUp;                         // new level; #70 unlocks clubs here
+    public event Action<int> LeveledUp;                         // new level; unlocks applied; raised before Changed
 }
 ```
-Implementation (#89): `Session/GameSession` + `Session/GameSessionData`, a plain `[Serializable]` class with public fields: `UnlockedClubs` (club asset names), `PlayerLevel`, `Xp`, `BestResults` (best = higher score, then fewer strokes, then more time left), `RunResults` (every level finished in this run, for the Ending, #30), and `Settings` (master/music/SFX volume, for #77). XP curve (#78, PO 2026-10-28): `xpToReachLevel` on the prefab, default 100 / 250 / 450 / 700 total XP for levels 2–5 (max level 5); `AddXp` levels up as often as the XP allows. *Magic > Game > Add Game Session* puts `Prefabs/Shared/GameSession.prefab` in the open scene. Every scene you can press Play in has one. The first one to wake becomes `Instance` and survives scene loads, and later copies destroy themselves. `LevelResult` (§4.6) was written in #89 so the session could use it; Pongpat owns it from here.
+Implementation (#89): `Session/GameSession` + `Session/GameSessionData`, a plain `[Serializable]` class with public fields: `UnlockedClubs` (club asset names), `PlayerLevel`, `Xp`, `BestResults` (best = higher score, then fewer strokes, then more time left), `RunResults` (every level finished in this run, for the Ending, #30), and `Settings` (master/music/SFX volume, for #77). XP curve (#78, PO 2026-10-28): `xpToReachLevel` on the prefab, default 100 / 250 / 450 / 700 total XP for levels 2–5 (max level 5); `AddXp` levels up as often as the XP allows. Leveling (#70, PO 2026-10-28: functionality first, content TBD): the prefab's **Unlocks** table (level → club and/or `SkillProfile`) is applied at every level-up and on Load; placeholder rows Lv2 Sledgehammer, Lv3 Skill A, Lv4 Mysterious, Lv5 Skill B (*Magic > Game > Set Up Leveling*). XP sources: `RecordResult` gives `xpPerLevelFinished` (100) + `xpPerSecondLeft` (1) per second left; the `XpSeed` prefab (`XpCollectible`, +20 XP when the ball rolls through) is placed by the level owners. With a session, `ShotController` uses `UnlockedClubs` (the Inspector list only in test areas). `UI/LevelUpNotice` writes "Level 3! New: …" in the dialog bar. *Magic > Game > Add Game Session* puts `Prefabs/Shared/GameSession.prefab` in the open scene. Every scene you can press Play in has one. The first one to wake becomes `Instance` and survives scene loads, and later copies destroy themselves. `LevelResult` (§4.6) was written in #89 so the session could use it; Pongpat owns it from here.
 
 ### 4.10 Level scene hierarchy (#8)
 Every level scene has the same root objects. **Magic > Level > Create Level Scene Skeleton** adds any that are missing, and **Magic > Level > Validate Level Scene** lists what's missing. The list itself is in `Editor/Magic/LevelSkeleton.cs`.
