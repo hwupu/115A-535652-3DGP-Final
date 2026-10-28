@@ -29,6 +29,8 @@ namespace Project3DGP.Game.Session
         public IReadOnlyList<ClubProfile> AllClubs => allClubs;
         public int PlayerLevel => _data.PlayerLevel;
         public int Xp => _data.Xp;
+        /// <summary>The save slot (#44) on the same GameSession object, or null until it exists.</summary>
+        public ISaveStore SaveStore => GetComponent<ISaveStore>();
 
         /// <summary>Anything changed (unlock, result, load): HUD and save can refresh.</summary>
         public event Action Changed;
@@ -66,6 +68,7 @@ namespace Project3DGP.Game.Session
         public void Load(GameSessionData data)
         {
             _data = data ?? NewGame();
+            ApplySettings(_data.Settings);
             RefreshUnlocked();
             Changed?.Invoke();
         }
@@ -99,6 +102,13 @@ namespace Project3DGP.Game.Session
         }
 
         public LevelResult? GetBestResult(string levelId) => _data.GetBestResult(levelId);
+
+        /// <summary>Applies the master volume (settings panel, load). Music and SFX read their own volume.</summary>
+        public static void ApplySettings(Settings settings)
+        {
+            if (settings != null)
+                AudioListener.volume = Mathf.Clamp01(settings.MasterVolume);
+        }
 
         // Unlocked clubs in the order of allClubs, so the key slots stay the same as clubs unlock.
         void RefreshUnlocked()

@@ -61,7 +61,7 @@ namespace Project3DGP.EditorTools
             new Slot { Path = "Gameplay/Hazards", Purpose = "Level hazards: cat, wind, ice, ..." },
             new Slot { Path = "Gameplay/InvalidZones", Purpose = "InvalidZone triggers: water, out of bounds (Henry, #14)" },
 
-            new Slot { Path = "UI", Purpose = "HUD canvas and menu dialog (Henry, #20; Pongpat, #77)" },
+            new Slot { Path = "UI", Purpose = "HUD and level dialogs (Henry, #20)" },
         };
 
         /// <summary>Default scene objects that are moved into their group if they sit at the scene root.</summary>
