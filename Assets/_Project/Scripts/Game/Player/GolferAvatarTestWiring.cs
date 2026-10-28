@@ -5,7 +5,9 @@ namespace Project3DGP.Game.Player
 {
     /// <summary>
     /// Development helper (#88): does the avatar wiring that LevelManager (#27, Pongpat) does in the game, so the
-    /// avatar can be tried in the Shot Test Area. Not part of the game; don't put it in a level scene.
+    /// avatar can be tried in the Shot Test Area. Not part of the game. TEMP(#27): it also stands in for LevelManager
+    /// in level scenes as Systems/AvatarWiring_TEMP (Magic > Level > Add Ball, Shot and Avatar); delete that object
+    /// once LevelManager does this wiring.
     ///   ball stops -> TeleportTo     shot -> PlaySwing     club change -> SetTool     aiming -> FaceYaw
     /// Test keys (Input System): C = PlayCelebrate, X = PlayFail.
     /// </summary>

@@ -68,7 +68,8 @@ namespace Project3DGP.EditorTools
         }
 
         // Canvas > PowerMeter (left, vertical) > Fill + Label, read by PowerMeterView through a Core BarView.
-        static void BuildPowerMeter(ShotController shot)
+        // Also used for the level HUD (LevelPlayerSlotsMenu, #95). Returns the canvas.
+        internal static GameObject BuildPowerMeter(ShotController shot)
         {
             var canvasObject = new GameObject("Canvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             canvasObject.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
@@ -119,6 +120,7 @@ namespace Project3DGP.EditorTools
             viewSo.FindProperty("shot").objectReferenceValue = shot;
             viewSo.FindProperty("bar").objectReferenceValue = bar;
             viewSo.ApplyModifiedPropertiesWithoutUndo();
+            return canvasObject;
         }
     }
 }
