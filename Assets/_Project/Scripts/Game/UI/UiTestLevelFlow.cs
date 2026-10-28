@@ -2,6 +2,7 @@ using System;
 using Project3DGP.Game.Danger;
 using Project3DGP.Game.Flow;
 using Project3DGP.Game.Scoring;
+using Project3DGP.Game.Session;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -11,7 +12,7 @@ namespace Project3DGP.Game.UI
     /// A stand-in level for the UI Test Area and the UI tests (#20): a fake LevelManager + DangerManager +
     /// ScoreKeeper behind the same interfaces, so the HUD and dialogs can be tried without the real ones (#7,
     /// #18, #27). The timer runs down from totalSeconds; S = a shot (+1 stroke, costs shotCost seconds),
-    /// F = time up now. It never loads scenes (Retry resets, Main menu only logs). Not for level scenes.
+    /// F = time up now, X = 40 XP (GameSession, for the XP bar, #78). It never loads scenes (Retry resets, Main menu only logs). Not for level scenes.
     /// </summary>
     public class UiTestLevelFlow : MonoBehaviour, ILevelFlow, IDangerTimer, IStrokeCounter
     {
@@ -62,6 +63,7 @@ namespace Project3DGP.Game.UI
             {
                 if (keyboard.sKey.wasPressedThisFrame) TakeShot();
                 if (keyboard.fKey.wasPressedThisFrame) SetRemaining(0f);
+                if (keyboard.xKey.wasPressedThisFrame && GameSession.Instance != null) GameSession.Instance.AddXp(40);
             }
             if (IsRunning)
                 SetRemaining(RemainingSeconds - Time.deltaTime);
@@ -141,7 +143,7 @@ namespace Project3DGP.Game.UI
                 return;
             GUI.Label(new Rect(10f, Screen.height - 50f, 900f, 40f),
                 $"UI test level: {Phase}, {State}, {RemainingSeconds:0.0} s left, {Strokes} strokes.   " +
-                "S = shot (costs time)   F = time up   Esc / menu button = pause");
+                "S = shot (costs time)   F = time up   X = +40 XP   Esc / menu button = pause");
         }
 
         internal void SetForTests(float total, float cost)

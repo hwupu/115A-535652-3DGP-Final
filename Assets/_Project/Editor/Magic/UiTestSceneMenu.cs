@@ -8,7 +8,7 @@ namespace Project3DGP.EditorTools
 {
     /// <summary>
     /// Magic > Game > Open UI Test Area (#20): the HUD and the level dialogs on a stand-in level (UiTestLevelFlow:
-    /// the timer runs down, S = shot, F = time up, Esc / Menu = pause), plus a GameSession with an in-memory save
+    /// the timer runs down, S = shot, F = time up, X = +40 XP, Esc / Menu = pause), plus a GameSession with an in-memory save
     /// slot (UiTestSaveStore), so pause, save + overwrite, settings, retry and time-up can be tried before
     /// LevelManager, DangerManager, ScoreKeeper and Save &amp; Load exist. New, UNSAVED scene; close it without saving.
     /// </summary>
@@ -32,10 +32,12 @@ namespace Project3DGP.EditorTools
 
             var flow = new GameObject("UiTestLevelFlow").AddComponent<UiTestLevelFlow>();
             GameUiBuilder.EnsureEventSystem(null);
-            GameUiBuilder.BuildHud(GameUiBuilder.NewCanvas("HUD", 0), flow);
+            var canvas = GameUiBuilder.NewCanvas("HUD", 0);
+            GameUiBuilder.BuildHud(canvas, flow);
+            GameUiBuilder.BuildXpBar(canvas);
             GameUiBuilder.BuildMenus(flow);
 
-            MagicMenuUtil.Log("Opened an unsaved UI test area. Press Play: S = shot, F = time up, Esc or Menu = pause. Close it without saving.");
+            MagicMenuUtil.Log("Opened an unsaved UI test area. Press Play: S = shot, F = time up, X = +40 XP, Esc or Menu = pause. Close it without saving.");
         }
     }
 }

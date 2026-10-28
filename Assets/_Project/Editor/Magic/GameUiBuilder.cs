@@ -93,6 +93,117 @@ namespace Project3DGP.EditorTools
         }
 
         /// <summary>
+        /// The XP bar (#78) under the strokes, upper left: "Lv 1" and a thin bar with "0 / 100 XP" on it.
+        /// Returns the XpBarView (on an "XpBar" child of the canvas; register Undo for its GameObject).
+        /// </summary>
+        public static XpBarView BuildXpBar(GameObject canvas)
+        {
+            var root = NewRect("XpBar", canvas.transform, new Vector2(0f, 1f), new Vector2(40f, -186f), new Vector2(520f, 40f));
+            var level = Label("Level", root, "Lv 1", 30, TextAnchor.MiddleCenter);
+            Place(level.rectTransform, new Vector2(0f, 0.5f), Vector2.zero, new Vector2(96f, 40f));
+
+            var barRect = NewRect("Bar", root, new Vector2(0f, 0.5f), new Vector2(116f, 0f), new Vector2(400f, 26f));
+            var background = barRect.gameObject.AddComponent<Image>();
+            background.color = new Color(0f, 0f, 0f, 0.55f);
+            background.raycastTarget = false;
+            var fill = Stretch("Fill", barRect, 3f);
+            var fillImage = fill.gameObject.AddComponent<Image>();
+            fillImage.color = new Color(0.45f, 0.75f, 1f);
+            fillImage.raycastTarget = false;
+            var text = Label("Label", barRect, "", 18, TextAnchor.MiddleCenter);
+            text.rectTransform.anchorMin = Vector2.zero;
+            text.rectTransform.anchorMax = Vector2.one;
+            text.rectTransform.offsetMin = text.rectTransform.offsetMax = Vector2.zero;
+            var bar = barRect.gameObject.AddComponent<BarView>();
+            var barSo = new SerializedObject(bar);
+            barSo.FindProperty("fill").objectReferenceValue = fill;
+            barSo.FindProperty("label").objectReferenceValue = text;
+            barSo.FindProperty("smoothTime").floatValue = 0.4f;
+            barSo.ApplyModifiedPropertiesWithoutUndo();
+
+            var view = root.gameObject.AddComponent<XpBarView>();
+            var so = new SerializedObject(view);
+            so.FindProperty("bar").objectReferenceValue = bar;
+            so.FindProperty("levelLabel").objectReferenceValue = level;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            return view;
+        }
+
+        /// <summary>
+        /// The minimap frame (#78), upper right under the menu button: a RawImage showing the minimap camera's texture.
+        /// Returns the frame (a "Minimap" child of the canvas; register Undo for it).
+        /// </summary>
+        public static GameObject BuildMinimapFrame(GameObject canvas, Texture texture)
+        {
+            var frame = NewRect("Minimap", canvas.transform, new Vector2(1f, 1f), new Vector2(-40f, -110f), new Vector2(280f, 280f));
+            var border = frame.gameObject.AddComponent<Image>();
+            border.color = new Color(1f, 1f, 1f, 0.8f);
+            border.raycastTarget = false;
+            var map = Stretch("Map", frame, 5f).gameObject.AddComponent<RawImage>();
+            map.texture = texture;
+            map.raycastTarget = false;
+            return frame.gameObject;
+        }
+
+        /// <summary>
+        /// The club cards (#78), right side, centred: one card per club slot (<paramref name="count"/>), with the
+        /// select sound. Returns the ClubPanelView (on a "ClubPanel" child of the canvas; register Undo for it).
+        /// </summary>
+        public static ClubPanelView BuildClubPanel(GameObject canvas, int count, AudioClip selectSound)
+        {
+            const float cardWidth = 280f, cardHeight = 90f, gap = 12f;
+            var height = count * cardHeight + (count - 1) * gap;
+            var root = NewRect("ClubPanel", canvas.transform, new Vector2(1f, 0.5f), new Vector2(-40f, -50f), new Vector2(cardWidth, height));
+            var audio = root.gameObject.AddComponent<AudioSource>();
+            audio.playOnAwake = false;
+            var view = root.gameObject.AddComponent<ClubPanelView>();
+
+            var so = new SerializedObject(view);
+            var list = so.FindProperty("cards");
+            list.arraySize = count;
+            for (var i = 0; i < count; i++)
+            {
+                var card = ClubCard(root, i, new Vector2(0f, -i * (cardHeight + gap)), new Vector2(cardWidth, cardHeight));
+                list.GetArrayElementAtIndex(i).objectReferenceValue = card;
+            }
+            so.FindProperty("audioSource").objectReferenceValue = audio;
+            so.FindProperty("selectSound").objectReferenceValue = selectSound;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            return view;
+        }
+
+        // Card = frame (tinted when selected) + dark background + colour square + title + numbers; the frame takes the click.
+        static SelectableCard ClubCard(Transform parent, int index, Vector2 position, Vector2 size)
+        {
+            var frame = NewRect($"Card_{index + 1}", parent, new Vector2(0.5f, 1f), position, size);
+            var frameImage = frame.gameObject.AddComponent<Image>();
+            frameImage.color = new Color(1f, 1f, 1f, 0.25f);
+            var background = Stretch("Background", frame, 4f).gameObject.AddComponent<Image>();
+            background.color = new Color(0.08f, 0.08f, 0.12f, 0.9f);
+            background.raycastTarget = false;
+            var icon = NewRect("Icon", frame, new Vector2(0f, 0.5f), new Vector2(14f, 0f), new Vector2(48f, 48f)).gameObject.AddComponent<Image>();
+            icon.raycastTarget = false;
+            var title = Label("Title", frame, "Club", 24, TextAnchor.UpperLeft);
+            Place(title.rectTransform, new Vector2(0f, 1f), new Vector2(76f, -10f), new Vector2(196f, 30f));
+            var details = Label("Details", frame, "", 17, TextAnchor.UpperLeft);
+            Place(details.rectTransform, new Vector2(0f, 1f), new Vector2(76f, -42f), new Vector2(196f, 44f));
+
+            var button = frame.gameObject.AddComponent<Button>();
+            button.targetGraphic = frameImage;
+            button.transition = Selectable.Transition.None;                       // the card draws its own highlight
+            button.navigation = new Navigation { mode = Navigation.Mode.None };
+
+            var card = frame.gameObject.AddComponent<SelectableCard>();
+            var so = new SerializedObject(card);
+            so.FindProperty("frame").objectReferenceValue = frameImage;
+            so.FindProperty("icon").objectReferenceValue = icon;
+            so.FindProperty("title").objectReferenceValue = title;
+            so.FindProperty("details").objectReferenceValue = details;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            return card;
+        }
+
+        /// <summary>
         /// The HUD's dialog bar (bottom center): tutorial hints (#28) and story lines (#51). Click it to skip a line.
         /// Returns the DialogBar (on a "DialogBar" child of the canvas; register Undo for its GameObject).
         /// </summary>

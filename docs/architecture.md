@@ -284,7 +284,9 @@ public interface ISaveStore     { bool HasSave; void Save(SaveGame); bool TryLoa
 | Upper right | **Menu button** → pause dialog | `ILevelFlow.SetPaused` |
 | Left side, vertical | Power meter with the running marker | `ShotController.PowerMarker01` |
 | Bottom | **Dialog bar** (tutorial prompts in L1, story lines); non-blocking, skippable | `GardenTutorial` (#28), `Core/UI/DialogBar` |
-| Elsewhere (TBD) | Club name, stroke count, later XP bar and minimap (#78) | `ShotController`, `IStrokeCounter`, `GameSession` |
+| Upper left, under the time bar | Stroke count, then **XP bar** ("Lv 2", XP to the next level; the label pulses at a level-up) (#78) | `IStrokeCounter`, `GameSession.LevelProgress01`, `Changed`, `LeveledUp` |
+| Upper right, under the menu button | **Minimap**: top-down, follows the ball, north up, - / = zoom; icons for ball, avatar, cup, exit, hazards (#78) | `Core/Cameras/MinimapCamera`, `MinimapIcon` |
+| Right side, centred | **Club cards**: only the clubs the player can use; the current one lights up and grows with a sound; click = pick (only while aiming) (#78) | `ShotController.AvailableClubs`, `ClubChanged`, `CanChangeClub` |
 
 **Screens and dialogs**
 | When | What | Buttons |
@@ -300,6 +302,7 @@ public interface ISaveStore     { bool HasSave; void Save(SaveGame); bool TryLoa
 Saving is **manual** (pause dialog), **one slot**. A save holds the `GameSessionData` and the level scene; Continue restarts that level from the tee. Plain uGUI with placeholder looks; Henry's art replaces the sprites without code changes.
 Implementation (#20): `UI/HudView` (time bar = 1 − `Progress01`, stage icon with `stageSprites[DangerState]`, strokes, `OpenMenu`), `UI/LevelMenus` (pause, save confirm, settings, time-up after `timeUpDelay` s of fail scene; Esc pauses and closes), `UI/SettingsPanel` (reused by the main menu), `UI/GameQuit`. Both views find the level's `ILevelFlow` at Start (`Flow/LevelFlowFinder`: the assigned one, else the first in the scene), so they connect to LevelManager without re-wiring. Saving uses `GameSession.SaveStore` (the `ISaveStore` component on the GameSession prefab, #44); without one the Save button is disabled. Master volume is applied by `GameSession.ApplySettings`; music and SFX read their volumes themselves. *Magic > Level > Add HUD and Menus* adds `UI/HUD` (on the power meter's canvas), `UI/Menus` and an EventSystem to a level (every level, shared framework). *Magic > Game > Open UI Test Area* tries everything on `UI/UiTestLevelFlow` + `UI/UiTestSaveStore` (stand-ins, never in level scenes).
 Main menu and Ending (#30): `UI/MainMenuView` (Start = `GameSession.Load(NewGame())` + load `GameScenes.FirstLevel`; **Continue is disabled** until Save & Load (#44, Pongpat) enables it when `SaveStore.HasSave` and loads the save; Settings; Quit) and `UI/EndingView` (one line per `GameSessionData.RunResults` entry plus totals; Main menu, Close). `GameSession.RecordResult` adds every finished level to `RunResults`; a new game starts it empty. Scene names: `Flow/GameScenes`. Dialog bar and tutorial (#28): `Core/UI/DialogBar` queues lines, each shown for its seconds (game time) or until the bar is clicked; *Add HUD and Menus* adds it to every level's HUD (story lines, #51, can use it). `Levels/Garden/GardenTutorial` (*Magic > Level > Garden: Add Tutorial*) shows L1's hints once per attempt: at the start (look, power, tools), after the first shot (time cost), when the ball first stops (goals, cup last), and at the first Warning and Critical (needs DangerManager, #7). Texts are in its Inspector. Clicks on the HUD never shoot (`ShotController` ignores clicks over UI). **TEMP(#27):** `GolferAvatarTestWiring` (`Systems/AvatarWiring_TEMP`) is a minimal `ILevelFlow` (pause, Retry = reload, Main menu) so the menu works in levels before LevelManager; it goes away with that object. *Magic > Scenes > Add Main Menu UI* / *Add Ending UI* fill the open MainMenu / Ending scene.
+HUD additions (#78, PO 2026-10-28): `UI/XpBarView`, `UI/ClubPanelView` (reuses `Core/UI/SelectableCard` from mini-exercise 4.E.3; finds the ShotController at Start; more cards appear when unlocks add clubs) and the minimap (`Cameras/Minimap Camera` with `Core/Cameras/MinimapCamera` → `UI/Minimap/Minimap.renderTexture` → RawImage; icons are `Core/Cameras/MinimapIcon` quads on the **Minimap** layer, which other cameras must not render, CameraRig #19 included). *Add HUD and Menus* adds all three (run it again after adding hazards: every object under `Gameplay/Hazards` gets a red icon); *Magic > Level > Add Minimap Icon to Selection* marks anything else.
 
 ### 4.9 Game session — Henry
 ```csharp
@@ -307,17 +310,22 @@ public class GameSession : MonoBehaviour   // DontDestroyOnLoad; the prefab is i
 {
     public static GameSession Instance { get; }
     public IReadOnlyList<ClubProfile> UnlockedClubs { get; }   // in slot order; starts with the standard club
-    public int PlayerLevel { get; } public int Xp { get; }
+    public int PlayerLevel { get; } public int Xp { get; }      // Xp = total of this game, never reset
+    public int MaxLevel { get; } public bool IsMaxLevel { get; }
+    public int XpForLevel(int level);                           // total XP to reach it (Inspector: xpToReachLevel)
+    public float LevelProgress01 { get; }                       // this level -> next, for the HUD (#78)
+    public void AddXp(int amount);                              // leveling (#70): holes, collectibles
     public bool Unlock(ClubProfile club);                       // leveling (#70)
-    public void SetProgress(int playerLevel, int xp);           // leveling (#70); the XP curve lives there
+    public void SetProgress(int playerLevel, int xp);           // debug keys, tests
     public bool RecordResult(LevelResult result);               // LevelManager (#27); true = new best
     public LevelResult? GetBestResult(string levelId);
     public GameSessionData Data { get; }                        // save/load (#44): JsonUtility.ToJson(Data) ...
     public void Load(GameSessionData data);                     // ... and Load(FromJson<GameSessionData>(json))
     public event Action Changed;                                // HUD (#78), autosave
+    public event Action<int> LeveledUp;                         // new level; #70 unlocks clubs here
 }
 ```
-Implementation (#89): `Session/GameSession` + `Session/GameSessionData`, a plain `[Serializable]` class with public fields: `UnlockedClubs` (club asset names), `PlayerLevel`, `Xp`, `BestResults` (best = higher score, then fewer strokes, then more time left), `RunResults` (every level finished in this run, for the Ending, #30), and `Settings` (master/music/SFX volume, for #77). *Magic > Game > Add Game Session* puts `Prefabs/Shared/GameSession.prefab` in the open scene. Every scene you can press Play in has one. The first one to wake becomes `Instance` and survives scene loads, and later copies destroy themselves. `LevelResult` (§4.6) was written in #89 so the session could use it; Pongpat owns it from here.
+Implementation (#89): `Session/GameSession` + `Session/GameSessionData`, a plain `[Serializable]` class with public fields: `UnlockedClubs` (club asset names), `PlayerLevel`, `Xp`, `BestResults` (best = higher score, then fewer strokes, then more time left), `RunResults` (every level finished in this run, for the Ending, #30), and `Settings` (master/music/SFX volume, for #77). XP curve (#78, PO 2026-10-28): `xpToReachLevel` on the prefab, default 100 / 250 / 450 / 700 total XP for levels 2–5 (max level 5); `AddXp` levels up as often as the XP allows. *Magic > Game > Add Game Session* puts `Prefabs/Shared/GameSession.prefab` in the open scene. Every scene you can press Play in has one. The first one to wake becomes `Instance` and survives scene loads, and later copies destroy themselves. `LevelResult` (§4.6) was written in #89 so the session could use it; Pongpat owns it from here.
 
 ### 4.10 Level scene hierarchy (#8)
 Every level scene has the same root objects. **Magic > Level > Create Level Scene Skeleton** adds any that are missing, and **Magic > Level > Validate Level Scene** lists what's missing. The list itself is in `Editor/Magic/LevelSkeleton.cs`.
