@@ -84,7 +84,8 @@ namespace Project3DGP.Game.Golf
             ClubChanged?.Invoke(club);
         }
 
-        bool CanChangeClub => InputEnabled && Phase == ShotPhase.Aiming && clubs.Count > 0;
+        /// <summary>Clubs can change only while aiming (keys, wheel, the HUD club panel).</summary>
+        public bool CanChangeClub => InputEnabled && Phase == ShotPhase.Aiming && clubs.Count > 0;
 
         // Keys 1-3 -> slot 0-2. A slot without a club (e.g. still locked, #70) is ignored.
         void OnClubSlotSelected(int slot)

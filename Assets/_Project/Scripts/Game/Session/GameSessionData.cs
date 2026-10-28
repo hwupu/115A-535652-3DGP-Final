@@ -14,6 +14,7 @@ namespace Project3DGP.Game.Session
     {
         public List<string> UnlockedClubs = new();
         public int PlayerLevel = 1;
+        /// <summary>Total XP of this game; the level thresholds are on GameSession (xpToReachLevel).</summary>
         public int Xp;
         public List<BestResult> BestResults = new();
         /// <summary>Every level finished in this run, in order (the Ending totals). A new game starts empty.</summary>
