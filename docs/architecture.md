@@ -272,16 +272,21 @@ Plain uGUI for now (sprites later). The menu dialog and its items are #77 (items
 
 ### 4.9 Game session — Henry
 ```csharp
-public class GameSession : MonoBehaviour   // DontDestroyOnLoad, created by the first scene that needs it
+public class GameSession : MonoBehaviour   // DontDestroyOnLoad; the prefab is in every playable scene
 {
     public static GameSession Instance { get; }
-    public IReadOnlyList<ClubProfile> UnlockedClubs { get; }   // leveling (#70) unlocks more
+    public IReadOnlyList<ClubProfile> UnlockedClubs { get; }   // in slot order; starts with the standard club
     public int PlayerLevel { get; } public int Xp { get; }
-    public void RecordResult(LevelResult result);
+    public bool Unlock(ClubProfile club);                       // leveling (#70)
+    public void SetProgress(int playerLevel, int xp);           // leveling (#70); the XP curve lives there
+    public bool RecordResult(LevelResult result);               // LevelManager (#27); true = new best
     public LevelResult? GetBestResult(string levelId);
-    // Settings (volume, ...) for #77. Save/load (#44, Pongpat) serializes this data.
+    public GameSessionData Data { get; }                        // save/load (#44): JsonUtility.ToJson(Data) ...
+    public void Load(GameSessionData data);                     // ... and Load(FromJson<GameSessionData>(json))
+    public event Action Changed;                                // HUD (#78), autosave
 }
 ```
+Implementation (#89): `Session/GameSession` + `Session/GameSessionData`, a plain `[Serializable]` class with public fields: `UnlockedClubs` (club asset names), `PlayerLevel`, `Xp`, `BestResults` (best = higher score, then fewer strokes, then more time left), and `Settings` (master/music/SFX volume, for #77). *Magic > Game > Add Game Session* puts `Prefabs/Shared/GameSession.prefab` in the open scene. Every scene you can press Play in has one. The first one to wake becomes `Instance` and survives scene loads, and later copies destroy themselves. `LevelResult` (§4.6) was written in #89 so the session could use it; Pongpat owns it from here.
 
 ### 4.10 Level scene hierarchy (#8)
 Every level scene has the same root objects. **Magic > Level > Create Level Scene Skeleton** adds any that are missing, and **Magic > Level > Validate Level Scene** lists what's missing. The list itself is in `Editor/Magic/LevelSkeleton.cs`.
