@@ -10,7 +10,8 @@ namespace Project3DGP.EditorTools
 {
     /// <summary>
     /// Magic > Game > Open Shot Test Area (#15, #16): the ball test green plus the real shot sequence: ShotController
-    /// (all 3 clubs: keys 1-3 / wheel), the golfer avatar (#88, with test wiring), the AimCone at the ball and a vertical power meter on the left of a uGUI canvas.
+    /// (all 3 clubs: keys 1-3 / wheel), the golfer avatar (#88, with test wiring), the AimCone at the ball, a vertical power meter on the left of a uGUI canvas,
+    /// and two ball-hit goals to try (#22): a branch target on a post and a lever.
     /// New, UNSAVED scene; close it without saving.
     /// </summary>
     public static class ShotTestSceneMenu
@@ -18,6 +19,7 @@ namespace Project3DGP.EditorTools
         [MenuItem(MagicMenuUtil.Root + "Game/Open Shot Test Area", priority = MagicMenuUtil.GamePriority + 12)]
         static void Open()
         {
+            PlaceholderPrefabsMenu.CreateAll();   // incl. the BranchTarget and Lever (#22)
             ClubProfilesMenu.CreateAll();
             var hasAvatar = GolferAvatarPrefabMenu.Create() != null;   // needs the Hamster placeholder prefab
             if (!GolfBallTestSceneMenu.OpenArea(out var input, out var ball, out _))
@@ -49,9 +51,34 @@ namespace Project3DGP.EditorTools
             coneSo.ApplyModifiedPropertiesWithoutUndo();
 
             BuildPowerMeter(shot);
+            AddGoals();
             if (hasAvatar)
                 AddAvatar(shot, ball);
             MagicMenuUtil.Log("Opened an unsaved shot test area. Press Play; close it without saving.");
+        }
+
+        // Ball-hit goals (#22): a lever left of the ramp and a target 1.2 m up on a post, both facing the tee.
+        static void AddGoals()
+        {
+            Place("Course/Lever", new Vector3(-3f, 0f, 6f), 0f);
+            var target = Place("Course/BranchTarget", new Vector3(4f, 1.2f, 12f), 180f);
+            if (target == null)
+                return;
+            var post = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            post.name = "Post";
+            post.transform.position = new Vector3(4f, 0.45f, 12.1f);
+            post.transform.localScale = new Vector3(0.1f, 0.9f, 0.1f);
+            post.GetComponent<Renderer>().sharedMaterial = PlaceholderMaterials.Wood;
+        }
+
+        static GameObject Place(string prefab, Vector3 position, float yaw)
+        {
+            var asset = AssetDatabase.LoadAssetAtPath<GameObject>($"{PlaceholderPrefabsMenu.Folder}/{prefab}.prefab");   // after NewScene
+            if (asset == null)
+                return null;
+            var go = (GameObject)PrefabUtility.InstantiatePrefab(asset);
+            go.transform.SetPositionAndRotation(position, Quaternion.Euler(0f, yaw, 0f));
+            return go;
         }
 
         // The golfer avatar (#88) + the test wiring that stands in for LevelManager (#27).
