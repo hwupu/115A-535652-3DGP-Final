@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using Project3DGP.Game.Golf;
 using UnityEngine;
@@ -11,7 +12,8 @@ namespace Project3DGP.Game.Player
     /// later), so swapping the model changes no script.
     ///
     /// Animation: if the model has an Animator (#36), the Play* methods set its triggers ("Swing", "Celebrate",
-    /// "Fail"). Without one, a tiny code fallback moves the "ShoulderR" pivot / the Visual, so a shot still reads.
+    /// "Fail") and the bool "Walking". Without one, a tiny code fallback moves the "ShoulderR" pivot / the Visual,
+    /// so a shot still reads.
     /// </summary>
     public class GolferAvatar : MonoBehaviour
     {
@@ -22,15 +24,19 @@ namespace Project3DGP.Game.Player
         [SerializeField] Vector3 standOffset = new(-0.45f, 0f, -0.75f);
         [Tooltip("Layers the feet can stand on (ground snap after a teleport).")]
         [SerializeField] LayerMask groundLayers = ~0;
+        [Tooltip("WalkTo speed (m/s): all goals met, the hamster walks to the open exit by itself.")]
+        [SerializeField] float walkSpeed = 1.5f;
 
         GameObject _tool;            // the instantiated ToolPrefab in the hand
         Animator _animator;          // from the Blender model, once it exists (#36)
         Transform _visual, _shoulder;
         Coroutine _fallback;         // the running code animation, if any
+        Coroutine _walk;             // the running WalkTo, if any
         Vector3 _ballPosition;       // from the last TeleportTo: FaceYaw walks around this point
         bool _hasBall;
 
         public ClubProfile CurrentTool { get; private set; }
+        public bool IsWalking => _walk != null;
 
         void Awake()
         {
@@ -44,6 +50,7 @@ namespace Project3DGP.Game.Player
         /// <summary>Stands beside the ball (next shooting position) and faces the aim.</summary>
         public void TeleportTo(Vector3 ballPosition, float aimYaw)
         {
+            StopWalking();
             _ballPosition = ballPosition;
             _hasBall = true;
             FaceYaw(aimYaw);
@@ -98,6 +105,63 @@ namespace Project3DGP.Game.Player
         {
             if (!Trigger("Fail"))
                 Play(LeanBackFallback());
+        }
+
+        /// <summary>
+        /// Walks straight to the target on the ground (all goals met: to the open exit, #38), facing the way it
+        /// goes, then calls arrived. Another WalkTo or a TeleportTo stops the walk without calling arrived.
+        /// </summary>
+        public void WalkTo(Vector3 target, Action arrived = null)
+        {
+            StopWalking();
+            if (_fallback != null)
+                StopCoroutine(_fallback);
+            _fallback = null;
+            ResetPose();
+            _hasBall = false;   // no longer standing at the ball
+            _walk = StartCoroutine(Walk(target, arrived));
+        }
+
+        IEnumerator Walk(Vector3 target, Action arrived)
+        {
+            SetWalking(true);
+            var useFallback = _animator == null || _animator.runtimeAnimatorController == null;
+            for (var t = 0f; ; t += Time.deltaTime)
+            {
+                var toTarget = target - transform.position;
+                toTarget.y = 0f;
+                var step = walkSpeed * Time.deltaTime;
+                if (toTarget.magnitude <= step)
+                    break;
+                var direction = toTarget.normalized;
+                transform.SetPositionAndRotation(SnapToGround(transform.position + direction * step),
+                    Quaternion.LookRotation(direction));
+                // Code fallback: a small bob, two steps per second.
+                if (useFallback && _visual != null)
+                    _visual.localPosition = Vector3.up * (0.05f * Mathf.Abs(Mathf.Sin(t * 2f * Mathf.PI)));
+                yield return null;
+            }
+            transform.position = SnapToGround(new Vector3(target.x, transform.position.y, target.z));
+            _walk = null;   // done (not StopCoroutine: this is the running coroutine)
+            SetWalking(false);
+            ResetPose();
+            arrived?.Invoke();
+        }
+
+        void StopWalking()
+        {
+            if (_walk == null)
+                return;
+            StopCoroutine(_walk);
+            _walk = null;
+            SetWalking(false);
+            ResetPose();
+        }
+
+        void SetWalking(bool walking)
+        {
+            if (_animator != null && _animator.runtimeAnimatorController != null)
+                _animator.SetBool("Walking", walking);
         }
 
         // ---- Animator path (#36) ----

@@ -674,6 +674,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2109358221366077994, guid: 49a000c8baf2e4a399b14ed5835586a2, type: 3}
   m_PrefabInstance: {fileID: 175892403}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &175892405 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3249353120280604075, guid: 49a000c8baf2e4a399b14ed5835586a2, type: 3}
+  m_PrefabInstance: {fileID: 175892403}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb0bc896d77344ac6832943e79a26e57, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project3DGP.Game::Project3DGP.Game.Flow.LevelExit
 --- !u!1 &236018369
 GameObject:
   m_ObjectHideFlags: 0
@@ -1853,6 +1864,7 @@ MonoBehaviour:
   shot: {fileID: 1210270524}
   ball: {fileID: 1347358142}
   avatar: {fileID: 861933004}
+  exit: {fileID: 175892405}
 --- !u!1001 &934452831
 PrefabInstance:
   m_ObjectHideFlags: 0

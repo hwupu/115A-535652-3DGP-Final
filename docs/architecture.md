@@ -132,7 +132,7 @@ public class GolferAvatar : MonoBehaviour
 }
 ```
 The avatar prefab keeps the visual in a child (`Visual/`): a **box for now**, later the Blender hamster with an Animator. Game code only calls the methods above, so replacing the model doesn't change any other script. Animation clips needed and the clip/timing handoff: see #36.
-Implementation (#88): `Prefabs/Shared/GolferAvatar.prefab` is a **variant of `Prefabs/Characters/Hamster`** (Magic > Game > Create Golfer Avatar Prefab), so the Blender model replaces the Hamster's `Visual` once and the avatar follows. The tool goes to the child named `ToolSocket` (right hand). `TeleportTo` stands at `standOffset` (left of and behind the ball, in the aim's frame) snapped to the ground; `FaceYaw` circles the ball keeping that stance. `PlaySwing`/`PlayCelebrate`/`PlayFail` set Animator triggers `Swing`/`Celebrate`/`Fail` when the model has an Animator (#36), else a small code fallback (shoulder swing, hop, lean back). The avatar has no collider (the ball passes through).
+Implementation (#88): `Prefabs/Shared/GolferAvatar.prefab` is a **variant of `Prefabs/Characters/Hamster`** (Magic > Game > Create Golfer Avatar Prefab), so the Blender model replaces the Hamster's `Visual` once and the avatar follows. The tool goes to the child named `ToolSocket` (right hand). `TeleportTo` stands at `standOffset` (left of and behind the ball, in the aim's frame) snapped to the ground; `FaceYaw` circles the ball keeping that stance. `PlaySwing`/`PlayCelebrate`/`PlayFail` set Animator triggers `Swing`/`Celebrate`/`Fail` when the model has an Animator (#36), else a small code fallback (shoulder swing, hop, lean back). The avatar has no collider (the ball passes through). `WalkTo` (#38) walks in a straight line on the ground at `walkSpeed` (1.5 m/s), facing the way it goes, and sets the Animator bool `Walking` (code fallback: a small bob). `TeleportTo` or another `WalkTo` stops the walk without calling `arrived`.
 
 ### 4.4 Camera — Bahadir
 ```csharp
@@ -262,6 +262,7 @@ public class LevelExit : MonoBehaviour   // the gate (L1) / portal: closed until
     public event Action Opened;          // FX, sound
 }
 ```
+Implementation (#38): `Flow/LevelExit` shows/hides objects when it opens. `Prefabs/Course/Gate` is a LevelExit: wooden bars while closed, the portal surface once open, and a `WalkTarget` 1.5 m behind the gate (+Z). *Magic > Level > Add Level Exit* updates the Gate prefab and, if the level has no exit yet, puts a Gate in `Gameplay/Exit`. Until LevelManager exists, `TEMP(#27)` `AvatarWiring_TEMP` opens the exit with **G** and makes the hamster walk through. There is no `Close`: Retry reloads the level.
 
 ### 4.8 HUD, menus and screens — Henry (PO, 2026-10-28)
 The UI is built against four small interfaces (Henry, #20), so it works and is tested before the owners' code exists. The owners implement them: `DangerManager : IDangerTimer` (#7), `ScoreKeeper : IStrokeCounter` (#18), `LevelManager : ILevelFlow` (#27), Save & Load `: ISaveStore` (#44).

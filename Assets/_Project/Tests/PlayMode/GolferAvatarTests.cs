@@ -107,5 +107,40 @@ namespace Project3DGP.Game.Tests
             yield return new WaitForSeconds(1.2f);
             Assert.That(_root.transform.Find("Visual").localPosition.y, Is.GreaterThanOrEqualTo(0f), "code fallback ran without an Animator");
         }
+
+        [UnityTest]
+        public IEnumerator WalkTo_WalksOnTheGround_FacingTheWay_ThenCallsArrived()
+        {
+            yield return new WaitForFixedUpdate();
+            _root.transform.position = Vector3.zero;
+            var target = new Vector3(0f, 0f, 1.5f);
+            var arrived = 0;
+            _avatar.WalkTo(target, () => arrived++);
+            Assert.That(_avatar.IsWalking, Is.True);
+
+            yield return null;
+            yield return null;
+            Assert.That(_root.transform.eulerAngles.y, Is.EqualTo(0f).Within(0.5f), "faces the target (+Z)");
+            Assert.That(_root.transform.position.y, Is.EqualTo(0f).Within(0.01f), "feet on the ground");
+
+            for (var t = 0f; t < 3f && arrived == 0; t += Time.deltaTime)   // 1.5 m at 1.5 m/s
+                yield return null;
+            Assert.That(arrived, Is.EqualTo(1), "arrived was called");
+            Assert.That(_avatar.IsWalking, Is.False);
+            Assert.That(Vector3.Distance(_root.transform.position, target), Is.LessThan(0.01f));
+        }
+
+        [UnityTest]
+        public IEnumerator TeleportTo_StopsAWalk_WithoutCallingArrived()
+        {
+            yield return new WaitForFixedUpdate();
+            var arrived = false;
+            _avatar.WalkTo(new Vector3(0f, 0f, 10f), () => arrived = true);
+            yield return null;
+            _avatar.TeleportTo(new Vector3(2f, 0.1f, 3f), 0f);
+            Assert.That(_avatar.IsWalking, Is.False);
+            yield return null;
+            Assert.That(arrived, Is.False);
+        }
     }
 }
