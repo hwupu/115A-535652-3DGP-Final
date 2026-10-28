@@ -4,6 +4,7 @@ using NUnit.Framework;
 using Project3DGP.Core.UI;
 using Project3DGP.Game.Danger;
 using Project3DGP.Game.Flow;
+using Project3DGP.Game.Scoring;
 using Project3DGP.Game.Session;
 using Project3DGP.Game.UI;
 using UnityEngine;
@@ -13,7 +14,7 @@ using UnityEngine.UI;
 namespace Project3DGP.Game.Tests
 {
     /// <summary>
-    /// HUD, level dialogs and settings (#20) against the stand-in level (UiTestLevelFlow) and save slot
+    /// HUD, level dialogs, settings (#20) and the Ending totals (#30) against the stand-in level (UiTestLevelFlow) and save slot
     /// (UiTestSaveStore), the same interfaces LevelManager, DangerManager, ScoreKeeper and Save &amp; Load implement.
     /// </summary>
     public class GameUiTests
@@ -202,6 +203,26 @@ namespace Project3DGP.Game.Tests
             Assert.That(settings.SfxVolume, Is.EqualTo(0.9f).Within(1e-4f));
             Assert.That(AudioListener.volume, Is.EqualTo(0.4f).Within(1e-4f), "master applies at once");
             AudioListener.volume = 1f;
+        }
+
+        [Test]
+        public void Ending_ListsEachLevel_AndTheTotals()
+        {
+            var results = new List<BestResult>
+            {
+                BestResult.From(new LevelResult("L1_Garden", 3, 40.6f, 900)),
+                BestResult.From(new LevelResult("L2_Desert", 5, 20f, 600)),
+            };
+            var label = New("Summary").AddComponent<Text>();
+            var ending = New("Ending").AddComponent<EndingView>();
+            ending.SetForTests(label);
+
+            ending.Show(results);
+            StringAssert.Contains("L1_Garden:  3 strokes,  40 s left,  900 points", label.text);
+            StringAssert.Contains("Total:  8 strokes,  60 s left,  1500 points", label.text);
+
+            ending.Show(new List<BestResult>());
+            Assert.That(label.text, Is.EqualTo("No levels finished in this run."));
         }
     }
 }

@@ -18,17 +18,18 @@ namespace Project3DGP.EditorTools
         public const string PrefabPath = GolfBallPrefabMenu.Folder + "/GameSession.prefab";
 
         [MenuItem(MagicMenuUtil.Root + "Game/Add Game Session", priority = MagicMenuUtil.GamePriority + 14)]
-        static void Add()
+        static void Add() => AddToScene(EditorSceneManager.GetActiveScene());
+
+        /// <summary>Puts a GameSession in the scene if it has none (also used by the menu scene tools). True if added.</summary>
+        internal static bool AddToScene(UnityEngine.SceneManagement.Scene scene)
         {
             var prefab = CreatePrefab();
             if (prefab == null)
-                return;
-
-            var scene = EditorSceneManager.GetActiveScene();
+                return false;
             if (Object.FindAnyObjectByType<GameSession>(FindObjectsInactive.Include) != null)
             {
                 MagicMenuUtil.Log($"Skipped: {scene.name} already has a GameSession.");
-                return;
+                return false;
             }
             var go = (GameObject)PrefabUtility.InstantiatePrefab(prefab, scene);
             var systems = LevelSkeleton.Find(scene, "Systems");
@@ -37,6 +38,7 @@ namespace Project3DGP.EditorTools
             Undo.RegisterCreatedObjectUndo(go, "Add GameSession");
             EditorSceneManager.MarkSceneDirty(scene);
             MagicMenuUtil.Log($"Added GameSession to {scene.name}" + (systems != null ? " (Systems)" : "") + ". Save the scene to keep it.");
+            return true;
         }
 
         internal static GameObject CreatePrefab()
