@@ -59,5 +59,17 @@ namespace Project3DGP.Game.Tests
             Assert.That(copy.GetBestResult("L1_Garden").Value.RemainingSeconds, Is.EqualTo(42.5f));
             Assert.That(copy.Settings.MusicVolume, Is.EqualTo(0.3f));
         }
+
+        [Test]
+        public void RecordResult_AddsEveryResultToTheRun_EvenIfNotBest()
+        {
+            var data = new GameSessionData();
+            data.RecordResult(new LevelResult("L1_Garden", 3, 40f, 900));
+            data.RecordResult(new LevelResult("L1_Garden", 6, 10f, 300));   // worse: not a new best
+            data.RecordResult(new LevelResult("L2_Desert", 4, 30f, 700));
+            Assert.That(data.RunResults, Has.Count.EqualTo(3));
+            Assert.That(data.RunResults[1].Strokes, Is.EqualTo(6));
+            Assert.That(data.BestResults, Has.Count.EqualTo(2));
+        }
     }
 }

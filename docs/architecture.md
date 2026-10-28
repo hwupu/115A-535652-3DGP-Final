@@ -299,6 +299,7 @@ public interface ISaveStore     { bool HasSave; void Save(SaveGame); bool TryLoa
 
 Saving is **manual** (pause dialog), **one slot**. A save holds the `GameSessionData` and the level scene; Continue restarts that level from the tee. Plain uGUI with placeholder looks; Henry's art replaces the sprites without code changes.
 Implementation (#20): `UI/HudView` (time bar = 1 − `Progress01`, stage icon with `stageSprites[DangerState]`, strokes, `OpenMenu`), `UI/LevelMenus` (pause, save confirm, settings, time-up after `timeUpDelay` s of fail scene; Esc pauses and closes), `UI/SettingsPanel` (reused by the main menu), `UI/GameQuit`. Both views find the level's `ILevelFlow` at Start (`Flow/LevelFlowFinder`: the assigned one, else the first in the scene), so they connect to LevelManager without re-wiring. Saving uses `GameSession.SaveStore` (the `ISaveStore` component on the GameSession prefab, #44); without one the Save button is disabled. Master volume is applied by `GameSession.ApplySettings`; music and SFX read their volumes themselves. *Magic > Level > Add HUD and Menus* adds `UI/HUD` (on the power meter's canvas), `UI/Menus` and an EventSystem to a level (every level, shared framework). *Magic > Game > Open UI Test Area* tries everything on `UI/UiTestLevelFlow` + `UI/UiTestSaveStore` (stand-ins, never in level scenes).
+Main menu and Ending (#30): `UI/MainMenuView` (Start = `GameSession.Load(NewGame())` + load `GameScenes.FirstLevel`; **Continue is disabled** until Save & Load (#44, Pongpat) enables it when `SaveStore.HasSave` and loads the save; Settings; Quit) and `UI/EndingView` (one line per `GameSessionData.RunResults` entry plus totals; Main menu, Close). `GameSession.RecordResult` adds every finished level to `RunResults`; a new game starts it empty. Scene names: `Flow/GameScenes`. Clicks on the HUD never shoot (`ShotController` ignores clicks over UI). **TEMP(#27):** `GolferAvatarTestWiring` (`Systems/AvatarWiring_TEMP`) is a minimal `ILevelFlow` (pause, Retry = reload, Main menu) so the menu works in levels before LevelManager; it goes away with that object. *Magic > Scenes > Add Main Menu UI* / *Add Ending UI* fill the open MainMenu / Ending scene.
 
 ### 4.9 Game session — Henry
 ```csharp
@@ -316,7 +317,7 @@ public class GameSession : MonoBehaviour   // DontDestroyOnLoad; the prefab is i
     public event Action Changed;                                // HUD (#78), autosave
 }
 ```
-Implementation (#89): `Session/GameSession` + `Session/GameSessionData`, a plain `[Serializable]` class with public fields: `UnlockedClubs` (club asset names), `PlayerLevel`, `Xp`, `BestResults` (best = higher score, then fewer strokes, then more time left), and `Settings` (master/music/SFX volume, for #77). *Magic > Game > Add Game Session* puts `Prefabs/Shared/GameSession.prefab` in the open scene. Every scene you can press Play in has one. The first one to wake becomes `Instance` and survives scene loads, and later copies destroy themselves. `LevelResult` (§4.6) was written in #89 so the session could use it; Pongpat owns it from here.
+Implementation (#89): `Session/GameSession` + `Session/GameSessionData`, a plain `[Serializable]` class with public fields: `UnlockedClubs` (club asset names), `PlayerLevel`, `Xp`, `BestResults` (best = higher score, then fewer strokes, then more time left), `RunResults` (every level finished in this run, for the Ending, #30), and `Settings` (master/music/SFX volume, for #77). *Magic > Game > Add Game Session* puts `Prefabs/Shared/GameSession.prefab` in the open scene. Every scene you can press Play in has one. The first one to wake becomes `Instance` and survives scene loads, and later copies destroy themselves. `LevelResult` (§4.6) was written in #89 so the session could use it; Pongpat owns it from here.
 
 ### 4.10 Level scene hierarchy (#8)
 Every level scene has the same root objects. **Magic > Level > Create Level Scene Skeleton** adds any that are missing, and **Magic > Level > Validate Level Scene** lists what's missing. The list itself is in `Editor/Magic/LevelSkeleton.cs`.
@@ -360,7 +361,7 @@ The tool moves only the default `Main Camera`, `Directional Light` and `Global V
     public event Action<int> ClubSlotSelected; // keys 1-3 -> 0..2 (ShotController)
     public event Action<int> ClubCycled;   // wheel: -1 previous, +1 next (ShotController)
     public event Action ToggleView;        // V (CameraRig, optional overview)
-    public event Action Pause;             // Esc (LevelManager)
+    public event Action Pause;             // Esc; the pause dialog (LevelMenus) already handles Esc, so LevelManager must not toggle pause on it
     public event Action Retry;             // R (LevelManager)
 }
 ```

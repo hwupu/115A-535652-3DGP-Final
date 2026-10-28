@@ -129,6 +129,63 @@ namespace Project3DGP.EditorTools
             return menus;
         }
 
+        /// <summary>
+        /// "MainMenu" canvas: background, game title, Start / Continue (disabled until #44) / Settings / Quit, settings panel.
+        /// </summary>
+        public static MainMenuView BuildMainMenu()
+        {
+            var canvas = NewCanvas("MainMenu", 0);
+            Background(canvas.transform, new Color(0.35f, 0.6f, 0.4f));
+            var title = Label("Title", canvas.transform, "Hamster Golf", 96, TextAnchor.MiddleCenter);   // the game title is TBD
+            Place(title.rectTransform, new Vector2(0.5f, 1f), new Vector2(0f, -80f), new Vector2(1400f, 160f));
+
+            var view = canvas.AddComponent<MainMenuView>();
+            var menu = Dialog(canvas.transform, "Menu", "", out var box,
+                ("Start", view.StartGame), ("Continue", null), ("Settings", view.OpenSettings), ("Quit", view.Quit));
+            menu.GetComponent<Image>().color = Color.clear;
+            box.anchoredPosition = new Vector2(0f, -80f);
+            var continueButton = box.Find("Continue").GetComponent<Button>();
+            continueButton.interactable = false;   // Save & Load (#44) enables it
+            var settings = BuildSettings(canvas.transform, view.CloseSettings);
+            settings.gameObject.SetActive(false);
+
+            var so = new SerializedObject(view);
+            so.FindProperty("menuPanel").objectReferenceValue = menu;
+            so.FindProperty("continueButton").objectReferenceValue = continueButton;
+            so.FindProperty("settingsPanel").objectReferenceValue = settings;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            return view;
+        }
+
+        /// <summary>"Ending" canvas: background, title, this run's results and totals, Main menu / Close.</summary>
+        public static EndingView BuildEnding()
+        {
+            var canvas = NewCanvas("Ending", 0);
+            Background(canvas.transform, new Color(0.2f, 0.25f, 0.45f));
+            var title = Label("Title", canvas.transform, "The princess is safe!", 80, TextAnchor.MiddleCenter);
+            Place(title.rectTransform, new Vector2(0.5f, 1f), new Vector2(0f, -80f), new Vector2(1400f, 140f));
+            var summary = Label("Summary", canvas.transform, "", 36, TextAnchor.UpperCenter);
+            Place(summary.rectTransform, new Vector2(0.5f, 1f), new Vector2(0f, -260f), new Vector2(1400f, 420f));
+
+            var view = canvas.AddComponent<EndingView>();
+            var mainMenu = NewButton("Main menu", canvas.transform, "Main menu", view.GoToMainMenu);
+            Place((RectTransform)mainMenu.transform, new Vector2(0.5f, 0f), new Vector2(-220f, 120f), new Vector2(400f, 64f));
+            var close = NewButton("Close", canvas.transform, "Close", view.Quit);
+            Place((RectTransform)close.transform, new Vector2(0.5f, 0f), new Vector2(220f, 120f), new Vector2(400f, 64f));
+
+            var so = new SerializedObject(view);
+            so.FindProperty("summaryLabel").objectReferenceValue = summary;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            return view;
+        }
+
+        static void Background(Transform canvas, Color color)
+        {
+            var background = Stretch("Background", canvas, 0f).gameObject.AddComponent<Image>();
+            background.color = color;
+            background.raycastTarget = false;
+        }
+
         /// <summary>Settings panel: master, music and SFX sliders and a Back button that calls <paramref name="back"/>.</summary>
         public static SettingsPanel BuildSettings(Transform parent, UnityAction back)
         {
@@ -192,7 +249,8 @@ namespace Project3DGP.EditorTools
             label.fontSize = 30;
             label.color = new Color(0.1f, 0.1f, 0.1f);
             var button = go.GetComponent<Button>();
-            UnityEventTools.AddPersistentListener(button.onClick, action);
+            if (action != null)
+                UnityEventTools.AddPersistentListener(button.onClick, action);
             return button;
         }
 

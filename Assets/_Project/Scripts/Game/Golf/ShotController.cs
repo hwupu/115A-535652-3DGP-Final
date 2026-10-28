@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Project3DGP.Core.Gauges;
 using Project3DGP.Game.Controls;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Project3DGP.Game.Golf
 {
@@ -22,6 +23,7 @@ namespace Project3DGP.Game.Golf
         [SerializeField] List<ClubProfile> clubs = new();
 
         readonly PingPongGauge _marker = new();
+        bool _pointerOverUi;   // a click on a HUD button (e.g. Menu) must not also shoot
 
         public ShotPhase Phase { get; private set; } = ShotPhase.Aiming;
         public ClubProfile CurrentClub { get; private set; }
@@ -65,7 +67,12 @@ namespace Project3DGP.Game.Golf
             ball.CameToRest -= OnBallCameToRest;
         }
 
-        void Update() => _marker.Tick(Time.deltaTime);
+        void Update()
+        {
+            _marker.Tick(Time.deltaTime);
+            // Read here, not in OnShoot: the Input System UI module can't answer during input callbacks.
+            _pointerOverUi = EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
+        }
 
         public void SelectClub(ClubProfile club)
         {
@@ -98,7 +105,7 @@ namespace Project3DGP.Game.Golf
 
         void OnShoot()
         {
-            if (!InputEnabled || Phase != ShotPhase.Aiming || !ball.IsAtRest || CurrentClub == null)
+            if (!InputEnabled || _pointerOverUi || Phase != ShotPhase.Aiming || !ball.IsAtRest || CurrentClub == null)
                 return;
 
             var power = _marker.Stop();                       // the player's timing = the power
