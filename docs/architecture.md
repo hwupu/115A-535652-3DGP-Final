@@ -7,14 +7,15 @@ Sources: proposal §6 (gameplay, danger system, clubs) and §7 (level independen
 ## 1. Ownership
 | Area | Owner | Components | Folder (`Assets/_Project/Scripts/Game/`) | Issues |
 |---|---|---|---|---|
-| Ball | Henry | `GolfBall`, `InvalidZone` | `Golf/` | #14 |
+| Ball | Henry | `GolfBall`, `InvalidZone`, `BallHitTarget` | `Golf/` | #14, #22 |
 | Input | Henry | `GolfInput` (+ `GolfControls.inputactions` in `Settings/Input/`) | `Controls/` | #13 |
 | Shot + clubs | Henry | `ShotController`, `AimCone`, `ClubProfile` | `Golf/` | #15, #16, #70 |
 | Golfer avatar | Henry | `GolferAvatar` (placeholder box for now) | `Player/` | #88, #36 |
+| Level exit | Henry | `LevelExit` (gate / portal) | `Flow/` | #38 |
 | Cross-scene data | Henry | `GameSession` | `Session/` | #89 |
 | Camera | Bahadir | `CameraRig` | `Camera/` | #19 |
 | Danger (timer) | Pongpat | `DangerManager`, `DangerConfig` | `Danger/` | #7 |
-| Goal + score | Pongpat | `LevelGoal`, `Cup`, `ScoreKeeper`, `LevelResult` | `Scoring/` | #18, #43 |
+| Goal + score | Pongpat | `LevelGoal`, `LevelGoals`, `Cup`, `ScoreKeeper`, `LevelResult` | `Scoring/` | #18, #43 |
 | Level flow | Pongpat | `LevelManager` | `Flow/` | #27 |
 | HUD | Henry | `Hud` (reads the contracts, never writes) | `UI/` | #20, #78 |
 | Level-specific | level owner | cat / wind + scarabs / ice + guardian | `Levels/Garden`, `Levels/Desert`, `Levels/Lake` | per level |
@@ -39,7 +40,7 @@ Sources: proposal §6 (gameplay, danger system, clubs) and §7 (level independen
 4. **Ball stops.** The timer resumes. The avatar **teleports** to the ball (next shooting position); back to step 1.
 5. **Out of bounds / invalid area.** The ball goes back to the **nearest valid position** (its last position on valid ground) and play continues.
 6. **Menu.** A **menu button at the upper right** opens the menu dialog; while it's open the **game is paused** (physics, timer, input). Menu items are undecided (#77).
-7. **Win:** the ball reaches the level goal (a cup for now; could be another target later). **Lose:** the timer reaches 0 while the player is aiming (it can't run out during flight, because it's paused).
+7. **Win:** the ball meets **all of the level's goals** (PO, 2026-10-28). A goal is anything the ball must reach or hit: the cup, a target spot on a branch, a lever. Each level decides which goals it has and how many. They can be met in any order, **except the cup, which is always last**: until every other goal is met it ignores the ball, which rolls over it like normal ground. When all goals are met, **the timer stops** (the level can no longer fail), the **gate/portal opens**, and the hamster **walks to it by itself** (no new controls). Then the next level loads. **Lose:** the timer reaches 0 while the player is aiming (it can't run out during flight, because it's paused).
 
 ## 4. Contracts
 The signatures are the agreement. Names may still change in review; after approval they change only by PR.
@@ -125,6 +126,7 @@ public class GolferAvatar : MonoBehaviour
     public void SetTool(ClubProfile club);                      // swaps the held tool (ToolPrefab)
     public void PlaySwing(ClubProfile club);                    // triggered on ShotTaken
     public void PlayCelebrate(); public void PlayFail();
+    public void WalkTo(Vector3 target, Action arrived);         // all goals met: walks to the open exit (#38)
 }
 ```
 The avatar prefab keeps the visual in a child (`Visual/`): a **box for now**, later the Blender hamster with an Animator. Game code only calls the methods above, so replacing the model doesn't change any other script. Animation clips needed and the clip/timing handoff: see #36.
@@ -180,11 +182,24 @@ If a shot's cost takes the timer to 0, that last shot still plays out: **if it g
 
 ### 4.6 Goal and score — Pongpat
 ```csharp
-public abstract class LevelGoal : MonoBehaviour   // what the ball must reach
+public abstract class LevelGoal : MonoBehaviour   // something the ball must reach or hit
 {
-    public event Action Reached;                  // fires once per attempt
+    public bool IsMet { get; }
+    public bool Accepting { get; set; }           // false = ignores the ball (the cup until the others are met)
+    public void ResetGoal();                      // retry: not met again
+    public event Action<LevelGoal> Reached;       // fires once per attempt
 }
-public class Cup : LevelGoal { }                  // trigger at the hole; the only goal for now
+public class Cup : LevelGoal { }                  // trigger at the hole; always the LAST goal
+public class BallHitTarget : LevelGoal { }        // Henry (#22): met when the ball touches it (branch target spot, lever);
+                                                  // reusable for other levels' targets (e.g. #24)
+
+public class LevelGoals : MonoBehaviour           // all goals of the level (the children of Gameplay/Goal)
+{
+    public int MetCount { get; } public int Total { get; }
+    public void ResetGoals();                     // retry
+    public event Action<int, int> ProgressChanged;  // (met, total): HUD "goals 1/3"
+    public event Action AllMet;                   // LevelManager: win
+}
 
 public readonly struct LevelResult
 {
@@ -214,7 +229,7 @@ public class LevelManager : MonoBehaviour
     [SerializeField] GolfBall ball;          [SerializeField] ShotController shot;
     [SerializeField] GolferAvatar avatar;    [SerializeField] CameraRig cameraRig;
     [SerializeField] DangerManager danger;   [SerializeField] ScoreKeeper score;
-    [SerializeField] LevelGoal goal;
+    [SerializeField] LevelGoals goals;       [SerializeField] LevelExit exit;
 
     public GolfBall Ball { get; }  /* ...read-only accessors for each reference... */
     public LevelPhase Phase { get; }
@@ -229,7 +244,18 @@ public class LevelManager : MonoBehaviour
     public event Action<bool> PausedChanged;
 }
 ```
-`LevelManager` does the wiring: `ShotTaken` → `DangerManager.ApplyShot`, `ScoreKeeper.CountStroke`, `GolferAvatar.PlaySwing`; `GolfBall.CameToRest` → `DangerManager.OnBallAtRest`, `GolferAvatar.TeleportTo`; `LevelGoal.Reached` → completion; `DangerState.Failed` → failure. It reports results to `GameSession`. The proposal's generic "complete hole" fallback is a god key (#71) that calls the same completion path.
+`LevelManager` does the wiring: `ShotTaken` → `DangerManager.ApplyShot`, `ScoreKeeper.CountStroke`, `GolferAvatar.PlaySwing`; `GolfBall.CameToRest` → `DangerManager.OnBallAtRest`, `GolferAvatar.TeleportTo`; `LevelGoals.AllMet` → completion (stop the timer, `LevelExit.Open`, `GolferAvatar.WalkTo(exit.WalkTarget)`, then `LoadNext`); `DangerState.Failed` → failure. It reports results to `GameSession`. The proposal's generic "complete hole" fallback is a god key (#71) that calls the same completion path.
+
+### 4.7b Level exit — Henry (#38)
+```csharp
+public class LevelExit : MonoBehaviour   // the gate (L1) / portal: closed until all goals are met
+{
+    public bool IsOpen { get; }
+    public Transform WalkTarget { get; } // where the hamster walks to; arriving there loads the next level
+    public void Open();                  // LevelManager on LevelGoals.AllMet
+    public event Action Opened;          // FX, sound
+}
+```
 
 ### 4.8 HUD layout — Henry (menu dialog: Pongpat)
 | Screen position | Element | Source |
@@ -269,7 +295,8 @@ Environment             static only
 Gameplay                what the ball and player interact with
 ├── BallSpawn           the tee
 ├── Player              GolfBall + GolferAvatar (Henry)
-├── Goal/Cup            flat cylinder with a trigger (Pongpat's Cup)
+├── Goal                LevelGoals; children = the goals: Cup (always last), BallHitTargets (branch, lever, ...)
+├── Exit                LevelExit: the gate / portal to the next level (#38)
 ├── Hazards             cat / wind / ice (level-specific scripts)
 └── InvalidZones        InvalidZone triggers: water, out of bounds
 UI                      HUD canvas, menu dialog
@@ -328,9 +355,9 @@ sequenceDiagram
     B-->>D: CameToRest -> OnBallAtRest (resume timer)
     B-->>A: CameToRest -> TeleportTo(ball)
     B-->>C: CameToRest -> Aim view
-    alt ball reaches goal
-        B->>G: enters trigger
-        G-->>L: Reached -> LevelCompleted(result)
+    alt ball meets the last open goal (cup last)
+        B->>G: enters trigger / hits target
+        G-->>L: AllMet -> stop timer, exit opens, avatar walks to it, LevelCompleted(result)
     else timer reaches 0
         D-->>L: StateChanged(Failed) -> LevelFailed (retry)
     end
@@ -343,7 +370,7 @@ sequenceDiagram
 - Last shot: if a shot's cost takes the timer to 0, the shot still plays out; if it goes in, the player wins.
 - Third tool codename: **Mysterious** (low range, high accuracy) until the real tool is decided.
 - The game's hamster uses **Blender animation clips** driven by an Animator (#36). Mini-exercise 4.A.1 (#59) stays a standalone exercise and is not reused for the hamster.
-- The goal is generic (`LevelGoal`); a cup for now.
+- The goal is generic (`LevelGoal`). **2026-10-28:** a level can have several goals (cup, branch target spot, lever). All must be met, and the cup is always last. Then the timer stops, the gate/portal opens, and the hamster walks there by itself to load the next level. The water-splash trap and the Level 1 noise gauge are dropped.
 - `GameSession` is owned by Henry.
 - No "ideal one-shot range" mark on the power meter for now (maybe later).
 - HUD: time bar visible at the upper left; menu button at the upper right; opening the menu pauses the game. Menu items undecided.
