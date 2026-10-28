@@ -13,6 +13,7 @@ Sources: proposal §6 (gameplay, danger system, clubs) and §7 (level independen
 | Golfer avatar | Henry | `GolferAvatar` (placeholder box for now) | `Player/` | #88, #36 |
 | Level exit | Henry | `LevelExit` (gate / portal) | `Flow/` | #38 |
 | Cross-scene data | Henry | `GameSession` | `Session/` | #89 |
+| Effects | Henry (Garden + shared) | `ShotImpactEffect`, `BallTriggerEffect`; placeholder prefabs in `Prefabs/FX` | `Effects/` | #39 |
 | Leveling | Henry | XP + unlock table on `GameSession`, `SkillProfile`, `LevelUnlock`, `XpCollectible` | `Session/` | #70 |
 | Camera | Bahadir | `CameraRig` | `Camera/` | #19 |
 | Danger (timer) | Pongpat | `DangerManager`, `DangerConfig` | `Danger/` | #7 |
