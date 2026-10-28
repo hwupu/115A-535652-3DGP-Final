@@ -318,6 +318,40 @@ namespace Project3DGP.EditorTools
             return view;
         }
 
+        // Placeholder story (#51), from the proposal; Henry revises it in the StoryPages Inspector.
+        public static readonly string[] IntroPages =
+        {
+            "In the cheerful Hamster Kingdom, the curious princess has been taken away by Sir Grumblepaws, a mischievous cat.",
+            "He left a trail of strange golf-course puzzles behind him: through a sunny garden, a windy desert and a frozen lake.",
+            "A young hamster inventor sets out to rescue her, with a magical golf ball and a few unusual clubs.",
+            "Finish each course before Sir Grumblepaws wakes up. Good luck!",
+        };
+
+        /// <summary>
+        /// A full-screen story panel (#51, the intro) on top of the canvas: page text, "1 / 4", Skip (left) and Next (right).
+        /// Returns the StoryPages (on a "name" child of the canvas, always active; its panel starts hidden).
+        /// </summary>
+        public static StoryPages BuildStoryPages(GameObject canvas, string name, string[] pages, Color background)
+        {
+            var root = Stretch(name, canvas.transform, 0f);
+            root.SetAsLastSibling();   // drawn above the menu
+            var story = root.gameObject.AddComponent<StoryPages>();
+            var panel = Stretch("Panel", root, 0f);
+            panel.gameObject.AddComponent<Image>().color = background;   // opaque: blocks clicks to what is under it
+            var page = Label("Page", panel, "", 44, TextAnchor.MiddleCenter);
+            Place(page.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0f, 40f), new Vector2(1300f, 400f));
+            var counter = Label("Counter", panel, "", 26, TextAnchor.MiddleCenter);
+            Place(counter.rectTransform, new Vector2(0.5f, 0f), new Vector2(0f, 120f), new Vector2(300f, 40f));
+            var skip = NewButton("Skip", panel, "Skip", story.Skip);
+            Place((RectTransform)skip.transform, new Vector2(0f, 0f), new Vector2(60f, 60f), new Vector2(240f, 64f));
+            var next = NewButton("Next", panel, "Next", story.Next);
+            Place((RectTransform)next.transform, new Vector2(1f, 0f), new Vector2(-60f, 60f), new Vector2(240f, 64f));
+            story.Configure(panel.gameObject, page, counter, pages);
+            EditorUtility.SetDirty(story);
+            panel.gameObject.SetActive(false);
+            return story;
+        }
+
         static void Background(Transform canvas, Color color)
         {
             var background = Stretch("Background", canvas, 0f).gameObject.AddComponent<Image>();
