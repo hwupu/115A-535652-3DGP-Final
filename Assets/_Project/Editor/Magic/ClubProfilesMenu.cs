@@ -26,16 +26,16 @@ namespace Project3DGP.EditorTools
         {
             MagicMenuUtil.EnsureFolder(Folder);
             // Standard golf club: mid range, mid accuracy (architecture §4.2). The only club at the start (#70).
-            Ensure(StandardPath, "StandardClub", "Standard Club", minSpeed: 4f, maxSpeed: 16f, cone: 10f, cycle: 1.6f, pitch: 25f, noise: 0.3f);
-            // Sledgehammer: high range, low accuracy (wide cone), a faster marker (harder to time), loud.
-            Ensure(SledgehammerPath, "Sledgehammer", "Sledgehammer", minSpeed: 8f, maxSpeed: 26f, cone: 30f, cycle: 1.2f, pitch: 20f, noise: 1f);
-            // Mysterious (codename, real tool TBD): low range, high accuracy (narrow cone), a slow calm marker, quiet.
-            Ensure(MysteriousPath, "Mysterious", "Mysterious", minSpeed: 2f, maxSpeed: 10f, cone: 3f, cycle: 2f, pitch: 30f, noise: 0.1f);
+            Ensure(StandardPath, "StandardClub", "Standard Club", minSpeed: 4f, maxSpeed: 16f, cone: 10f, cycle: 1.6f, pitch: 25f);
+            // Sledgehammer: high range, low accuracy (wide cone), a faster marker (harder to time).
+            Ensure(SledgehammerPath, "Sledgehammer", "Sledgehammer", minSpeed: 8f, maxSpeed: 26f, cone: 30f, cycle: 1.2f, pitch: 20f);
+            // Mysterious (codename, real tool TBD): low range, high accuracy (narrow cone), a slow calm marker.
+            Ensure(MysteriousPath, "Mysterious", "Mysterious", minSpeed: 2f, maxSpeed: 10f, cone: 3f, cycle: 2f, pitch: 30f);
             AssetDatabase.SaveAssets();
         }
 
         static void Ensure(string path, string toolName, string displayName, float minSpeed, float maxSpeed, float cone,
-            float cycle, float pitch, float noise)
+            float cycle, float pitch)
         {
             var tool = AssetDatabase.LoadAssetAtPath<GameObject>($"{PlaceholderPrefabsMenu.Folder}/Tools/{toolName}.prefab");
             if (File.Exists(path))
@@ -59,7 +59,6 @@ namespace Project3DGP.EditorTools
             club.AimConeDegrees = cone;
             club.MarkerCycleSeconds = cycle;
             club.LaunchPitch = pitch;
-            club.Noise = noise;
             AssetDatabase.CreateAsset(club, path);
             MagicMenuUtil.Log("Created " + path);
         }

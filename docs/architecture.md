@@ -58,7 +58,7 @@ public class GolfBall : MonoBehaviour            // Rigidbody + SphereCollider
     public void ResetToLastValid();                            // out of bounds, invalid zone
 
     public event Action Launched;
-    public event Action<Collision> Collided;    // sound, particles, noise gauge
+    public event Action<Collision> Collided;    // sound, particles
     public event Action CameToRest;             // avatar teleports, next shot allowed
     public event Action WentOutOfBounds;        // raised before the reset
 }
@@ -79,7 +79,6 @@ public enum ShotPhase { Aiming, InFlight }
     public float AimConeDegrees;       // accuracy: full cone width; shot direction is random inside
     public float MarkerCycleSeconds;   // control: time for the marker to go up and down once
     public float LaunchPitch;          // fixed launch angle (no pitch control in MVP)
-    public float Noise;                // Level 1 noise gauge (sledgehammer is loud)
     public GameObject ToolPrefab;      // what the avatar holds
 }
 
@@ -103,7 +102,7 @@ public class ShotController : MonoBehaviour
 
     public event Action<ShotPhase> PhaseChanged;
     public event Action<ClubProfile> ClubChanged;
-    public event Action<ShotInfo> ShotTaken;   // Danger deducts time, Score counts a stroke, cat hears noise
+    public event Action<ShotInfo> ShotTaken;   // Danger deducts time, Score counts a stroke, avatar swings
 }
 ```
 `AimCone` draws the cone at the ball (e.g., two lines or a flat mesh), pointing along `CameraRig.AimYaw`, width = `CurrentClub.AimConeDegrees`. Visible only while `Aiming`.
@@ -112,10 +111,10 @@ Implementation (#15): `ShotMath` holds the formula (speed = Lerp(Min, Max, power
 | Club | Range (Min..Max speed) | Accuracy (cone) | Notes |
 |---|---|---|---|
 | Standard golf club | mid | mid | the only club at the start (#70) |
-| Sledgehammer | high | low (wide cone) | loud (Level 1 noise) |
+| Sledgehammer | high | low (wide cone) | fast marker (hard to time) |
 | **Mysterious** (codename; real tool TBD) | low | high (narrow cone) | name and look to be decided |
 
-Shipped defaults (#16, `Settings/Clubs/`, tune in the Inspector): Standard 4–16 m/s, cone 10°, marker 1.6 s, pitch 25°, noise 0.3 · Sledgehammer 8–26 m/s, cone 30°, marker 1.2 s, pitch 20°, noise 1 · Mysterious 2–10 m/s, cone 3°, marker 2 s, pitch 30°, noise 0.1. Keys 1–3 pick the slot in `AvailableClubs` order, the wheel steps through it (wraps); only while `Aiming`.
+Shipped defaults (#16, `Settings/Clubs/`, tune in the Inspector): Standard 4–16 m/s, cone 10°, marker 1.6 s, pitch 25° · Sledgehammer 8–26 m/s, cone 30°, marker 1.2 s, pitch 20° · Mysterious 2–10 m/s, cone 3°, marker 2 s, pitch 30°. Keys 1–3 pick the slot in `AvailableClubs` order, the wheel steps through it (wraps); only while `Aiming`.
 
 ### 4.3 Golfer avatar — Henry
 ```csharp
@@ -348,6 +347,7 @@ sequenceDiagram
 - `GameSession` is owned by Henry.
 - No "ideal one-shot range" mark on the power meter for now (maybe later).
 - HUD: time bar visible at the upper left; menu button at the upper right; opening the menu pauses the game. Menu items undecided.
+- **Level 1 has no noise mechanism** (2026-10-28): clubs have no noise value, and the cat follows only the danger timer: Normal = asleep, Warning = twitching, then suspicious (eyes half open), Critical = searching (sits up, watches the ball), Failed = **awake = game over**. Code: `Levels/Garden/CatAlertMachine` (FSM, #79) and `GardenCat` (#21); the cat listens to `DangerManager.StateChanged` (rule 4).
 
 ## 7. Open questions
 - Real name and look of the Mysterious tool.

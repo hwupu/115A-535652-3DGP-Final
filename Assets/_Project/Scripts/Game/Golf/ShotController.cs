@@ -36,7 +36,7 @@ namespace Project3DGP.Game.Golf
 
         public event Action<ShotPhase> PhaseChanged;
         public event Action<ClubProfile> ClubChanged;
-        /// <summary>Danger deducts time, Score counts a stroke, the cat hears the noise.</summary>
+        /// <summary>Danger deducts time, Score counts a stroke, the avatar swings.</summary>
         public event Action<ShotInfo> ShotTaken;
 
         void Awake()

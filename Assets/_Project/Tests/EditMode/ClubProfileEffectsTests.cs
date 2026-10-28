@@ -51,13 +51,6 @@ namespace Project3DGP.Game.Tests
         }
 
         [Test]
-        public void Noise_SledgehammerIsLoudest()
-        {
-            Assert.That(_sledgehammer.Noise, Is.GreaterThan(_standard.Noise));
-            Assert.That(_sledgehammer.Noise, Is.GreaterThan(_mysterious.Noise));
-        }
-
-        [Test]
         public void EveryClub_HasAValidRange()
         {
             foreach (var club in new[] { _standard, _sledgehammer, _mysterious })

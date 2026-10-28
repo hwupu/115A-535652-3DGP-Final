@@ -19,8 +19,6 @@ namespace Project3DGP.Game.Golf
         public float MarkerCycleSeconds = 1.6f;
         [Tooltip("Fixed launch angle above the ground (degrees). No pitch control in the MVP.")]
         public float LaunchPitch = 25f;
-        [Tooltip("Level 1 noise gauge: how loud a shot is (0..1).")]
-        public float Noise = 0.3f;
         [Tooltip("What the avatar holds (#88).")]
         public GameObject ToolPrefab;
     }

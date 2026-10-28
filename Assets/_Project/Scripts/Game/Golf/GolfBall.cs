@@ -51,7 +51,7 @@ namespace Project3DGP.Game.Golf
 
         /// <summary>Raised by Hit (the shot left the tee).</summary>
         public event Action Launched;
-        /// <summary>Every collision while moving (sound, particles, noise gauge).</summary>
+        /// <summary>Every collision while moving (sound, particles).</summary>
         public event Action<Collision> Collided;
         /// <summary>The ball stopped (or was reset): next shot allowed, avatar teleports.</summary>
         public event Action CameToRest;
