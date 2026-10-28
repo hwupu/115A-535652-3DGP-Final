@@ -37,7 +37,7 @@ Key dates: **Nov 16** Demo 1 + mini-exercises 1–2 · **Dec 14** Demo 2 (featur
 
 ## Layout
 - `Assets/_Project/` — all our own content:
-  - `Scenes/` — `MainMenu`, `L1_Garden`, `L2_Desert`, `L3_Lake`, `Ending` (Build Settings order); only the owner edits a scene.
+  - `Scenes/` — `MainMenu`, `L1_Garden`, `L2_Desert`, `L3_Lake`, `Ending` (Build Settings order). The owner edits the level content; **shared framework objects** (e.g. `GameSession`) go into every scene via a Magic tool, added by whoever builds them, so all scenes share the same framework (PO 2026-10-28). Tell the owners in the PR.
   - `Scripts/Core/` (`Project3DGP.Core`, generic, no game types) and `Scripts/Game/` (`Project3DGP.Game`, refs Core; folders per `docs/architecture.md`, level code in `Levels/<Garden|Desert|Lake>/`).
   - `MiniExercises/<Member>/<Code>_<Name>/` — one asmdef per member (`Project3DGP.MiniEx.<Member>`, refs Core only). Exercise plan for the scaffolding tool: `Editor/Magic/MiniExerciseCatalog.cs` (update it if the plan changes).
   - `Editor/Magic/` — all Editor tools, including helpers for mini-exercises (an exercise folder is runtime-only).
