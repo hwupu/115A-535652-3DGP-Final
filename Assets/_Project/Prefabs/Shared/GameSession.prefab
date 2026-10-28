@@ -50,3 +50,19 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 608e4457e9a214fbcb9ee14f94d89c55, type: 2}
   startingClubs:
   - {fileID: 11400000, guid: 56f7e9d5e2f63422485ea3b76c5eac1d, type: 2}
+  xpToReachLevel: 64000000fa000000c2010000bc020000
+  unlocks:
+  - Level: 2
+    Club: {fileID: 11400000, guid: 62b5feb45a9e34a788e0269f89217d98, type: 2}
+    Skill: {fileID: 0}
+  - Level: 3
+    Club: {fileID: 0}
+    Skill: {fileID: 11400000, guid: d025b3c20af80445abbb9f169b405520, type: 2}
+  - Level: 4
+    Club: {fileID: 11400000, guid: 608e4457e9a214fbcb9ee14f94d89c55, type: 2}
+    Skill: {fileID: 0}
+  - Level: 5
+    Club: {fileID: 0}
+    Skill: {fileID: 11400000, guid: 7ea24797ef5f1458fb1e6b17f39e89da, type: 2}
+  xpPerLevelFinished: 100
+  xpPerSecondLeft: 1

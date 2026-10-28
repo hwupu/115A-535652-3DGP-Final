@@ -12,7 +12,7 @@ namespace Project3DGP.EditorTools
     /// Magic > Level > Add HUD and Menus (#20, architecture §4.8): the shared level UI, for every level scene.
     ///   UI/HUD         HudView: time bar + stage icon, strokes, menu button (on the power meter's canvas if it exists)
     ///                  DialogBar: tutorial hints and story lines at the bottom (#28, #51)
-    ///                  XpBar: level + XP under the strokes (#78, reads GameSession)
+    ///                  XpBar: level + XP under the strokes (#78, reads GameSession), LevelUpNotice in the dialog bar (#70)
     ///                  ClubPanel: the usable clubs on the right, current one highlighted + sound (#78)
     ///                  Minimap: upper right (#78), from Cameras/Minimap Camera following the ball, with icons for
     ///                  ball, avatar, cup, exit and each object under Gameplay/Hazards (run again after adding hazards)
@@ -72,6 +72,14 @@ namespace Project3DGP.EditorTools
                 var xp = GameUiBuilder.BuildXpBar(hudCanvas);
                 Undo.RegisterCreatedObjectUndo(xp.gameObject, "Add XP Bar");
                 MagicMenuUtil.Log("Added the XP bar (level + XP) to the HUD");
+                added++;
+            }
+
+            if (Object.FindAnyObjectByType<LevelUpNotice>(FindObjectsInactive.Include) == null)
+            {
+                var xpBar = Object.FindAnyObjectByType<XpBarView>(FindObjectsInactive.Include);
+                Undo.AddComponent<LevelUpNotice>(xpBar.gameObject);
+                MagicMenuUtil.Log("Added LevelUpNotice to the XP bar (\"Level 3! New: ...\" in the dialog bar)");
                 added++;
             }
 

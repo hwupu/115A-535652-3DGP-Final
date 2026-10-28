@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Project3DGP.Core.Gauges;
 using Project3DGP.Game.Controls;
+using Project3DGP.Game.Session;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -14,13 +15,19 @@ namespace Project3DGP.Game.Golf
     ///   InFlight : clicks are ignored until the ball raises CameToRest, then back to Aiming
     /// Club switching (#16): keys 1-3 pick a slot, the wheel steps through the list (wrapping around).
     /// Only while Aiming: the club can't change in mid-flight.
+    /// Leveling (#70): with a GameSession, the clubs are its unlocked ones (in slot order) and grow when a level-up
+    /// unlocks one; the Inspector list is only used where there is no session (test areas).
     /// </summary>
     public class ShotController : MonoBehaviour
     {
         [SerializeField] GolfInput input;
         [SerializeField] GolfBall ball;
-        [Tooltip("Clubs the player can use. Later from GameSession unlocks (#70). The first one is selected at start.")]
+        [Tooltip("Clubs the player can use when there is no GameSession (or Clubs From Session is off). The first one is selected at start.")]
         [SerializeField] List<ClubProfile> clubs = new();
+        [Tooltip("On = use GameSession's unlocked clubs (#70) when a session exists.")]
+        [SerializeField] bool clubsFromSession = true;
+
+        GameSession _session;
 
         readonly PingPongGauge _marker = new();
         bool _pointerOverUi;   // a click on a HUD button (e.g. Menu) must not also shoot
@@ -44,6 +51,31 @@ namespace Project3DGP.Game.Golf
         void Awake()
         {
             if (clubs.Count > 0)
+                SelectClub(clubs[0]);
+        }
+
+        // Start, not Awake: the scene's GameSession has woken up by then.
+        void Start()
+        {
+            if (!clubsFromSession || GameSession.Instance == null)
+                return;
+            _session = GameSession.Instance;
+            _session.Changed += SyncClubsFromSession;
+            SyncClubsFromSession();
+        }
+
+        void OnDestroy()
+        {
+            if (_session != null)
+                _session.Changed -= SyncClubsFromSession;
+        }
+
+        void SyncClubsFromSession()
+        {
+            if (_session.UnlockedClubs.Count == 0)
+                return;   // a session without clubs: keep the Inspector list
+            clubs = new List<ClubProfile>(_session.UnlockedClubs);
+            if (!clubs.Contains(CurrentClub))
                 SelectClub(clubs[0]);
         }
 

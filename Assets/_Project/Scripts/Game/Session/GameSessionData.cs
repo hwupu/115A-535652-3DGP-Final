@@ -5,7 +5,7 @@ using Project3DGP.Game.Scoring;
 namespace Project3DGP.Game.Session
 {
     /// <summary>
-    /// Everything that carries over between scenes (#89): unlocked clubs, player level and XP, the best result per
+    /// Everything that carries over between scenes (#89): unlocked clubs and skills, player level and XP, the best result per
     /// level, this run's results, settings. Plain [Serializable] class with public fields, so save/load (#44) can write it with
     /// JsonUtility.ToJson and read it back with FromJson. Clubs are stored by asset name (e.g. "Standard").
     /// </summary>
@@ -13,6 +13,8 @@ namespace Project3DGP.Game.Session
     public class GameSessionData
     {
         public List<string> UnlockedClubs = new();
+        /// <summary>Shot skills unlocked by leveling (#70), by asset name.</summary>
+        public List<string> UnlockedSkills = new();
         public int PlayerLevel = 1;
         /// <summary>Total XP of this game; the level thresholds are on GameSession (xpToReachLevel).</summary>
         public int Xp;
@@ -29,6 +31,17 @@ namespace Project3DGP.Game.Session
             if (string.IsNullOrEmpty(clubName) || IsUnlocked(clubName))
                 return false;
             UnlockedClubs.Add(clubName);
+            return true;
+        }
+
+        public bool HasSkill(string skillName) => UnlockedSkills.Contains(skillName);
+
+        /// <summary>Returns true if the skill was locked before.</summary>
+        public bool UnlockSkill(string skillName)
+        {
+            if (string.IsNullOrEmpty(skillName) || HasSkill(skillName))
+                return false;
+            UnlockedSkills.Add(skillName);
             return true;
         }
 
