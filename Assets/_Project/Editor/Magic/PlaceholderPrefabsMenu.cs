@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Project3DGP.Game.Golf;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -88,14 +89,15 @@ namespace Project3DGP.EditorTools
             pin.height = 2.5f;
         }
 
-        // Water surface; the trigger reaches 1 m down (InvalidZone component later, #14). Scale the root to resize.
+        // Water surface + InvalidZone trigger from 1 m below to 0.5 m above it, so a rolling ball touches it. Scale the root to resize.
         static void BuildPond(GameObject root)
         {
             Part(Visual(root), PrimitiveType.Cube, "Water", Vector3.zero, new Vector3(8f, 0.02f, 8f), PlaceholderMaterials.Water);
             var zone = root.AddComponent<BoxCollider>();
-            zone.center = new Vector3(0f, -0.5f, 0f);
-            zone.size = new Vector3(8f, 1f, 8f);
+            zone.center = PondInvalidZone.TriggerCenter;
+            zone.size = PondInvalidZone.TriggerSize;
             zone.isTrigger = true;
+            root.AddComponent<InvalidZone>();   // the ball goes back to its last valid spot (#14)
         }
 
         // A 2 m fence segment along X; duplicate and line them up for boundaries.
