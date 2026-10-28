@@ -298,6 +298,7 @@ public interface ISaveStore     { bool HasSave; void Save(SaveGame); bool TryLoa
 | Settings (pause or main menu) | **Settings panel**: master, music, SFX volume (`GameSession.Data.Settings`) | Back |
 
 Saving is **manual** (pause dialog), **one slot**. A save holds the `GameSessionData` and the level scene; Continue restarts that level from the tee. Plain uGUI with placeholder looks; Henry's art replaces the sprites without code changes.
+Implementation (#20): `UI/HudView` (time bar = 1 − `Progress01`, stage icon with `stageSprites[DangerState]`, strokes, `OpenMenu`), `UI/LevelMenus` (pause, save confirm, settings, time-up after `timeUpDelay` s of fail scene; Esc pauses and closes), `UI/SettingsPanel` (reused by the main menu), `UI/GameQuit`. Both views find the level's `ILevelFlow` at Start (`Flow/LevelFlowFinder`: the assigned one, else the first in the scene), so they connect to LevelManager without re-wiring. Saving uses `GameSession.SaveStore` (the `ISaveStore` component on the GameSession prefab, #44); without one the Save button is disabled. Master volume is applied by `GameSession.ApplySettings`; music and SFX read their volumes themselves. *Magic > Level > Add HUD and Menus* adds `UI/HUD` (on the power meter's canvas), `UI/Menus` and an EventSystem to a level (every level, shared framework). *Magic > Game > Open UI Test Area* tries everything on `UI/UiTestLevelFlow` + `UI/UiTestSaveStore` (stand-ins, never in level scenes).
 
 ### 4.9 Game session — Henry
 ```csharp

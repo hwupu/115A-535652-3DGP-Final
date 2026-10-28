@@ -39,7 +39,7 @@ namespace Project3DGP.EditorTools
             MagicMenuUtil.Log($"Added GameSession to {scene.name}" + (systems != null ? " (Systems)" : "") + ". Save the scene to keep it.");
         }
 
-        static GameObject CreatePrefab()
+        internal static GameObject CreatePrefab()
         {
             if (File.Exists(PrefabPath))
             {
