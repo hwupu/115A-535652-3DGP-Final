@@ -220,6 +220,8 @@ public class ScoreKeeper : MonoBehaviour
 }
 ```
 
+Implementation (#22): the `LevelGoal` base is in `Scoring/LevelGoal.cs`, written by Henry so `BallHitTarget` could use it. Pongpat owns it from here and builds `Cup` and `LevelGoals` on it. Subclasses call `MarkMet()`, which is ignored if the goal is already met or `Accepting` is false. They can override `OnMet`/`OnGoalReset` to show the change. `BallHitTarget` (`Golf/`) is met when the `GolfBall` touches its collider (solid or trigger), and it can show/hide objects and flip a part. Placeholder prefabs: `Prefabs/Course/BranchTarget` and `Prefabs/Course/Lever`. You can try both in *Magic > Game > Open Shot Test Area*. Level 1 has **only the cup for now** (PO, 2026-10-28).
+
 ### 4.7 Level flow — Pongpat
 ```csharp
 public enum LevelPhase { Intro, Playing, Completed, Failed }

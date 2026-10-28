@@ -166,14 +166,15 @@ namespace Project3DGP.Game.Golf
             }
         }
 
-        // "Nearest valid position": the newest ground sample that is clear of every InvalidZone
-        // (the newest one is often right at the pond's edge), else where the ball last stopped.
+        // "Nearest valid position": the newest ground sample that is clear of every InvalidZone (the newest one
+        // is often right at the pond's edge) and has ground right under its centre (the last sample before
+        // rolling off a cliff can be past the edge, still touching it), else where the ball last stopped.
         Vector3 FindLastValidPosition()
         {
             for (var n = 0; n < _historyCount; n++)
             {
                 var candidate = _groundHistory[(_historyHead - n + HistorySize) % HistorySize];
-                if (!OverlapsInvalidZone(candidate))
+                if (!OverlapsInvalidZone(candidate) && HasGroundBelow(candidate))
                     return candidate;
             }
             return _lastRestPosition;
@@ -199,6 +200,17 @@ namespace Project3DGP.Game.Golf
             foreach (var hit in Physics.OverlapSphere(centre, radius, ~0, QueryTriggerInteraction.Collide))
             {
                 if (hit.TryGetComponent<InvalidZone>(out _))
+                    return true;
+            }
+            return false;
+        }
+
+        bool HasGroundBelow(Vector3 centre)
+        {
+            var reach = _sphere.radius * MaxScale(transform.lossyScale) + 0.1f;   // the radius + a small gap
+            foreach (var hit in Physics.RaycastAll(centre, Vector3.down, reach, ~0, QueryTriggerInteraction.Ignore))
+            {
+                if (hit.collider != _sphere && hit.normal.y >= groundNormalMinY)
                     return true;
             }
             return false;

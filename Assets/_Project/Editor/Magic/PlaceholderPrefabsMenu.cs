@@ -25,6 +25,8 @@ namespace Project3DGP.EditorTools
             ("Course/Pond", BuildPond),
             ("Course/Fence", BuildFence),
             ("Course/Gate", BuildGate),
+            ("Course/BranchTarget", BuildBranchTarget),
+            ("Course/Lever", BuildLever),
             ("Nature/Tree", BuildTree),
             ("Nature/Bush", BuildBush),
             ("Nature/Rock", BuildRock),
@@ -37,7 +39,7 @@ namespace Project3DGP.EditorTools
         };
 
         [MenuItem(MagicMenuUtil.Root + "Prefabs/Create Placeholder Prefabs", priority = MagicMenuUtil.PrefabsPriority)]
-        static void CreateAll()
+        internal static void CreateAll()
         {
             // Build in a preview scene so the open scene isn't touched.
             var buildScene = EditorSceneManager.NewPreviewScene();
@@ -87,6 +89,56 @@ namespace Project3DGP.EditorTools
             pin.center = new Vector3(0f, 1.25f, 0f);
             pin.radius = 0.04f;
             pin.height = 2.5f;
+        }
+
+        // Ball-hit goal (#22): a round target facing +Z, root at its centre; put it on a branch. Solid: the ball
+        // bounces off. The red bullseye turns green when met.
+        static void BuildBranchTarget(GameObject root)
+        {
+            var visual = Visual(root);
+            var facing = Quaternion.Euler(90f, 0f, 0f);   // a cylinder's flat side faces +Y; turn it to face +Z
+            Part(visual, PrimitiveType.Cylinder, "Ring", Vector3.zero, new Vector3(0.6f, 0.02f, 0.6f), PlaceholderMaterials.White).localRotation = facing;
+            var red = Part(visual, PrimitiveType.Cylinder, "Bullseye", new Vector3(0f, 0f, 0.015f), new Vector3(0.3f, 0.02f, 0.3f), PlaceholderMaterials.Flag);
+            red.localRotation = facing;
+            var green = Part(visual, PrimitiveType.Cylinder, "BullseyeMet", new Vector3(0f, 0f, 0.015f), new Vector3(0.3f, 0.02f, 0.3f), GoalMet);
+            green.localRotation = facing;
+            var box = root.AddComponent<BoxCollider>();
+            box.size = new Vector3(0.6f, 0.6f, 0.1f);
+            AddBallHitTarget(root, green.gameObject, red.gameObject, null, Vector3.zero);
+        }
+
+        // Ball-hit goal (#22): a lever leaning back; hitting it flips the handle forward and the knob turns green.
+        static void BuildLever(GameObject root)
+        {
+            var visual = Visual(root);
+            Part(visual, PrimitiveType.Cube, "Base", new Vector3(0f, 0.075f, 0f), new Vector3(0.4f, 0.15f, 0.3f), PlaceholderMaterials.Stone);
+            var handle = Pivot(visual, "Handle", new Vector3(0f, 0.15f, 0f));
+            handle.localRotation = Quaternion.Euler(-35f, 0f, 0f);
+            Part(handle, PrimitiveType.Cylinder, "Rod", new Vector3(0f, 0.3f, 0f), new Vector3(0.05f, 0.3f, 0.05f), PlaceholderMaterials.Wood);
+            var red = Part(handle, PrimitiveType.Sphere, "Knob", new Vector3(0f, 0.6f, 0f), Vector3.one * 0.15f, PlaceholderMaterials.Flag);
+            var green = Part(handle, PrimitiveType.Sphere, "KnobMet", new Vector3(0f, 0.6f, 0f), Vector3.one * 0.15f, GoalMet);
+            var box = root.AddComponent<BoxCollider>();
+            box.center = new Vector3(0f, 0.4f, 0f);
+            box.size = new Vector3(0.5f, 0.8f, 0.5f);
+            AddBallHitTarget(root, green.gameObject, red.gameObject, handle, new Vector3(35f, 0f, 0f));
+        }
+
+        static Material GoalMet => PlaceholderMaterials.Get("GoalMet", new Color(0.2f, 0.8f, 0.3f));
+
+        static void AddBallHitTarget(GameObject root, GameObject showWhenMet, GameObject hideWhenMet, Transform flipPart, Vector3 flipEuler)
+        {
+            showWhenMet.SetActive(false);
+            var target = root.AddComponent<BallHitTarget>();
+            var so = new SerializedObject(target);
+            var show = so.FindProperty("showWhenMet");
+            show.arraySize = 1;
+            show.GetArrayElementAtIndex(0).objectReferenceValue = showWhenMet;
+            var hide = so.FindProperty("hideWhenMet");
+            hide.arraySize = 1;
+            hide.GetArrayElementAtIndex(0).objectReferenceValue = hideWhenMet;
+            so.FindProperty("flipPart").objectReferenceValue = flipPart;
+            so.FindProperty("flipEuler").vector3Value = flipEuler;
+            so.ApplyModifiedPropertiesWithoutUndo();
         }
 
         // Water surface + InvalidZone trigger from 1 m below to 0.5 m above it, so a rolling ball touches it. Scale the root to resize.
