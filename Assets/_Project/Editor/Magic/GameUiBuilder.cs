@@ -92,6 +92,34 @@ namespace Project3DGP.EditorTools
             return hud;
         }
 
+        /// <summary>
+        /// The HUD's dialog bar (bottom center): tutorial hints (#28) and story lines (#51). Click it to skip a line.
+        /// Returns the DialogBar (on a "DialogBar" child of the canvas; register Undo for its GameObject).
+        /// </summary>
+        public static DialogBar BuildDialogBar(GameObject canvas)
+        {
+            var root = Stretch("DialogBar", canvas.transform, 0f);
+            var panel = NewRect("Panel", root, new Vector2(0.5f, 0f), new Vector2(0f, 40f), new Vector2(1100f, 120f));
+            panel.gameObject.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.7f);   // catches the skip click
+            var text = Label("Text", panel, "", 30, TextAnchor.MiddleCenter);
+            var textRect = text.rectTransform;
+            textRect.anchorMin = Vector2.zero;
+            textRect.anchorMax = Vector2.one;
+            textRect.offsetMin = new Vector2(30f, 24f);
+            textRect.offsetMax = new Vector2(-30f, -12f);
+            var hint = Label("SkipHint", panel, "click to skip", 18, TextAnchor.LowerRight);
+            Place(hint.rectTransform, new Vector2(1f, 0f), new Vector2(-12f, 6f), new Vector2(200f, 24f));
+            hint.color = new Color(1f, 1f, 1f, 0.6f);
+
+            var bar = root.gameObject.AddComponent<DialogBar>();
+            var so = new SerializedObject(bar);
+            so.FindProperty("panel").objectReferenceValue = panel.gameObject;
+            so.FindProperty("label").objectReferenceValue = text;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            panel.gameObject.SetActive(false);
+            return bar;
+        }
+
         /// <summary>A "Menus" canvas above the HUD with the pause, confirm, settings and time-up dialogs.</summary>
         public static LevelMenus BuildMenus(MonoBehaviour flow)
         {
