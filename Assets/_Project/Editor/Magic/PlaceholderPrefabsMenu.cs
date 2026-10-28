@@ -175,6 +175,7 @@ namespace Project3DGP.EditorTools
             Part(visual, PrimitiveType.Cube, "EarLeft", new Vector3(-0.25f, 1.25f, 1.2f), new Vector3(0.15f, 0.25f, 0.1f), PlaceholderMaterials.Cat);
             Part(visual, PrimitiveType.Cube, "EarRight", new Vector3(0.25f, 1.25f, 1.2f), new Vector3(0.15f, 0.25f, 0.1f), PlaceholderMaterials.Cat);
             Part(visual, PrimitiveType.Cube, "Tail", new Vector3(0.3f, 0.2f, -1.4f), new Vector3(0.15f, 0.15f, 1f), PlaceholderMaterials.Cat);
+            CatPrefabEyes.Add(visual);   // closed / open by GardenCat (#21)
             var box = root.AddComponent<BoxCollider>();
             box.center = new Vector3(0f, 0.6f, 0.2f);
             box.size = new Vector3(1f, 1.2f, 2.4f);

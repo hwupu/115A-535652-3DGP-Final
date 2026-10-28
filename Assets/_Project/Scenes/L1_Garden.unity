@@ -1420,6 +1420,7 @@ Transform:
   - {fileID: 871537471}
   - {fileID: 1210270523}
   - {fileID: 910783225}
+  - {fileID: 808101903}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &798116232
@@ -1453,6 +1454,52 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1915827052}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &808101902
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 808101903}
+  - component: {fileID: 808101904}
+  m_Layer: 0
+  m_Name: CatTestKeys_TEMP
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &808101903
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 808101902}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 780809552}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &808101904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 808101902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e188857593daa4cc68d6e3aa0e4eb997, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project3DGP.Game::Project3DGP.Game.Levels.Garden.GardenCatTestKeys
+  cat: {fileID: 1317332853}
+  shot: {fileID: 1210270524}
 --- !u!1 &811561423
 GameObject:
   m_ObjectHideFlags: 0
@@ -2251,7 +2298,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 148855418249513394, guid: 971ab436115f54a90b4ad88660bbba9c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1317332853}
   m_SourcePrefab: {fileID: 100100000, guid: 971ab436115f54a90b4ad88660bbba9c, type: 3}
 --- !u!4 &1154957706 stripped
 Transform:
@@ -2669,6 +2719,27 @@ Terrain:
   m_EnableTreesAndDetailsRayTracing: 0
   m_EnableHeightmapLODFrustumCulling: 1
   m_TreeMotionVectorModeOverride: 3
+--- !u!1 &1317332851 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 148855418249513394, guid: 971ab436115f54a90b4ad88660bbba9c, type: 3}
+  m_PrefabInstance: {fileID: 1154957705}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1317332853
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1317332851}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8eae9aba4dd5a446e8b1c110dac952ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project3DGP.Game::Project3DGP.Game.Levels.Garden.GardenCat
+  machine:
+    SuspiciousAfterSeconds: 4
+  lookTarget: {fileID: 1347358147}
+  blendSpeed: 4
 --- !u!1 &1330829168
 GameObject:
   m_ObjectHideFlags: 0
