@@ -26,6 +26,9 @@ namespace Project3DGP.Game.Player
         [SerializeField] GolferAvatar avatar;
         [Tooltip("Optional: the level's exit (#38).")]
         [SerializeField] LevelExit exit;
+        [Tooltip("On = the avatar teleports to the ball when it stops (classic). Off = explore mode (#19): " +
+                 "PlayerModeController lets the player walk to the ball; the stance is kept only while shooting.")]
+        [SerializeField] bool teleportToBall = true;
 
         // ---------- TEMP(#27) ILevelFlow: LevelManager does all of this ----------
         public LevelPhase Phase => exit != null && exit.IsOpen ? LevelPhase.Completed : LevelPhase.Playing;
@@ -91,7 +94,7 @@ namespace Project3DGP.Game.Player
 
         void Update()
         {
-            if (shot.Phase == ShotPhase.Aiming && ball.IsAtRest && !avatar.IsWalking && (exit == null || !exit.IsOpen))
+            if ((teleportToBall || shot.InputEnabled) && shot.Phase == ShotPhase.Aiming && ball.IsAtRest && !avatar.IsWalking && (exit == null || !exit.IsOpen))
                 avatar.FaceYaw(shot.AimYaw);   // TEMP(#19): CameraRig.AimYaw
 
             var keyboard = UnityEngine.InputSystem.Keyboard.current;
@@ -113,7 +116,7 @@ namespace Project3DGP.Game.Player
 
         void OnCameToRest()
         {
-            if (exit == null || !exit.IsOpen)
+            if (teleportToBall && (exit == null || !exit.IsOpen))
                 avatar.TeleportTo(ball.Position, shot.AimYaw);
         }
         void OnShotTaken(ShotInfo info) => avatar.PlaySwing(info.Club);
