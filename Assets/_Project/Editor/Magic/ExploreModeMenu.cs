@@ -18,8 +18,8 @@ namespace Project3DGP.EditorTools
     /// Magic > Level > Add Camera Rig and Explore Mode (#19, Bahadir): sets up the open level scene so the player
     /// walks to the ball instead of teleporting:
     ///   Cameras/CameraRig        CameraRig, moving Cameras/Main Camera (replaces the TEMP(#19) OrbitFollowCamera)
-    ///   Gameplay/Player avatar   CharacterController (sized from its model) + CharacterWalker, on this scene's copy
-    ///                            only (the avatar prefab is not changed)
+    ///   Gameplay/Player avatar   CharacterController (sized from its model) + CharacterWalker + ProceduralWalkCycle
+    ///                            (legs LegL / LegR), on this scene's copy only (the avatar prefab is not changed)
     ///   Systems/PlayerModes      PlayerModeController (walk / shoot / ball in flight)
     ///   Systems/AvatarWiring_TEMP  "Teleport To Ball" off
     /// Run Magic > Level > Add Ball, Shot and Avatar first. Each step runs only if its component is missing. One Undo
@@ -91,6 +91,32 @@ namespace Project3DGP.EditorTools
                 controller.enabled = false;
                 MagicMenuUtil.Log($"Added CharacterWalker to {avatar.name} (starts off; PlayerModes turns it on)");
                 changes++;
+            }
+
+            // 2b. Leg swing while moving (any movement, also the walk to the exit). Legs found by name in the model.
+            if (avatar.GetComponent<ProceduralWalkCycle>() == null)
+            {
+                var legL = FindDeep(avatar.transform, "LegL");
+                var legR = FindDeep(avatar.transform, "LegR");
+                if (legL != null && legR != null)
+                {
+                    var cycle = Undo.AddComponent<ProceduralWalkCycle>(avatar.gameObject);
+                    Undo.RecordObject(cycle, "Set the legs");
+                    cycle.SetLegs(new[]
+                    {
+                        new ProceduralWalkCycle.Leg { part = legL, phaseOffset = 0f },
+                        new ProceduralWalkCycle.Leg { part = legR, phaseOffset = 0.5f },   // half a cycle later: opposite
+                    });
+                    var so = new SerializedObject(cycle);
+                    so.FindProperty("strideLength").floatValue = Mathf.Max(0.3f, height * 1.5f);   // small model, small steps
+                    so.ApplyModifiedPropertiesWithoutUndo();
+                    MagicMenuUtil.Log($"Added ProceduralWalkCycle to {avatar.name} (legs LegL, LegR)");
+                    changes++;
+                }
+                else
+                {
+                    MagicMenuUtil.Log($"Skipped the walk cycle: no LegL / LegR under {avatar.name}");
+                }
             }
 
             // 3. The camera rig on its slot.
@@ -178,6 +204,15 @@ namespace Project3DGP.EditorTools
             controller.skinWidth = Mathf.Max(0.005f, radius * 0.1f);
             controller.minMoveDistance = 0f;
             return height;
+        }
+
+        // A child (at any depth) with this name, or null.
+        static Transform FindDeep(Transform parent, string name)
+        {
+            foreach (var child in parent.GetComponentsInChildren<Transform>(true))
+                if (child.name == name)
+                    return child;
+            return null;
         }
 
         // The aim cone and the power meter (only the meter itself, never a whole HUD canvas).

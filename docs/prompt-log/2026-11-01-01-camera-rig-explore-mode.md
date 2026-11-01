@@ -32,3 +32,12 @@
 > Ok, that looks nice. Works well. Can you properly add the notes in the achritecutre md and relevant places and push it back properly?
 
 - Docs: architecture.md, ADR-0012, decisions index, README controls. Committed under Bahadir, pushed the branch.
+
+> Ok, do this legs movement. Just lets, no arms. Idk whats implemented already about walking to the gate but yes, it would also work in such case. Please implement it and tell me what I can do on Unity editor for you
+
+- New Core `Movement/ProceduralWalkCycle`: legs swing as pendulums (sin of a phase advanced by distance walked, weight fades in / out), each leg around the top of its mesh; speed measured from movement, so it also plays in `WalkTo` (exit); off when an Animator controller exists. The Magic tool adds it with LegL / LegR. Legs only (no arms), as asked. Reusable for mini-exercise 4.A.2 (#61).
+- Tested by Bahadir in L1: works, but the placeholder legs (0.16 m spheres in Henry's Hamster prefab) are too small to see the swing well. Not changed: the prefab is Henry's and his four mini-exercises use it; longer legs are a later topic (or the Blender model, #36).
+
+> I got confirmation from teammates about pushing changes. They said "Make PR then self-merge" ... Do it on behalf of my name.
+
+- Pushed the walk cycle to PR #130 and squash-merged it (team OK to self-merge).
