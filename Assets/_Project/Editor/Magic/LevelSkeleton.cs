@@ -57,10 +57,11 @@ namespace Project3DGP.EditorTools
                 Path = "Gameplay/Goal/Cup", Shape = Shape.Cylinder, Position = new Vector3(0f, 0.01f, 20f),
                 Scale = new Vector3(0.5f, 0.01f, 0.5f), Trigger = true, Purpose = "Cup placeholder (Pongpat, #18)",
             },
+            new Slot { Path = "Gameplay/Exit", Purpose = "LevelExit: the gate / portal to the next level (Henry, #38)" },
             new Slot { Path = "Gameplay/Hazards", Purpose = "Level hazards: cat, wind, ice, ..." },
             new Slot { Path = "Gameplay/InvalidZones", Purpose = "InvalidZone triggers: water, out of bounds (Henry, #14)" },
 
-            new Slot { Path = "UI", Purpose = "HUD canvas and menu dialog (Henry, #20; Pongpat, #77)" },
+            new Slot { Path = "UI", Purpose = "HUD and level dialogs (Henry, #20)" },
         };
 
         /// <summary>Default scene objects that are moved into their group if they sit at the scene root.</summary>

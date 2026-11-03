@@ -53,10 +53,13 @@ Details per sprint: [`docs/scrum/roadmap.md`](docs/scrum/roadmap.md) and the [bo
 ## 🎮 Controls
 | Action | Default |
 |---|---|
-| Orbit the camera around the ball | Hold right mouse button + move the mouse |
+| Orbit / turn the camera | Hold right mouse button + move the mouse |
+| Walk to the ball (the shot starts when you're close) | `W` `A` `S` `D` |
+| Sprint / jump | Hold `Left Shift` / `Space` |
+| Leave the shot and walk again | `Q` |
 | Shoot (power under the marker) | Left click |
 | Switch club | `1` `2` `3`, or mouse wheel (up = previous, down = next) |
-| Switch camera view | `V` |
+| Switch camera view while walking | `V`: third person → first person → free fly (`WASD`, `Space` up, `Left Ctrl` down) → ball view |
 | Pause menu | `Esc` |
 | Retry | `R` |
 

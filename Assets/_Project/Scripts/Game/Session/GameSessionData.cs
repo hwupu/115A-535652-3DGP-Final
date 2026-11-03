@@ -5,17 +5,22 @@ using Project3DGP.Game.Scoring;
 namespace Project3DGP.Game.Session
 {
     /// <summary>
-    /// Everything that carries over between scenes (#89): unlocked clubs, player level and XP, the best result per
-    /// level, settings. Plain [Serializable] class with public fields, so save/load (#44) can write it with
+    /// Everything that carries over between scenes (#89): unlocked clubs and skills, player level and XP, the best result per
+    /// level, this run's results, settings. Plain [Serializable] class with public fields, so save/load (#44) can write it with
     /// JsonUtility.ToJson and read it back with FromJson. Clubs are stored by asset name (e.g. "Standard").
     /// </summary>
     [Serializable]
     public class GameSessionData
     {
         public List<string> UnlockedClubs = new();
+        /// <summary>Shot skills unlocked by leveling (#70), by asset name.</summary>
+        public List<string> UnlockedSkills = new();
         public int PlayerLevel = 1;
+        /// <summary>Total XP of this game; the level thresholds are on GameSession (xpToReachLevel).</summary>
         public int Xp;
         public List<BestResult> BestResults = new();
+        /// <summary>Every level finished in this run, in order (the Ending totals). A new game starts empty.</summary>
+        public List<BestResult> RunResults = new();
         public Settings Settings = new();
 
         public bool IsUnlocked(string clubName) => UnlockedClubs.Contains(clubName);
@@ -29,9 +34,24 @@ namespace Project3DGP.Game.Session
             return true;
         }
 
-        /// <summary>Keeps the result if it is the level's first or a better one. Returns true if it was kept.</summary>
+        public bool HasSkill(string skillName) => UnlockedSkills.Contains(skillName);
+
+        /// <summary>Returns true if the skill was locked before.</summary>
+        public bool UnlockSkill(string skillName)
+        {
+            if (string.IsNullOrEmpty(skillName) || HasSkill(skillName))
+                return false;
+            UnlockedSkills.Add(skillName);
+            return true;
+        }
+
+        /// <summary>
+        /// Adds the result to this run, and keeps it as the level's best if it is the first or a better one.
+        /// Returns true if it is a new best.
+        /// </summary>
         public bool RecordResult(LevelResult result)
         {
+            RunResults.Add(BestResult.From(result));
             var index = BestResults.FindIndex(r => r.LevelId == result.LevelId);
             var candidate = BestResult.From(result);
             if (index < 0)

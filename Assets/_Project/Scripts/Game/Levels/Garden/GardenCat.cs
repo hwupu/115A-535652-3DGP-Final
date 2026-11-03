@@ -1,4 +1,6 @@
 using System;
+using Project3DGP.Game.Danger;
+using Project3DGP.Game.Flow;
 using UnityEngine;
 
 namespace Project3DGP.Game.Levels.Garden
@@ -13,7 +15,8 @@ namespace Project3DGP.Game.Levels.Garden
     ///   Suspicious  lying, eyes half open, looks left and right
     ///   Searching   sits up, eyes open, follows the ball with its head
     ///   Awake       stands up, eyes wide, tail up, stares at the ball
-    /// Wiring: DangerManager.StateChanged -> SetAlert (TEMP(#7): F1-F4 on GardenCatTestKeys until it exists).
+    /// Wiring (#31): at Start the cat follows the level's danger timer (ILevelFlow.Danger, DangerManager #7):
+    /// Normal / Warning / Critical / Failed -> SetAlert. Until DangerManager exists: F1-F4 on GardenCatTestKeys (TEMP(#7)).
     /// </summary>
     public class GardenCat : MonoBehaviour
     {
@@ -22,6 +25,10 @@ namespace Project3DGP.Game.Levels.Garden
         [SerializeField] Transform lookTarget;
         [Tooltip("How fast poses blend (1/s).")]
         [SerializeField] float blendSpeed = 4f;
+        [Tooltip("The level's ILevelFlow (LevelManager, #27). Empty = the first one in the scene at Start.")]
+        [SerializeField] MonoBehaviour flow;
+
+        IDangerTimer _danger;
 
         Transform _visual, _body, _earLeft, _earRight, _tail, _eyeLeft, _eyeRight;
         Vector3 _bodyScale, _eyeScale;
@@ -59,6 +66,25 @@ namespace Project3DGP.Game.Levels.Garden
 
         void OnEnable() => machine.StateChanged += OnMachineStateChanged;
         void OnDisable() => machine.StateChanged -= OnMachineStateChanged;
+
+        // The danger timer drives the cat; no timer yet (no LevelManager, or the TEMP wiring) = the test keys do.
+        void Start()
+        {
+            _danger = LevelFlowFinder.Find(flow)?.Danger;
+            if (_danger == null)
+                return;
+            _danger.StateChanged += OnDangerChanged;
+            OnDangerChanged(_danger.State);
+        }
+
+        void OnDestroy()
+        {
+            if (_danger != null)
+                _danger.StateChanged -= OnDangerChanged;
+        }
+
+        // CatAlert has the same order as DangerState: Normal = Calm, Warning, Critical, Failed = TimeUp.
+        void OnDangerChanged(DangerState state) => SetAlert((CatAlert)(int)state);
 
         public void SetAlert(CatAlert alert) => machine.SetAlert(alert);
 
@@ -168,5 +194,7 @@ namespace Project3DGP.Game.Levels.Garden
             }
             return null;
         }
+
+        internal void SetFlowForTests(MonoBehaviour levelFlow) => flow = levelFlow;
     }
 }

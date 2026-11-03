@@ -20,6 +20,8 @@ namespace Project3DGP.Game.Controls
     ///   hold right mouse + move = orbit camera   left click = shoot
     ///   1 / 2 / 3 = club slot                     mouse wheel = previous / next club
     ///   V = toggle view                           Esc = pause    R = retry
+    ///   WASD = walk / fly    Q = exit shot        Space / Left Ctrl = fly up / down   (explore mode, #19)
+    ///   Space = jump         Left Shift = sprint  (explore mode, while walking)
     /// </summary>
     [CreateAssetMenu(menuName = "Project3DGP/Golf Input", fileName = "GolfInput")]
     public class GolfInput : ScriptableObject
@@ -37,8 +39,9 @@ namespace Project3DGP.Game.Controls
 
         InputActionMap _gameplay, _system;
         InputAction _orbit, _look, _shoot, _clubScroll, _toggleView, _pause, _retry;
+        InputAction _move, _exitShot, _flyVertical, _jump, _sprint;   // explore mode (#19): walk, leave the shot, free-fly up/down, jump, sprint
         InputAction[] _clubSlots;
-        int _users;              // how many components called Acquire() and not Release()
+        int _users;             // how many components called Acquire() and not Release()
         bool _gameplayEnabled = true;
         float _lastScrollTime = float.NegativeInfinity;
 
@@ -60,6 +63,21 @@ namespace Project3DGP.Game.Controls
 
         /// <summary>Mouse movement this frame in pixels, only while orbiting; zero otherwise.</summary>
         public Vector2 OrbitDelta => IsOrbiting ? _look.ReadValue<Vector2>() : Vector2.zero;
+
+        /// <summary>Q: leave the shot and walk again (PlayerModeController, explore mode).</summary>
+        public event Action ExitShot;
+
+        /// <summary>WASD as x = right/left, y = forward/back, each -1..1 (walking, free-fly camera).</summary>
+        public Vector2 Move => _gameplayEnabled && _move != null ? _move.ReadValue<Vector2>() : Vector2.zero;
+
+        /// <summary>Space = +1 (up), Left Ctrl = -1 (down); free-fly camera only.</summary>
+        public float FlyVertical => _gameplayEnabled && _flyVertical != null ? _flyVertical.ReadValue<float>() : 0f;
+
+        /// <summary>Space: jump while walking (PlayerModeController). In free fly the same key flies up.</summary>
+        public event Action Jump;
+
+        /// <summary>True while Left Shift is held: walk faster.</summary>
+        public bool IsSprinting => _gameplayEnabled && _sprint != null && _sprint.IsPressed();
 
         public bool IsActive => _users > 0;
 
@@ -134,6 +152,16 @@ namespace Project3DGP.Game.Controls
             };
             _pause = _system.FindAction("Pause", true);
             _retry = _system.FindAction("Retry", true);
+            // Explore mode actions are optional (null-safe), so an older actions asset still binds.
+            _move = _gameplay.FindAction("Move");
+            _exitShot = _gameplay.FindAction("ExitShot");
+            _flyVertical = _gameplay.FindAction("FlyVertical");
+            _jump = _gameplay.FindAction("Jump");
+            _sprint = _gameplay.FindAction("Sprint");
+            if (_exitShot != null)
+                _exitShot.performed += OnExitShot;
+            if (_jump != null)
+                _jump.performed += OnJump;
 
             _shoot.performed += OnShoot;
             _clubScroll.performed += OnClubScroll;
@@ -156,6 +184,10 @@ namespace Project3DGP.Game.Controls
                 slot.performed -= OnClubSlot;
             _pause.performed -= OnPause;
             _retry.performed -= OnRetry;
+            if (_exitShot != null)
+                _exitShot.performed -= OnExitShot;
+            if (_jump != null)
+                _jump.performed -= OnJump;
             _gameplay.Disable();
             _system.Disable();
             _gameplay = _system = null;
@@ -166,6 +198,8 @@ namespace Project3DGP.Game.Controls
         void OnToggleView(InputAction.CallbackContext _) => ToggleView?.Invoke();
         void OnPause(InputAction.CallbackContext _) => Pause?.Invoke();
         void OnRetry(InputAction.CallbackContext _) => Retry?.Invoke();
+        void OnExitShot(InputAction.CallbackContext _) => ExitShot?.Invoke();
+        void OnJump(InputAction.CallbackContext _) => Jump?.Invoke();
 
         // Club1 -> slot 0, Club2 -> slot 1, Club3 -> slot 2.
         void OnClubSlot(InputAction.CallbackContext context) =>

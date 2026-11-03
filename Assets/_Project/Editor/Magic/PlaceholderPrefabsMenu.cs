@@ -165,7 +165,8 @@ namespace Project3DGP.EditorTools
             box.size = new Vector3(2f, 0.8f, 0.1f);
         }
 
-        // Stone arch with a portal surface. Pillars are solid; "PortalTrigger" is the opening (behaviour TBD).
+        // Stone arch, the level exit (#38): bars while closed, portal surface once open (GateLevelExit). Pillars are
+        // solid; "PortalTrigger" is the opening (not used yet: LevelManager loads the next level when the walk ends).
         static void BuildGate(GameObject root)
         {
             var visual = Visual(root);
@@ -186,6 +187,7 @@ namespace Project3DGP.EditorTools
             trigger.center = new Vector3(0f, 1.5f, 0f);
             trigger.size = new Vector3(2f, 3f, 0.5f);
             trigger.isTrigger = true;
+            GateLevelExit.Add(root);
         }
 
         static void BuildTree(GameObject root)
@@ -321,7 +323,7 @@ namespace Project3DGP.EditorTools
             return visual;
         }
 
-        static Transform Part(Transform parent, PrimitiveType type, string name, Vector3 position, Vector3 scale, Material material)
+        internal static Transform Part(Transform parent, PrimitiveType type, string name, Vector3 position, Vector3 scale, Material material)
         {
             var go = GameObject.CreatePrimitive(type);
             Object.DestroyImmediate(go.GetComponent<Collider>());

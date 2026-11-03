@@ -13,11 +13,15 @@ Sources: proposal §6 (gameplay, danger system, clubs) and §7 (level independen
 | Golfer avatar | Henry | `GolferAvatar` (placeholder box for now) | `Player/` | #88, #36 |
 | Level exit | Henry | `LevelExit` (gate / portal) | `Flow/` | #38 |
 | Cross-scene data | Henry | `GameSession` | `Session/` | #89 |
-| Camera | Bahadir | `CameraRig` | `Camera/` | #19 |
+| Effects | Henry (Garden + shared) | `ShotImpactEffect`, `BallTriggerEffect`; placeholder prefabs in `Prefabs/FX` | `Effects/` | #39 |
+| Leveling | Henry | XP + unlock table on `GameSession`, `SkillProfile`, `LevelUnlock`, `XpCollectible` | `Session/` | #70 |
+| Camera + explore mode | Bahadir | `CameraRig`, `PlayerModeController` (+ Core `Movement/CharacterWalker`) | `Cameras/`, `Explore/` | #19, #125 |
 | Danger (timer) | Pongpat | `DangerManager`, `DangerConfig` | `Danger/` | #7 |
 | Goal + score | Pongpat | `LevelGoal`, `LevelGoals`, `Cup`, `ScoreKeeper`, `LevelResult` | `Scoring/` | #18, #43 |
 | Level flow | Pongpat | `LevelManager` | `Flow/` | #27 |
-| HUD | Henry | `Hud` (reads the contracts, never writes) | `UI/` | #20, #78 |
+| HUD + menus | Henry | `Hud`, pause / time-up / settings dialogs, main menu, ending screen (read the contracts; call only `ILevelFlow`, `ISaveStore`, `GameSession`) | `UI/` | #20, #30, #77, #78 |
+| Game-flow interfaces | Henry | `IDangerTimer`, `IStrokeCounter`, `ILevelFlow`, `ISaveStore` (the owners implement them) | `Danger/`, `Scoring/`, `Flow/`, `Session/` | #20 |
+| Save & load | Pongpat | implements `ISaveStore` (component on the GameSession prefab) | `Session/` | #44 |
 | Level-specific | level owner | cat / wind + scarabs / ice + guardian | `Levels/Garden`, `Levels/Desert`, `Levels/Lake` | per level |
 
 - Assembly: everything above is in `Project3DGP.Game` (namespace `Project3DGP.Game.<Folder>`). Generic, game-agnostic code (FSM base, timers, UI bars, ...) goes in `Project3DGP.Core` (ADR-0010).
@@ -30,17 +34,25 @@ Sources: proposal §6 (gameplay, danger system, clubs) and §7 (level independen
 3. **The shared components are prefabs** (`Prefabs/Shared/`). The level skeleton tool (#8, Magic > Level, §4.10) gives every level the same slots; once the prefabs exist, it drops them in and wires them to the `LevelManager`.
 4. **Level escalation listens to `DangerManager.StateChanged`**. Cat, sandstorm and ice cracks each live in their level folder, not in `DangerManager`.
 5. **Tunable numbers live in ScriptableObjects** (`ClubProfile`, `DangerConfig`), so balancing (#46) doesn't need code changes. Each level has its own `DangerConfig`.
-6. Input goes through the Input System actions via `GolfInput` (#13, §4.11). Only `ShotController` (shoot, club switch) and `CameraRig` (orbit, view) read gameplay input; `LevelManager` reads pause and retry.
+6. Input goes through the Input System actions via `GolfInput` (#13, §4.11). Only `ShotController` (shoot, club switch) and `CameraRig` (orbit, view) read gameplay input; `LevelManager` reads pause and retry. In explore mode `PlayerModeController` also reads walk, sprint, jump, exit shot and the view toggle (ADR-0012).
 7. **Keep it simple:** Unity physics simulates the ball; the GUI is plain uGUI (sprites later); the avatar is a box until the Blender model exists.
 
 ## 3. Gameplay loop (PO, 2026-10-26)
 1. **Aiming.** The avatar stands at the ball. The player **holds the right mouse button and drags** to orbit the camera around the ball. An **aim cone** starts at the ball and points along the camera's horizontal forward; its width is the club's accuracy. A **vertical power meter on the left** of the screen has a marker that **keeps running up and down**. Number keys / mouse wheel switch clubs.
 2. **Shot.** **Left click** shoots with the power under the marker (between the club's min and max). The real direction is random inside the cone. The timer loses the level's shot cost (e.g., 10 s).
 3. **In flight.** The camera follows the ball. **The timer is paused.** Input is locked except god keys.
-4. **Ball stops.** The timer resumes. The avatar **teleports** to the ball (next shooting position); back to step 1.
+4. **Ball stops.** The timer resumes. The avatar **teleports** to the ball (next shooting position); back to step 1. *Explore mode (below) replaces this teleport with walking.*
 5. **Out of bounds / invalid area.** The ball goes back to the **nearest valid position** (its last position on valid ground) and play continues.
-6. **Menu.** A **menu button at the upper right** opens the menu dialog; while it's open the **game is paused** (physics, timer, input). Menu items are undecided (#77).
+6. **Menu.** A **menu button at the upper right** opens the menu dialog; while it's open the **game is paused** (physics, timer, input). Items and the other screens: §4.8.
 7. **Win:** the ball meets **all of the level's goals** (PO, 2026-10-28). A goal is anything the ball must reach or hit: the cup, a target spot on a branch, a lever. Each level decides which goals it has and how many. They can be met in any order, **except the cup, which is always last**: until every other goal is met it ignores the ball, which rolls over it like normal ground. When all goals are met, **the timer stops** (the level can no longer fail), the **gate/portal opens**, and the hamster **walks to it by itself** (no new controls). Then the next level loads. **Lose:** the timer reaches 0 while the player is aiming (it can't run out during flight, because it's paused).
+
+**Explore mode (Bahadir, 2026-11-01, ADR-0012, #19).** The player walks to the ball instead of teleporting. `Explore/PlayerModeController` is a small state machine:
+- **Walking:** the camera starts on the player in third person. WASD walks, Left Shift sprints, Space jumps (Core `CharacterWalker` on the avatar, a CharacterController). V cycles the camera: third person → first person → free fly (WASD, Space up, Left Ctrl down; stops at colliders) → ball view. The player can only walk in third and first person. **The timer keeps running while walking.**
+- **Shooting:** starts by itself when the player is within `shootRadius` (1.2 m, on the ground) of the resting ball. The avatar snaps into its stance with `GolferAvatar.TeleportTo` and steps 1–2 above run unchanged (aim view, cone, power meter). **Q** leaves the shot; the player must then walk a little away (`shootRadius + rearmMargin`) before the ball can start the shot again. The level also starts in Walking.
+- **BallInFlight:** after `ShotTaken`; the player stands still and the camera follows the ball. On `CameToRest` → Walking, third person.
+- **Finished:** the exit opened; the avatar walks there by itself (§4.7b).
+
+Shooting is enabled only in Shooting (`ShotController.InputEnabled`); the aim cone and power meter are hidden otherwise. A level opts in with *Magic > Level > Add Camera Rig and Explore Mode* (§4.10); without it the classic teleport loop above still works.
 
 ## 4. Contracts
 The signatures are the agreement. Names may still change in review; after approval they change only by PR.
@@ -130,27 +142,54 @@ public class GolferAvatar : MonoBehaviour
 }
 ```
 The avatar prefab keeps the visual in a child (`Visual/`): a **box for now**, later the Blender hamster with an Animator. Game code only calls the methods above, so replacing the model doesn't change any other script. Animation clips needed and the clip/timing handoff: see #36.
-Implementation (#88): `Prefabs/Shared/GolferAvatar.prefab` is a **variant of `Prefabs/Characters/Hamster`** (Magic > Game > Create Golfer Avatar Prefab), so the Blender model replaces the Hamster's `Visual` once and the avatar follows. The tool goes to the child named `ToolSocket` (right hand). `TeleportTo` stands at `standOffset` (left of and behind the ball, in the aim's frame) snapped to the ground; `FaceYaw` circles the ball keeping that stance. `PlaySwing`/`PlayCelebrate`/`PlayFail` set Animator triggers `Swing`/`Celebrate`/`Fail` when the model has an Animator (#36), else a small code fallback (shoulder swing, hop, lean back). The avatar has no collider (the ball passes through).
+Implementation (#88): `Prefabs/Shared/GolferAvatar.prefab` is a **variant of `Prefabs/Characters/Hamster`** (Magic > Game > Create Golfer Avatar Prefab), so the Blender model replaces the Hamster's `Visual` once and the avatar follows. The tool goes to the child named `ToolSocket` (right hand). `TeleportTo` stands at `standOffset` (left of and behind the ball, in the aim's frame) snapped to the ground; `FaceYaw` circles the ball keeping that stance. `PlaySwing`/`PlayCelebrate`/`PlayFail` set Animator triggers `Swing`/`Celebrate`/`Fail` when the model has an Animator (#36), else a small code fallback (shoulder swing, hop, lean back). The avatar has no collider (the ball passes through). `WalkTo` (#38) walks in a straight line on the ground at `walkSpeed` (1.5 m/s), facing the way it goes, and sets the Animator bool `Walking` (code fallback: a small bob). `TeleportTo` or another `WalkTo` stops the walk without calling `arrived`.
 
 ### 4.4 Camera — Bahadir
 ```csharp
-public enum CameraView { Aim, Follow }
+public enum CameraView { Aim, Follow, ThirdPerson, FirstPerson, FreeFly, BallView }
 
-public class CameraRig : MonoBehaviour
+public class CameraRig : MonoBehaviour          // namespace Project3DGP.Game.Cameras
 {
     public CameraView View { get; }
     public float AimYaw { get; }                 // horizontal forward, degrees; the aim cone follows it
     public void SetView(CameraView view);        // smooth blend
+    public void SetAimYaw(float yaw);            // e.g. face the ball when a shot starts
     public void Shake(float strength, float duration);
+    public bool FollowShotsAutomatically { get; set; }   // true: Follow on ShotTaken, Aim on CameToRest
+    public Transform Player { get; set; }        // the walking player (explore mode)
 
     public event Action<CameraView> ViewChanged;
 }
 ```
 `Aim`: orbits around the ball while the right mouse button is held (yaw, plus a clamped pitch). `Follow`: after `ShotTaken`, follows the ball. Back to `Aim` on `GolfBall.CameToRest`, keeping the last yaw. The camera never moves the ball.
+Implementation (#19): `Cameras/CameraRig` on `Cameras/CameraRig` moves `Cameras/Main Camera`. Each view computes a wanted pose and the camera moves part of the way each frame (exponential smoothing), so switching blends. Explore views (§3): `ThirdPerson` behind the player, `FirstPerson` at `eyeHeight` (the player's renderers draw only their shadow), `FreeFly` (sphere cast, can't pass colliders), `BallView` (orbits the resting ball from further away). Fixed distances, no zoom and no camera collision yet. Folder and namespace are `Cameras` (not `Camera`): a `Project3DGP.Game.Camera` namespace would hide `UnityEngine.Camera` in all game code. Until Henry switches `ShotController` and `AimCone` to `CameraRig.AimYaw`, `TemporaryAimYaw` (main camera forward) gives the same yaw in the Aim view.
+
+**Explore mode — Bahadir (#19, ADR-0012)**
+```csharp
+public enum PlayerMode { Walking, Shooting, BallInFlight, Finished }
+
+public class PlayerModeController : MonoBehaviour   // namespace Project3DGP.Game.Explore; on Systems/PlayerModes
+{
+    public PlayerMode Mode { get; }
+    public bool IsWalking { get; }                   // walking and moving (walk animation later)
+    public event Action<PlayerMode> ModeChanged;
+}
+
+public class CharacterWalker : MonoBehaviour         // Core: Project3DGP.Core.Movement; needs a CharacterController
+{
+    public Vector2 MoveInput { get; set; }           // x = right, y = forward, -1..1; set by the owner every frame
+    public float ReferenceYaw { get; set; }          // which way is forward (the camera's yaw)
+    public bool Sprint { get; set; }
+    public bool Jump();                              // only on the ground
+    public float Speed { get; } public bool IsWalking { get; } public bool IsGrounded { get; } public bool IsSprinting { get; }
+}
+```
+The walker reads no input itself, so an AI or a path follower (A*, #34 / #123) can drive it too. Disabling it also disables its CharacterController (no collider while the avatar is placed in its shooting stance).
+Walk animation: Core `Movement/ProceduralWalkCycle` swings the placeholder hamster's `LegL` / `LegR` around their hips while the avatar moves (angle = swingAngle · weight · sin(2π(phase + offset)), phase advanced by distance walked). It measures the speed itself, so it also plays during `GolferAvatar.WalkTo` (exit) and ignores teleports. It turns itself off when the model has an Animator controller (#36 clips take over).
 
 ### 4.5 Danger (timer) — Pongpat
 ```csharp
-public enum DangerState { Normal, Warning, Critical, Failed }
+public enum DangerState { Normal, Warning, Critical, Failed }   // in Danger/IDangerTimer.cs (Henry, #20)
 
 [CreateAssetMenu] public class DangerConfig : ScriptableObject   // one per level, set by hand
 {
@@ -160,7 +199,7 @@ public enum DangerState { Normal, Warning, Critical, Failed }
     public float CriticalBelowSeconds;
 }
 
-public class DangerManager : MonoBehaviour
+public class DangerManager : MonoBehaviour, IDangerTimer   // IDangerTimer = the read-only part (HUD, escalation)
 {
     public DangerState State { get; }
     public float RemainingSeconds { get; }
@@ -209,7 +248,7 @@ public readonly struct LevelResult
     public readonly int Score;               // formula in #43
 }
 
-public class ScoreKeeper : MonoBehaviour
+public class ScoreKeeper : MonoBehaviour, IStrokeCounter    // IStrokeCounter = Strokes + StrokesChanged (HUD)
 {
     public int Strokes { get; }
     public void CountStroke(ShotInfo shot);   // wired to ShotController.ShotTaken
@@ -224,9 +263,9 @@ Implementation (#22): the `LevelGoal` base is in `Scoring/LevelGoal.cs`, written
 
 ### 4.7 Level flow — Pongpat
 ```csharp
-public enum LevelPhase { Intro, Playing, Completed, Failed }
+public enum LevelPhase { Intro, Playing, Completed, Failed }   // in Flow/ILevelFlow.cs (Henry, #20)
 
-public class LevelManager : MonoBehaviour
+public class LevelManager : MonoBehaviour, ILevelFlow   // ILevelFlow = what the HUD and dialogs use
 {
     [SerializeField] GolfBall ball;          [SerializeField] ShotController shot;
     [SerializeField] GolferAvatar avatar;    [SerializeField] CameraRig cameraRig;
@@ -236,7 +275,9 @@ public class LevelManager : MonoBehaviour
     public GolfBall Ball { get; }  /* ...read-only accessors for each reference... */
     public LevelPhase Phase { get; }
 
+    public IDangerTimer Danger { get; } public IStrokeCounter Strokes { get; }   // ILevelFlow
     public void StartLevel(); public void Retry(); public void LoadNext();
+    public void GoToMainMenu();          // unpause, load MainMenu
     public bool IsPaused { get; }
     public void SetPaused(bool paused);   // menu dialog: Time.timeScale = 0, DangerManager.Pause, shot input off
 
@@ -247,6 +288,7 @@ public class LevelManager : MonoBehaviour
 }
 ```
 `LevelManager` does the wiring: `ShotTaken` → `DangerManager.ApplyShot`, `ScoreKeeper.CountStroke`, `GolferAvatar.PlaySwing`; `GolfBall.CameToRest` → `DangerManager.OnBallAtRest`, `GolferAvatar.TeleportTo`; `LevelGoals.AllMet` → completion (stop the timer, `LevelExit.Open`, `GolferAvatar.WalkTo(exit.WalkTarget)`, then `LoadNext`); `DangerState.Failed` → failure. It reports results to `GameSession`. The proposal's generic "complete hole" fallback is a god key (#71) that calls the same completion path.
+**Explore mode (ADR-0012), for LevelManager (#27):** when the level has a `PlayerModeController`, do **not** call `GolferAvatar.TeleportTo` on `CameToRest`, and call `FaceYaw` only while shooting (`ShotController.InputEnabled` is true only then). `TEMP(#27)` `AvatarWiring_TEMP` does this with its **Teleport To Ball** switch (on = classic, off = explore; the Magic tool turns it off). Leave `ShotController.InputEnabled` to `PlayerModeController` except to turn it off on pause / complete / fail; it turns shooting off again after a pause if the player is walking.
 
 ### 4.7b Level exit — Henry (#38)
 ```csharp
@@ -258,17 +300,47 @@ public class LevelExit : MonoBehaviour   // the gate (L1) / portal: closed until
     public event Action Opened;          // FX, sound
 }
 ```
+Implementation (#38): `Flow/LevelExit` shows/hides objects when it opens. `Prefabs/Course/Gate` is a LevelExit: wooden bars while closed, the portal surface once open, and a `WalkTarget` 1.5 m behind the gate (+Z). *Magic > Level > Add Level Exit* updates the Gate prefab and, if the level has no exit yet, puts a Gate in `Gameplay/Exit`. Until LevelManager exists, `TEMP(#27)` `AvatarWiring_TEMP` opens the exit with **G** and makes the hamster walk through. There is no `Close`: Retry reloads the level.
 
-### 4.8 HUD layout — Henry (menu dialog: Pongpat)
+### 4.8 HUD, menus and screens — Henry (PO, 2026-10-28)
+The UI is built against four small interfaces (Henry, #20), so it works and is tested before the owners' code exists. The owners implement them: `DangerManager : IDangerTimer` (#7), `ScoreKeeper : IStrokeCounter` (#18), `LevelManager : ILevelFlow` (#27), Save & Load `: ISaveStore` (#44).
+```csharp
+public interface IDangerTimer   { DangerState State; float RemainingSeconds; float Progress01; bool IsRunning;
+                                  event Action<DangerState> StateChanged; event Action<float> ProgressJumped; }
+public interface IStrokeCounter { int Strokes; event Action<int> StrokesChanged; }
+public interface ILevelFlow     { LevelPhase Phase; IDangerTimer Danger; IStrokeCounter Strokes; bool IsPaused;
+                                  void SetPaused(bool); void Retry(); void GoToMainMenu();
+                                  event LevelStarted, LevelCompleted(LevelResult), LevelFailed, PausedChanged(bool); }
+public interface ISaveStore     { bool HasSave; void Save(SaveGame); bool TryLoad(out SaveGame); }
+[Serializable] public class SaveGame { public string LevelScene; public GameSessionData Session; }
+```
+
+**HUD** (every level)
 | Screen position | Element | Source |
 |---|---|---|
-| Upper left | **Time bar** (visible) + Warning/Critical icon | `DangerManager.Progress01`, `StateChanged` |
-| Upper right | **Menu button** → menu dialog; opening it pauses the game | `LevelManager.SetPaused` |
+| Upper left | **Time bar** + **stage icon** (cat faces: asleep, eyes half open, ... one sprite per `DangerState`, art by Henry). No numbers. | `IDangerTimer.Progress01`, `StateChanged` |
+| Upper right | **Menu button** → pause dialog | `ILevelFlow.SetPaused` |
 | Left side, vertical | Power meter with the running marker | `ShotController.PowerMarker01` |
-| Bottom | **Dialog bar** (tutorial prompts in L1, story lines); non-blocking, skippable | `GardenTutorial` (#28), generic dialog box in `Core/UI` |
-| Elsewhere (TBD) | Club name, stroke count, later XP bar and minimap (#78) | `ShotController`, `ScoreKeeper`, `GameSession` |
+| Bottom | **Dialog bar** (tutorial prompts in L1, story lines); non-blocking, skippable | `GardenTutorial` (#28), `Core/UI/DialogBar` |
+| Upper left, under the time bar | Stroke count, then **XP bar** ("Lv 2", XP to the next level; the label pulses at a level-up) (#78) | `IStrokeCounter`, `GameSession.LevelProgress01`, `Changed`, `LeveledUp` |
+| Upper right, under the menu button | **Minimap**: top-down, follows the ball, north up, - / = zoom; icons for ball, avatar, cup, exit, hazards (#78) | `Core/Cameras/MinimapCamera`, `MinimapIcon` |
+| Right side, centred | **Club cards**: only the clubs the player can use; the current one lights up and grows with a sound; click = pick (only while aiming) (#78) | `ShotController.AvailableClubs`, `ClubChanged`, `CanChangeClub` |
 
-Plain uGUI for now (sprites later). The menu dialog and its items are #77 (items undecided).
+**Screens and dialogs**
+| When | What | Buttons |
+|---|---|---|
+| Menu button | **Pause dialog** (game paused) | Resume, Retry level, Settings, Save, Main menu, Quit |
+| Save, a save exists | Confirm dialog | Overwrite, Cancel |
+| Time up | The level's fail scene plays (L1: the cat wakes up), then the **time-up dialog** | Retry (same level), Main menu, Close (= quit) |
+| Level complete, L1/L2 | No screen: the gate opens, the hamster walks there, the next level loads | — |
+| Level complete, L3 | **Ending** scene: totals of this run (strokes, time left, score) | Main menu, Close (= quit) |
+| MainMenu scene | **Main menu** | Start (new game → L1, no save), Continue (only if a save exists: loads it), Settings, Quit |
+| Settings (pause or main menu) | **Settings panel**: master, music, SFX volume (`GameSession.Data.Settings`) | Back |
+
+Saving is **manual** (pause dialog), **one slot**. A save holds the `GameSessionData` and the level scene; Continue restarts that level from the tee. Plain uGUI with placeholder looks; Henry's art replaces the sprites without code changes.
+Implementation (#20): `UI/HudView` (time bar = 1 − `Progress01`, stage icon with `stageSprites[DangerState]`, strokes, `OpenMenu`), `UI/LevelMenus` (pause, save confirm, settings, time-up after `timeUpDelay` s of fail scene; Esc pauses and closes), `UI/SettingsPanel` (reused by the main menu), `UI/GameQuit`. Both views find the level's `ILevelFlow` at Start (`Flow/LevelFlowFinder`: the assigned one, else the first in the scene), so they connect to LevelManager without re-wiring. Saving uses `GameSession.SaveStore` (the `ISaveStore` component on the GameSession prefab, #44); without one the Save button is disabled. Master volume is applied by `GameSession.ApplySettings`; music and SFX read their volumes themselves. *Magic > Level > Add HUD and Menus* adds `UI/HUD` (on the power meter's canvas), `UI/Menus` and an EventSystem to a level (every level, shared framework). *Magic > Game > Open UI Test Area* tries everything on `UI/UiTestLevelFlow` + `UI/UiTestSaveStore` (stand-ins, never in level scenes).
+Main menu and Ending (#30): `UI/MainMenuView` (Start = `GameSession.Load(NewGame())` + load `GameScenes.FirstLevel`; **Continue is disabled** until Save & Load (#44, Pongpat) enables it when `SaveStore.HasSave` and loads the save; Settings; Quit) and `UI/EndingView` (one line per `GameSessionData.RunResults` entry plus totals; Main menu, Close). `GameSession.RecordResult` adds every finished level to `RunResults`; a new game starts it empty. Scene names: `Flow/GameScenes`. Dialog bar and tutorial (#28): `Core/UI/DialogBar` queues lines, each shown for its seconds (game time) or until the bar is clicked; *Add HUD and Menus* adds it to every level's HUD (story lines, #51, can use it). `Levels/Garden/GardenTutorial` (*Magic > Level > Garden: Add Tutorial*) shows L1's hints once per attempt: at the start (look, power, tools), after the first shot (time cost), when the ball first stops (goals, cup last), and at the first Warning and Critical (needs DangerManager, #7). Texts are in its Inspector. Clicks on the HUD never shoot (`ShotController` ignores clicks over UI). **TEMP(#27):** `GolferAvatarTestWiring` (`Systems/AvatarWiring_TEMP`) is a minimal `ILevelFlow` (pause, Retry = reload, Main menu) so the menu works in levels before LevelManager; it goes away with that object. *Magic > Scenes > Add Main Menu UI* / *Add Ending UI* fill the open MainMenu / Ending scene.
+Story intro (#51, PO 2026-10-28: an intro screen only, no ending story; text later): `Core/UI/StoryPages` (full-screen pages; Next / Space / Enter, Skip / Esc). Main menu Start → new game → intro → L1. Placeholder pages from the proposal, editable in the StoryPages Inspector; *Add Main Menu UI* adds it. HUD additions (#78, PO 2026-10-28): `UI/XpBarView`, `UI/ClubPanelView` (reuses `Core/UI/SelectableCard` from mini-exercise 4.E.3; finds the ShotController at Start; more cards appear when unlocks add clubs) and the minimap (`Cameras/Minimap Camera` with `Core/Cameras/MinimapCamera` → `UI/Minimap/Minimap.renderTexture` → RawImage; icons are `Core/Cameras/MinimapIcon` quads on the **Minimap** layer, which other cameras must not render, CameraRig #19 included). *Add HUD and Menus* adds all three (run it again after adding hazards: every object under `Gameplay/Hazards` gets a red icon); *Magic > Level > Add Minimap Icon to Selection* marks anything else.
 
 ### 4.9 Game session — Henry
 ```csharp
@@ -276,17 +348,24 @@ public class GameSession : MonoBehaviour   // DontDestroyOnLoad; the prefab is i
 {
     public static GameSession Instance { get; }
     public IReadOnlyList<ClubProfile> UnlockedClubs { get; }   // in slot order; starts with the standard club
-    public int PlayerLevel { get; } public int Xp { get; }
+    public int PlayerLevel { get; } public int Xp { get; }      // Xp = total of this game, never reset
+    public int MaxLevel { get; } public bool IsMaxLevel { get; }
+    public int XpForLevel(int level);                           // total XP to reach it (Inspector: xpToReachLevel)
+    public float LevelProgress01 { get; }                       // this level -> next, for the HUD (#78)
+    public void AddXp(int amount);                              // leveling (#70): collectibles; RecordResult adds its own
     public bool Unlock(ClubProfile club);                       // leveling (#70)
-    public void SetProgress(int playerLevel, int xp);           // leveling (#70); the XP curve lives there
-    public bool RecordResult(LevelResult result);               // LevelManager (#27); true = new best
+    public bool HasSkill(SkillProfile skill);                   // shot skills (#70) check this
+    public IEnumerable<LevelUnlock> UnlocksAt(int level);       // level-up notice
+    public void SetProgress(int playerLevel, int xp);           // debug keys, tests
+    public bool RecordResult(LevelResult result);               // LevelManager (#27); true = new best; gives XP
     public LevelResult? GetBestResult(string levelId);
     public GameSessionData Data { get; }                        // save/load (#44): JsonUtility.ToJson(Data) ...
     public void Load(GameSessionData data);                     // ... and Load(FromJson<GameSessionData>(json))
     public event Action Changed;                                // HUD (#78), autosave
+    public event Action<int> LeveledUp;                         // new level; unlocks applied; raised before Changed
 }
 ```
-Implementation (#89): `Session/GameSession` + `Session/GameSessionData`, a plain `[Serializable]` class with public fields: `UnlockedClubs` (club asset names), `PlayerLevel`, `Xp`, `BestResults` (best = higher score, then fewer strokes, then more time left), and `Settings` (master/music/SFX volume, for #77). *Magic > Game > Add Game Session* puts `Prefabs/Shared/GameSession.prefab` in the open scene. Every scene you can press Play in has one. The first one to wake becomes `Instance` and survives scene loads, and later copies destroy themselves. `LevelResult` (§4.6) was written in #89 so the session could use it; Pongpat owns it from here.
+Implementation (#89): `Session/GameSession` + `Session/GameSessionData`, a plain `[Serializable]` class with public fields: `UnlockedClubs` (club asset names), `PlayerLevel`, `Xp`, `BestResults` (best = higher score, then fewer strokes, then more time left), `RunResults` (every level finished in this run, for the Ending, #30), and `Settings` (master/music/SFX volume, for #77). XP curve (#78, PO 2026-10-28): `xpToReachLevel` on the prefab, default 100 / 250 / 450 / 700 total XP for levels 2–5 (max level 5); `AddXp` levels up as often as the XP allows. Leveling (#70, PO 2026-10-28: functionality first, content TBD): the prefab's **Unlocks** table (level → club and/or `SkillProfile`) is applied at every level-up and on Load; placeholder rows Lv2 Sledgehammer, Lv3 Skill A, Lv4 Mysterious, Lv5 Skill B (*Magic > Game > Set Up Leveling*). XP sources: `RecordResult` gives `xpPerLevelFinished` (100) + `xpPerSecondLeft` (1) per second left; the `XpSeed` prefab (`XpCollectible`, +20 XP when the ball rolls through) is placed by the level owners. With a session, `ShotController` uses `UnlockedClubs` (the Inspector list only in test areas). `UI/LevelUpNotice` writes "Level 3! New: …" in the dialog bar. *Magic > Game > Add Game Session* puts `Prefabs/Shared/GameSession.prefab` in the open scene. Every scene you can press Play in has one. The first one to wake becomes `Instance` and survives scene loads, and later copies destroy themselves. `LevelResult` (§4.6) was written in #89 so the session could use it; Pongpat owns it from here.
 
 ### 4.10 Level scene hierarchy (#8)
 Every level scene has the same root objects. **Magic > Level > Create Level Scene Skeleton** adds any that are missing, and **Magic > Level > Validate Level Scene** lists what's missing. The list itself is in `Editor/Magic/LevelSkeleton.cs`.
@@ -312,6 +391,7 @@ UI                      HUD canvas, menu dialog
 The tool moves only the default `Main Camera`, `Directional Light` and `Global Volume` from the scene root into their group, keeping their world position; it never changes anything else. Until the prefabs exist, the slots are empty placeholders. Later the tool will add each owner's prefab into its slot (#95).
 
 **Filling the slots (#95).** *Magic > Level > Add Ball, Shot and Avatar* fills Henry's slots in the open level scene: the `ShotController` on `Systems/ShotController`; the `GolfBall` on the tee, the `GolferAvatar` and the `AimCone` under `Gameplay/Player`; and `UI/HUD` with the power meter. Until the owners' code is in, it also adds two stand-ins, which should be deleted later. `TEMP(#19)` is an `OrbitFollowCamera` on `Cameras/Main Camera`, replaced by the CameraRig. `TEMP(#27)` is `Systems/AvatarWiring_TEMP`, replaced by the LevelManager. The tool also adds `InvalidZone` to the Pond prefab, with the trigger raised to 0.5 m above the water. The second half of #95 (CameraRig, LevelManager, DangerManager, ScoreKeeper, Cup) follows when #19, #27, #7 and #18 are merged.
+**Camera rig and explore mode (#19, #125).** *Magic > Level > Add Camera Rig and Explore Mode* (run after *Add Ball, Shot and Avatar*) removes the `TEMP(#19)` `OrbitFollowCamera`, adds `CameraRig` on `Cameras/CameraRig`, adds a CharacterController (sized from the avatar's model), `CharacterWalker` and `ProceduralWalkCycle` (legs) to the scene's avatar (the prefab is not changed), adds `Systems/PlayerModes` (`PlayerModeController`) and turns off **Teleport To Ball** on `AvatarWiring_TEMP`. Each owner runs it in their own level and saves the scene.
 
 **Placeholder prefabs** (*Magic > Prefabs > Create Placeholder Prefabs*, `Prefabs/Course|Nature|Characters/`): each prefab has a root that holds the colliders (and later the scripts), plus a `Visual` child that holds the meshes. To use a real model, open the prefab and replace `Visual`; every placed copy updates. **Terrain** (*Magic > Level > Create Level Terrain*): 50 × 50 m with its surface at y = 0 and 2 m of depth below for ponds. Layers are Grass, Fairway, Sand and Snow; the data is in `Art/Terrain/<Scene>_TerrainData.asset`.
 
@@ -330,11 +410,18 @@ The tool moves only the default `Main Camera`, `Directional Light` and `Global V
     public event Action<int> ClubSlotSelected; // keys 1-3 -> 0..2 (ShotController)
     public event Action<int> ClubCycled;   // wheel: -1 previous, +1 next (ShotController)
     public event Action ToggleView;        // V (CameraRig, optional overview)
-    public event Action Pause;             // Esc (LevelManager)
+    public event Action Pause;             // Esc; the pause dialog (LevelMenus) already handles Esc, so LevelManager must not toggle pause on it
     public event Action Retry;             // R (LevelManager)
+
+    // Explore mode (#19, ADR-0012): PlayerModeController and CameraRig
+    public Vector2 Move { get; }           // WASD, x = right, y = forward
+    public bool IsSprinting { get; }       // Left Shift held
+    public float FlyVertical { get; }      // Space +1 / Left Ctrl -1 (free-fly camera)
+    public event Action Jump;              // Space (walking only)
+    public event Action ExitShot;          // Q (leave the shot)
 }
 ```
-Keyboard + mouse only (PO, 2026-10-27; no gamepad). Action maps: `Gameplay` (Orbit, Look, Shoot, Club1-3, ClubScroll, ToggleView) and `System` (Pause, Retry). Prefabs reference the same `GolfInput.asset` (Magic > Game > Create Golf Input Asset). Default keys are listed in the README.
+Keyboard + mouse only (PO, 2026-10-27; no gamepad). Action maps: `Gameplay` (Orbit, Look, Shoot, Club1-3, ClubScroll, ToggleView, and for explore mode Move, ExitShot, FlyVertical, Jump, Sprint) and `System` (Pause, Retry). The explore actions are looked up null-safe, so an older actions asset still binds. Prefabs reference the same `GolfInput.asset` (Magic > Game > Create Golf Input Asset). Default keys are listed in the README.
 
 ## 5. Event flow of one shot
 ```mermaid
@@ -380,9 +467,10 @@ sequenceDiagram
 - The goal is generic (`LevelGoal`). **2026-10-28:** a level can have several goals (cup, branch target spot, lever). All must be met, and the cup is always last. Then the timer stops, the gate/portal opens, and the hamster walks there by itself to load the next level. The water-splash trap and the Level 1 noise gauge are dropped.
 - `GameSession` is owned by Henry.
 - No "ideal one-shot range" mark on the power meter for now (maybe later).
-- HUD: time bar visible at the upper left; menu button at the upper right; opening the menu pauses the game. Menu items undecided.
+- HUD: time bar visible at the upper left; menu button at the upper right; opening the menu pauses the game.
+- **HUD, menus and saving (2026-10-28, §4.8):** time bar + cat-face stage icon, no numbers. Pause dialog: Resume, Retry level, Settings, Save, Main menu, Quit. Time up: fail scene, then Retry / Main menu / Close. No result screen in L1/L2; L3 → Ending with run totals. Main menu: Start, Continue, Settings, Quit. One manual save slot (pause dialog, asks before overwriting); a new game doesn't save; Continue restarts the saved level. Henry writes the interfaces and all UI (pause dialog moved from #77); Pongpat implements them in #7, #18, #27, #44.
 - **Level 1 has no noise mechanism** (2026-10-28): clubs have no noise value, and the cat follows only the danger timer: Normal = asleep, Warning = twitching, then suspicious (eyes half open), Critical = searching (sits up, watches the ball), Failed = **awake = game over**. Code: `Levels/Garden/CatAlertMachine` (FSM, #79) and `GardenCat` (#21); the cat listens to `DangerManager.StateChanged` (rule 4).
+- **Explore mode** (Bahadir, 2026-11-01, ADR-0012): the player walks to the ball instead of teleporting (WASD, Shift sprint, Space jump); close to the ball the shot starts by itself, Q leaves it; V cycles third person / first person / free fly / ball view while walking; the timer runs while walking; the player stands still while the ball flies. Ball reset key, camera zoom and camera collision: later.
 
 ## 7. Open questions
 - Real name and look of the Mysterious tool.
-- Menu dialog items (#77).
