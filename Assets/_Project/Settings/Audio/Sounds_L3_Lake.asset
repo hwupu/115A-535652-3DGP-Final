@@ -1,0 +1,154 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7aa19c822164f47a7f765c2510dfad, type: 3}
+  m_Name: Sounds_L3_Lake
+  m_EditorClassIdentifier: Project3DGP.Game::Project3DGP.Game.Effects.SoundSet
+  ShotClub:
+    Clips:
+    - {fileID: 8300000, guid: f43eac5437d2348248099d32052723f1, type: 3}
+    - {fileID: 8300000, guid: 07a34a9aede234caa8eb434add59ca8b, type: 3}
+    - {fileID: 8300000, guid: 5d10f0fa4701049f1b89c982874c3986, type: 3}
+    - {fileID: 8300000, guid: 016bb529b7bd14c7eb3010707d457b77, type: 3}
+    - {fileID: 8300000, guid: 15210c5824e8848bb9de7843ae40a3ee, type: 3}
+    Volume: 0.9
+    PitchJitter: 0.06
+  ShotHammer:
+    Clips:
+    - {fileID: 8300000, guid: 49af6feeb77404401a12edf55b32a0a0, type: 3}
+    - {fileID: 8300000, guid: 1c4ec4f914ea049b78f15e5a5bc3fea1, type: 3}
+    - {fileID: 8300000, guid: b6403c46029b7495fba712cd726cf3bc, type: 3}
+    - {fileID: 8300000, guid: 05895c06cd5cc4174b07ff65404bb0e7, type: 3}
+    - {fileID: 8300000, guid: f21cb1d08cc07476eba368914fb1346b, type: 3}
+    Volume: 0.8
+    PitchJitter: 0.06
+  ShotTap:
+    Clips:
+    - {fileID: 8300000, guid: 949e342809cb24a71b787646390429ac, type: 3}
+    - {fileID: 8300000, guid: d9ed820a969bf456f99b692ed2b078a3, type: 3}
+    - {fileID: 8300000, guid: 9c8bf58ed02934eb89991b143aa0af19, type: 3}
+    - {fileID: 8300000, guid: d1e7a6e32c1dd42a18e3d2555e5c3481, type: 3}
+    - {fileID: 8300000, guid: 81031a9e751594c43b54a6135f3988d8, type: 3}
+    Volume: 0.7
+    PitchJitter: 0.06
+  BounceGround:
+    Clips:
+    - {fileID: 8300000, guid: 9faf6070e66454330b4bdc8c60b1d851, type: 3}
+    - {fileID: 8300000, guid: d865846cc1983422f9c9d9bab53b6c73, type: 3}
+    - {fileID: 8300000, guid: 406215ceca29c4482a6fa29b5ea65525, type: 3}
+    - {fileID: 8300000, guid: a1eae47f858504d19b3351e0baf1bb0f, type: 3}
+    - {fileID: 8300000, guid: ea0245796ecbd4582b27c5a5ad16d5ce, type: 3}
+    Volume: 0.8
+    PitchJitter: 0.06
+  BounceHard:
+    Clips:
+    - {fileID: 8300000, guid: 39ffd725cff9c428dbd44f225ac48598, type: 3}
+    - {fileID: 8300000, guid: 8ccb7d73dd03040688bde8a830b1cf42, type: 3}
+    - {fileID: 8300000, guid: 4b79260f7bd4040bab5638d1b799e1e4, type: 3}
+    - {fileID: 8300000, guid: 19bc94adee37b4865a5e34197856387e, type: 3}
+    - {fileID: 8300000, guid: 9d9fd14b6ff104b7ebf12de7c2a49387, type: 3}
+    Volume: 0.9
+    PitchJitter: 0.06
+  OutOfBounds:
+    Clips:
+    - {fileID: 8300000, guid: ad4885093f72844a0ada900f2fc20229, type: 3}
+    - {fileID: 8300000, guid: 8b95b327ce0dd4511ba58b80409bbe2c, type: 3}
+    - {fileID: 8300000, guid: a82cb2eac045841b1bf36952c3fdd1a7, type: 3}
+    - {fileID: 8300000, guid: 734347414b3cd4d188b826c228a46a83, type: 3}
+    - {fileID: 8300000, guid: 0bbee67314ebe474a9f11cabd44ae560, type: 3}
+    Volume: 0.8
+    PitchJitter: 0.06
+  Footstep:
+    Clips:
+    - {fileID: 8300000, guid: c891992cda9b34213a3e15d01bc5ef74, type: 3}
+    - {fileID: 8300000, guid: a6ef1822877b54f94804a6fea55dd35f, type: 3}
+    - {fileID: 8300000, guid: 529c7ccd8f0884ea79d0dac8c85ba64a, type: 3}
+    - {fileID: 8300000, guid: 233ef85cec5b842729cc2934de639fd2, type: 3}
+    - {fileID: 8300000, guid: ffb37d14b9004427c810aba3cf51af71, type: 3}
+    Volume: 0.45
+    PitchJitter: 0.06
+  StepDistance: 0.7
+  GoalReached:
+    Clips:
+    - {fileID: 8300000, guid: 1f6671a424fb64bf7ac4caa4652bd0a6, type: 3}
+    - {fileID: 8300000, guid: 6d8b667dfdc1a4638a6807a7369b73e6, type: 3}
+    - {fileID: 8300000, guid: 18dd9a1b464664c60a82803be3677811, type: 3}
+    - {fileID: 8300000, guid: 63226b57a9e1540eda2299ac889db587, type: 3}
+    - {fileID: 8300000, guid: a9bc38e4ee2c04fb2a9e09f3a88ccca8, type: 3}
+    Volume: 1
+    PitchJitter: 0.06
+  GateOpen:
+    Clips:
+    - {fileID: 8300000, guid: 07cf09e42a5214c53a4f39f0489ede33, type: 3}
+    - {fileID: 8300000, guid: 4bf8f6c71aea8495894e312ecccce94e, type: 3}
+    - {fileID: 8300000, guid: aecf3e33c422446fb9ac92695cad7097, type: 3}
+    - {fileID: 8300000, guid: a62f56a4c20104f16b18881e6e7ce8f1, type: 3}
+    - {fileID: 8300000, guid: 032579a02e9a84ad1b5adb9b2884388c, type: 3}
+    Volume: 0.9
+    PitchJitter: 0.06
+  XpCollect:
+    Clips:
+    - {fileID: 8300000, guid: 9faf6070e66454330b4bdc8c60b1d851, type: 3}
+    - {fileID: 8300000, guid: d865846cc1983422f9c9d9bab53b6c73, type: 3}
+    - {fileID: 8300000, guid: 406215ceca29c4482a6fa29b5ea65525, type: 3}
+    - {fileID: 8300000, guid: a1eae47f858504d19b3351e0baf1bb0f, type: 3}
+    - {fileID: 8300000, guid: ea0245796ecbd4582b27c5a5ad16d5ce, type: 3}
+    Volume: 0.8
+    PitchJitter: 0.06
+  LevelUp:
+    Clips:
+    - {fileID: 8300000, guid: 536e151bcdc8746a4a17dad77276c168, type: 3}
+    - {fileID: 8300000, guid: f55433c340a614331bfb7216f4c06898, type: 3}
+    - {fileID: 8300000, guid: 3e7a5dd68dbf04eedb68eeadacbaa1c1, type: 3}
+    - {fileID: 8300000, guid: c49276259e43e4cb3b12002efc7327c6, type: 3}
+    - {fileID: 8300000, guid: e903cd6b3fa85431b90392219a5d74af, type: 3}
+    Volume: 0.8
+    PitchJitter: 0.06
+  LevelFailed:
+    Clips:
+    - {fileID: 8300000, guid: 239b53acbded647cda434a001ee2154a, type: 3}
+    - {fileID: 8300000, guid: 722828e68a76b4638b615c1faa20e50b, type: 3}
+    - {fileID: 8300000, guid: c4facf2fd257c4870b86d0181d029eb5, type: 3}
+    - {fileID: 8300000, guid: eebcbc7536a1d461ead9c845e8722afd, type: 3}
+    - {fileID: 8300000, guid: f94064a8bfc4f4098bc40d8c6a5f892a, type: 3}
+    Volume: 0.9
+    PitchJitter: 0.06
+  Extras:
+  - Name: IceCrack
+    Cue:
+      Clips:
+      - {fileID: 8300000, guid: fa681661043864be5aaa636d6359f7f5, type: 3}
+      - {fileID: 8300000, guid: ff4528a1ba1bc4df9acce34364b74406, type: 3}
+      - {fileID: 8300000, guid: 7e628c762f19c4efda9417410800de43, type: 3}
+      - {fileID: 8300000, guid: b08695dbf7e3844a3a7893edd0900bf3, type: 3}
+      - {fileID: 8300000, guid: ca3d2cef7caa34940878f3a2352ba29a, type: 3}
+      Volume: 1
+      PitchJitter: 0.06
+  - Name: GuardianHit
+    Cue:
+      Clips:
+      - {fileID: 8300000, guid: 07cf09e42a5214c53a4f39f0489ede33, type: 3}
+      - {fileID: 8300000, guid: 4bf8f6c71aea8495894e312ecccce94e, type: 3}
+      - {fileID: 8300000, guid: aecf3e33c422446fb9ac92695cad7097, type: 3}
+      - {fileID: 8300000, guid: a62f56a4c20104f16b18881e6e7ce8f1, type: 3}
+      - {fileID: 8300000, guid: 032579a02e9a84ad1b5adb9b2884388c, type: 3}
+      Volume: 0.9
+      PitchJitter: 0.06
+  - Name: SnowLanding
+    Cue:
+      Clips:
+      - {fileID: 8300000, guid: a9aeeab7e16a64bc4be39c4c61c9d903, type: 3}
+      - {fileID: 8300000, guid: dddf099d3fb814d05926cc380545f305, type: 3}
+      - {fileID: 8300000, guid: c44cbc34cccd443aebeb9ca9d790eb50, type: 3}
+      - {fileID: 8300000, guid: 0f78824283c5348ba9714a2049b4322c, type: 3}
+      - {fileID: 8300000, guid: 8c168792d8f7449c2a164a68d055ac6b, type: 3}
+      Volume: 0.9
+      PitchJitter: 0.06

@@ -15,3 +15,4 @@ Third-party content used in this project. Keep in sync with `docs/assets.md` (th
 | Platformer Kit | Kenney | https://kenney.nl/assets/platformer-kit | CC0 |
 | Mini Forest | Kenney | https://kenney.nl/assets/mini-forest | CC0 |
 | Skyboxes | Kenney | https://kenney.nl/assets/skyboxes | CC0 |
+| Impact Sounds | Kenney | https://kenney.nl/assets/impact-sounds | CC0 |

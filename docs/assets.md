@@ -25,3 +25,4 @@ This is a non-commercial class project (decided in #12). **There is no allow lis
 | Platformer Kit (16 models + colormap, L1 look, #74) | Kenney | https://kenney.nl/assets/platformer-kit | 4.1 | CC0 | Yes (LFS, ~0.6 MB) | `Assets/ThirdParty/Kenney/PlatformerKit/` | Henry |
 | Mini Forest (7 models + colormap, L1 look, #74) | Kenney | https://kenney.nl/assets/mini-forest | 1.0 | CC0 | Yes (LFS, ~0.3 MB) | `Assets/ThirdParty/Kenney/MiniForest/` | Henry |
 | Skyboxes (`skybox-day` for L1 and MainMenu, `skybox-morning` for Ending, #74) | Kenney | https://kenney.nl/assets/skyboxes | 1.0 | CC0 | Yes (LFS, 1.9 MB) | `Assets/ThirdParty/Kenney/Skyboxes/` | Henry |
+| Impact Sounds (21 groups x 5 variants, all levels + GUI, #72) | Kenney | https://kenney.nl/assets/impact-sounds | 1.0 | CC0 | Yes (LFS, ~1 MB) | `Assets/ThirdParty/Kenney/ImpactSounds/` | Henry |

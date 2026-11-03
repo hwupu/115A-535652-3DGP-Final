@@ -6,6 +6,7 @@ namespace Project3DGP.Game.Effects
     /// <summary>
     /// Plays an effect where the ball enters this trigger (#39): water splash on the pond, confetti on the cup.
     /// The effect is a particle system already in the scene (a replaceable prefab instance), reused each time.
+    /// Optional sound (#72), played through the level's GameplaySounds (the pond's splash).
     /// </summary>
     [RequireComponent(typeof(Collider))]
     public class BallTriggerEffect : MonoBehaviour
@@ -13,6 +14,7 @@ namespace Project3DGP.Game.Effects
         [SerializeField] ParticleSystem effect;
         [Tooltip("On = play at the ball; off = play at the effect's own place.")]
         [SerializeField] bool atBall = true;
+        [SerializeField] SoundCue sound = new();
 
         void OnTriggerEnter(Collider other)
         {
@@ -22,8 +24,12 @@ namespace Project3DGP.Game.Effects
         }
 
         /// <summary>Plays the effect (the trigger calls it; tests call it directly).</summary>
-        public void Play(Vector3 ballPosition) =>
-            EffectUtil.PlayAt(effect, atBall ? ballPosition : effect != null ? effect.transform.position : ballPosition);
+        public void Play(Vector3 ballPosition)
+        {
+            var position = atBall ? ballPosition : effect != null ? effect.transform.position : ballPosition;
+            EffectUtil.PlayAt(effect, position);
+            GameplaySounds.Play(sound, position);
+        }
 
         internal void SetForTests(ParticleSystem particles) => effect = particles;
     }
