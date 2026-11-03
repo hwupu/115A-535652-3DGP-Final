@@ -7,9 +7,10 @@ namespace Project3DGP.Game.Levels.Garden
 {
     /// <summary>
     /// Sir Grumblepaws, the Level 1 cat (#21). The danger timer decides the state (CatAlertMachine); this
-    /// component shows it with simple code poses on the placeholder's "Visual" parts, until the cat model and
-    /// its animations exist (#37). Time up = Awake = WokeUp: the level is lost (LevelManager handles the
-    /// failure itself through DangerState.Failed, #27).
+    /// component shows it. With the rigged model (#36/#37: an Animator under "Visual") it sets the Animator int
+    /// "State" (= CatState: one looping clip per state) and turns the head bone toward the ball while searching
+    /// or awake. Without it, simple code poses move the placeholder's "Visual" parts. Time up = Awake = WokeUp:
+    /// the level is lost (LevelManager handles the failure itself through DangerState.Failed, #27).
     ///   Asleep      lying, eyes closed, slow breathing
     ///   Twitching   lying, ears flick, tail swishes
     ///   Suspicious  lying, eyes half open, looks left and right
@@ -29,6 +30,8 @@ namespace Project3DGP.Game.Levels.Garden
         [SerializeField] MonoBehaviour flow;
 
         IDangerTimer _danger;
+        Animator _animator;          // the rigged model's, if any
+        Transform _headBone;
 
         Transform _visual, _body, _earLeft, _earRight, _tail, _eyeLeft, _eyeRight;
         Vector3 _bodyScale, _eyeScale;
@@ -54,6 +57,12 @@ namespace Project3DGP.Game.Levels.Garden
             _tail = Part("Tail");
             _eyeLeft = Part("EyeLeft");
             _eyeRight = Part("EyeRight");
+            if (_visual != null)
+            {
+                _animator = _visual.GetComponentInChildren<Animator>();
+                if (Animated)
+                    _headBone = Part("Head");
+            }
             if (_body != null) _bodyScale = _body.localScale;
             if (_eyeLeft != null) _eyeScale = _eyeLeft.localScale;
             if (_earLeft != null) _earLeftRest = _earLeft.localRotation;
@@ -64,7 +73,14 @@ namespace Project3DGP.Game.Levels.Garden
             (_height, _pitch, _eyesOpen, _tailLift) = (target.Height, target.Pitch, target.EyesOpen, target.TailLift);
         }
 
-        void OnEnable() => machine.StateChanged += OnMachineStateChanged;
+        bool Animated => _animator != null && _animator.runtimeAnimatorController != null;
+
+        void OnEnable()
+        {
+            machine.StateChanged += OnMachineStateChanged;
+            if (Animated)
+                _animator.SetInteger("State", (int)machine.State);
+        }
         void OnDisable() => machine.StateChanged -= OnMachineStateChanged;
 
         // The danger timer drives the cat; no timer yet (no LevelManager, or the TEMP wiring) = the test keys do.
@@ -90,6 +106,8 @@ namespace Project3DGP.Game.Levels.Garden
 
         void OnMachineStateChanged(CatState previous, CatState next)
         {
+            if (Animated)
+                _animator.SetInteger("State", (int)next);
             StateChanged?.Invoke(next);
             if (next == CatState.Awake)
                 WokeUp?.Invoke();
@@ -98,8 +116,22 @@ namespace Project3DGP.Game.Levels.Garden
         void Update()
         {
             machine.Tick(Time.deltaTime);
+            if (Animated)
+                return;   // the clips pose the cat; LateUpdate adds the head turn
             if (_visual != null)
                 Animate(Time.deltaTime);
+        }
+
+        // After the Animator: turn the head bone toward the ball (on top of the clip's own head motion).
+        void LateUpdate()
+        {
+            if (!Animated || _headBone == null)
+                return;
+            var blend = 1f - Mathf.Exp(-blendSpeed * Time.deltaTime);
+            var state = machine.State;
+            var wanted = state == CatState.Searching || state == CatState.Awake ? LookYaw(state) * 0.6f : 0f;
+            _yaw = Mathf.LerpAngle(_yaw, wanted, blend);
+            _headBone.rotation = Quaternion.AngleAxis(_yaw, transform.up) * _headBone.rotation;
         }
 
         // ---- Placeholder poses ----

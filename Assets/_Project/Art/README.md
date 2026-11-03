@@ -1,11 +1,14 @@
 # Art: our own models (#80)
 
+> **Characters (2026-11-03, #36, ADR-0013):** the hamster hero, the princess and Sir Grumblepaws are **AI-generated with Tripo3D (CC BY 4.0, credited)**, then decimated, rigged and animated in Blender with the scripts in `Characters/BlenderScripts~/` (see `docs/art/hamster-animation-handoff.md`). They are not hand-made, so they don't count as the manual artwork below; *Magic > Prefabs > Use Character Models* swaps them into the prefabs.
+
 Models we make ourselves (Blender). Each counts for Form B "Art work" (>= 1 per member, >= 3 total) and goes in the report.
 
 | Model | Folder | Replaces the placeholder in | Owner |
 |---|---|---|---|
 | Hamster hero | `Characters/Hamster/` | `Prefabs/Characters/Hamster.prefab` | Henry |
 | Hamster princess | `Characters/Princess/` | `Prefabs/Characters/Princess.prefab` | Henry |
+| Sir Grumblepaws (cat) | `Characters/Cat/` | `Prefabs/Characters/Cat.prefab` | Henry |
 | Standard club, Sledgehammer, Mysterious | `Tools/` | `Prefabs/Tools/*.prefab` | Henry |
 
 ## Files

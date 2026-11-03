@@ -11,9 +11,12 @@ namespace Project3DGP.Game.Player
     /// every frame while aiming. The look lives in the "Visual" child (placeholder hamster now, Blender model
     /// later), so swapping the model changes no script.
     ///
-    /// Animation: if the model has an Animator (#36), the Play* methods set its triggers ("Swing", "Celebrate",
-    /// "Fail") and the bool "Walking". Without one, a tiny code fallback moves the "ShoulderR" pivot / the Visual,
-    /// so a shot still reads.
+    /// Animation: if the model has an Animator (#36), the Play* methods set its triggers ("Swing" with the int
+    /// "Tool" = ClubProfile.Swing, "Equip", "Celebrate", "Fail") and the bool "Walking"; every frame it also sets
+    /// the float "Speed" (m/s, measured, so walking in explore mode and WalkTo both animate) and the bool "Aiming"
+    /// (FaceYaw was called in the last moment = standing at the ball, aiming). Without an Animator, a tiny code
+    /// fallback moves the "ShoulderR" pivot / the Visual, so a shot still reads. The swing clips call
+    /// OnSwingImpact (SwingImpactRelay on the model), which raises SwingImpact on the hit frame.
     /// </summary>
     public class GolferAvatar : MonoBehaviour
     {
@@ -34,9 +37,18 @@ namespace Project3DGP.Game.Player
         Coroutine _walk;             // the running WalkTo, if any
         Vector3 _ballPosition;       // from the last TeleportTo: FaceYaw walks around this point
         bool _hasBall;
+        Vector3 _lastPosition;       // for the measured "Speed"
+        float _speed;
+        float _lastFaceYawTime = float.NegativeInfinity;
+
+        const float AimingHoldSeconds = 0.25f;   // "Aiming" stays on this long after the last FaceYaw
+        const float TeleportSpeed = 8f;          // faster than this in one frame = a teleport, not walking
 
         public ClubProfile CurrentTool { get; private set; }
         public bool IsWalking => _walk != null;
+
+        /// <summary>The swing clip's hit frame (animation event, #36). Nothing raises it without the model.</summary>
+        public event Action SwingImpact;
 
         void Awake()
         {
@@ -45,6 +57,22 @@ namespace Project3DGP.Game.Player
             if (toolSocket == null)
                 toolSocket = FindDeep(transform, "ToolSocket");
             _shoulder = FindDeep(transform, "ShoulderR");
+            _lastPosition = transform.position;
+        }
+
+        void Update()
+        {
+            if (!HasController)
+                return;
+            var delta = transform.position - _lastPosition;
+            delta.y = 0f;
+            _lastPosition = transform.position;
+            var measured = Time.deltaTime > 0f ? delta.magnitude / Time.deltaTime : 0f;
+            if (measured > TeleportSpeed)
+                measured = 0f;
+            _speed = Mathf.Lerp(_speed, measured, 1f - Mathf.Exp(-12f * Time.deltaTime));   // smooth the frame jitter
+            _animator.SetFloat("Speed", _speed);
+            _animator.SetBool("Aiming", Time.time - _lastFaceYawTime < AimingHoldSeconds);
         }
 
         /// <summary>Stands beside the ball (next shooting position) and faces the aim.</summary>
@@ -62,6 +90,7 @@ namespace Project3DGP.Game.Player
         /// </summary>
         public void FaceYaw(float aimYaw)
         {
+            _lastFaceYawTime = Time.time;
             var facing = Quaternion.Euler(0f, aimYaw, 0f);
             if (!_hasBall)
             {
@@ -78,7 +107,10 @@ namespace Project3DGP.Game.Player
         {
             if (club == CurrentTool && (club == null || _tool != null))
                 return;
+            var switched = CurrentTool != null && club != null && club != CurrentTool;
             CurrentTool = club;
+            if (switched)
+                Trigger("Equip");
             if (_tool != null)
                 Destroy(_tool);
             _tool = null;
@@ -91,6 +123,8 @@ namespace Project3DGP.Game.Player
 
         public void PlaySwing(ClubProfile club)
         {
+            if (HasController)
+                _animator.SetInteger("Tool", club != null ? (int)club.Swing : 0);
             if (!Trigger("Swing"))
                 Play(SwingFallback());
         }
@@ -125,7 +159,7 @@ namespace Project3DGP.Game.Player
         IEnumerator Walk(Vector3 target, Action arrived)
         {
             SetWalking(true);
-            var useFallback = _animator == null || _animator.runtimeAnimatorController == null;
+            var useFallback = !HasController;
             for (var t = 0f; ; t += Time.deltaTime)
             {
                 var toTarget = target - transform.position;
@@ -160,15 +194,20 @@ namespace Project3DGP.Game.Player
 
         void SetWalking(bool walking)
         {
-            if (_animator != null && _animator.runtimeAnimatorController != null)
+            if (HasController)
                 _animator.SetBool("Walking", walking);
         }
 
         // ---- Animator path (#36) ----
 
+        bool HasController => _animator != null && _animator.runtimeAnimatorController != null;
+
+        /// <summary>Called by SwingImpactRelay (the animation event lives on the model, not on this object).</summary>
+        internal void RaiseSwingImpact() => SwingImpact?.Invoke();
+
         bool Trigger(string name)
         {
-            if (_animator == null || _animator.runtimeAnimatorController == null)
+            if (!HasController)
                 return false;
             _animator.SetTrigger(name);
             return true;
