@@ -13,7 +13,7 @@ Sources: proposal §6 (gameplay, danger system, clubs) and §7 (level independen
 | Golfer avatar | Henry | `GolferAvatar`, `SwingImpactRelay`; rigged Tripo3D models in `Art/Characters` | `Player/` | #88, #36 |
 | Level exit | Henry | `LevelExit` (gate / portal) | `Flow/` | #38 |
 | Cross-scene data | Henry | `GameSession` | `Session/` | #89 |
-| Effects | Henry (Garden + shared) | `ShotImpactEffect`, `BallTriggerEffect`; placeholder prefabs in `Prefabs/FX`; sounds: `GameplaySounds`, `SoundSet` (one per level in `Settings/Audio`), `SoundCue`, `UI/UiSounds` (list: `docs/audio/sound-list.md`) | `Effects/` | #39, #72 |
+| Effects | Henry (Garden + shared) | `ShotImpactEffect`, `BallTriggerEffect`; placeholder prefabs in `Prefabs/FX`; sounds: `GameplaySounds`, `SoundSet` (one per level in `Settings/Audio`), `SoundCue`, `UI/UiSounds`; music: `MusicPlayer` (one per scene, follows the Music volume; *Add Music*) (list: `docs/audio/sound-list.md`) | `Effects/` | #39, #72 |
 | Leveling | Henry | XP + unlock table on `GameSession`, `SkillProfile`, `LevelUnlock`, `XpCollectible` | `Session/` | #70 |
 | Camera + explore mode | Bahadir | `CameraRig`, `PlayerModeController` (+ Core `Movement/CharacterWalker`) | `Cameras/`, `Explore/` | #19, #125 |
 | Danger (timer) | Pongpat | `DangerManager`, `DangerConfig` | `Danger/` | #7 |

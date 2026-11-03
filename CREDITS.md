@@ -16,3 +16,10 @@ Third-party content used in this project. Keep in sync with `docs/assets.md` (th
 | Mini Forest | Kenney | https://kenney.nl/assets/mini-forest | CC0 |
 | Skyboxes | Kenney | https://kenney.nl/assets/skyboxes | CC0 |
 | Impact Sounds | Kenney | https://kenney.nl/assets/impact-sounds | CC0 |
+| Carefree | Kevin MacLeod | https://freemusicarchive.org/music/Kevin_MacLeod/Calming/Carefree/ | CC BY 3.0 |
+| Comedy Background | PulseBox | https://freemusicarchive.org/music/pulsebox/comedy-music/comedy-background/ | CC BY-ND 4.0 |
+| Desert ambient music | ZHRØ | https://freesound.org/s/686838/ | CC0 |
+| Ice Cavern Loop | Sirkoto51 | https://freesound.org/s/368574/ | CC BY 4.0 |
+| Moderate Passion Tango | Alena Smirnova | https://freemusicarchive.org/music/alena-smirnova/musical-menu/moderate-passion-tangomp3/ | CC BY-NC 4.0 |
+| Fanfare 2 - Rpg | colorsCrimsonTears | https://freesound.org/s/580310/ | CC0 |
+| Game Over 4 | HoliznaCC0 | https://freemusicarchive.org/music/holiznacc0/gamer-soundtrack-game-over | CC0 |
