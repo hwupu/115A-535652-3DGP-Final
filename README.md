@@ -77,7 +77,7 @@ Details per sprint: [`docs/scrum/roadmap.md`](docs/scrum/roadmap.md) and the [bo
    git config user.email "the-email-on-your-github-account"
    ```
 5. **Open in Unity Hub** (*Add project from disk*, Editor 6000.3.26f1). The first import takes a few minutes. Check that the **Magic** menu appears in the top bar.
-6. **Asset Store packs:** these are never in git, so each of us adds them by hand (*Window > Package Manager > My Assets*) into `Assets/AssetStore/`. Import the packs listed in [`docs/assets.md`](docs/assets.md). No packs listed yet? Skip this step.
+6. **Asset Store packs:** these are never in git, so each of us imports them by hand (*Window > Package Manager > My Assets*) and moves them into `Assets/AssetStore/`. Follow [`docs/asset-store-packs.md`](docs/asset-store-packs.md) (one free pack, about 5 minutes).
 7. **Sign in:** run `gh auth login` and sign in to Claude Code (`claude`, then follow the login prompt).
 8. **Recommended, scene merge tool** (merges Unity scenes/prefabs smartly). Run in the repo folder:
    ```bash

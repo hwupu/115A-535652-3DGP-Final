@@ -112,5 +112,9 @@ CLAUDE.local.md
 
 # ---- Unity Asset Store packages (free AND paid): NEVER commit (license) ----
 # Import them locally into Assets/AssetStore/ (Package Manager > My Assets) and list them in docs/assets.md.
+# How to install them: docs/asset-store-packs.md.
 /[Aa]ssets/AssetStore/
 /[Aa]ssets/AssetStore.meta
+# The pack we use, in case it is still where Unity imports it (before moving it into Assets/AssetStore/).
+/[Aa]ssets/maanetorn/
+/[Aa]ssets/maanetorn.meta
