@@ -19,7 +19,7 @@ namespace Project3DGP.EditorTools
     ///   Time bar, XP bar, power meter, sliders            brown track with a green fill
     ///   Club cards                                        cream frame (tinted by SelectableCard) on a brown card
     ///   Other text (HUD over the 3D view)                 white with a dark shadow
-    /// MainMenu / Ending also get the hand-painted sky (BD Studios) behind the menu: the flat Background image is
+    /// MainMenu / Ending also get the Kenney sky (day / morning, CC0) behind the menu: the flat Background image is
     /// switched off (not deleted), so the camera's skybox shows. One Undo step; the scene is marked dirty, not saved.
     /// The font is the committed OFL copy in Assets/ThirdParty/LilitaOne, so text still shows without the pack.
     /// </summary>
@@ -226,19 +226,15 @@ namespace Project3DGP.EditorTools
             }
         }
 
-        // MainMenu / Ending: the hand-painted sky behind the menu, if the scene still has Unity's default sky.
+        // MainMenu / Ending: the Kenney sky behind the menu, if the scene still has Unity's default sky.
         static string MenuSky(string sceneName, List<Canvas> canvases)
         {
-            var guid = sceneName == GameScenes.MainMenu ? AssetStorePacks.Skybox.DayClear
-                : sceneName == GameScenes.Ending ? AssetStorePacks.Skybox.Sunset : null;
-            if (guid == null)
+            var name = sceneName == GameScenes.MainMenu ? "day" : sceneName == GameScenes.Ending ? "morning" : null;
+            if (name == null)
                 return "";
-            var material = AssetStorePacks.Load<Material>(guid);
+            var material = KenneySky.Get(name);
             if (material == null)
-            {
-                MagicMenuUtil.Log($"Skybox pack not imported: kept the flat background (see {AssetStorePacks.Guide}).");
                 return "";
-            }
             var result = "";
             if (RenderSettings.skybox == null || RenderSettings.skybox.name == "Default-Skybox")
             {

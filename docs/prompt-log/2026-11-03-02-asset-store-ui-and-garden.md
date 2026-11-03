@@ -52,3 +52,5 @@
   - flowers and mushrooms scaled ×1.5–1.6 for the hamster's point of view.
 - **Still open in #74:** at least 3 lighting effects in different regions, lens flare, and snapshots.
 - **Shared UI:** L2 and L3 owners click *Apply Farm UI Theme* in their own scenes after importing the packs.
+
+**Update (same evening, log 03):** the PO chose the Kenney look for L1. The Pandazole, Chromisu and BD Studios packs and their tools were removed again. Only the Farm UI theme and the install guide (now just one pack) remain from this log.
