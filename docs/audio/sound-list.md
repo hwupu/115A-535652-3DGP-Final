@@ -51,3 +51,24 @@ The pack has no wind or ambience loops. Wind (L2) and birds (L1) still need anot
 | Club card select | `ClubPanelView` keeps its own sound (Freesound "invalid1") |
 
 Sounds play at the **SFX volume** from Settings; GUI sounds also play while the game is paused.
+
+## Music (BGM)
+Picked by Henry (PO) on 2026-11-04. Files are mp3 128 kbps, loudness-matched to about -18 LUFS, so one music volume fits all (except PulseBox, see below).
+
+**Playback:** `Effects/MusicPlayer` (one per scene): plays its track from the start with a 1 s fade-in, loops, plays an optional jingle once at the same moment, keeps playing while paused, and follows the **Music** volume setting live. `Play(clip, …)` switches tracks and `Stop(fade)` fades out, for later use (e.g. the shared audio manager, #42). *Magic > Game > Add Music* adds it to **MainMenu, L1_Garden and Ending** (Henry); L2/L3 owners add a GameObject with an AudioSource + MusicPlayer and drag in their track.
+
+| Scene | Track | File | Loop |
+|---|---|---|---|
+| MainMenu | Kevin MacLeod – Carefree | `ThirdParty/FreeMusicArchive/bgm_menu_carefree_kevin-macleod.mp3` | yes |
+| L1 Garden | PulseBox – Comedy Background | `ThirdParty/FreeMusicArchive/bgm_l1_comedy-background_pulsebox.mp3` | yes |
+| L2 Desert | ZHRØ – Desert ambient music | `ThirdParty/Freesound/bgm_l2_desert_ambient_686838.mp3` | yes |
+| L3 Lake | Sirkoto51 – Ice Cavern Loop | `ThirdParty/Freesound/bgm_l3_ice_cavern_loop_368574.mp3` | yes (made as a seamless loop) |
+| Ending (happy) | Alena Smirnova – Moderate Passion Tango, **plus** colorsCrimsonTears – Fanfare 2 played **once** at the start, at the same time | `ThirdParty/FreeMusicArchive/bgm_ending_happy_tango_alena-smirnova.mp3` + `ThirdParty/Freesound/sfx_fanfare_580310.mp3` | tango yes, fanfare no |
+| (not used yet) | HoliznaCC0 – Game Over 4, kept for a bad ending | `ThirdParty/FreeMusicArchive/bgm_ending_bad_game-over-4_holiznacc0.mp3` | yes |
+
+- **PulseBox is CC BY-ND (no derivatives):** the file is only re-encoded, never edited or normalized. It's about 7 dB louder than the others, so play it at an AudioSource volume of about **0.45**.
+- **Tango is CC BY-NC:** fine for this non-commercial class project; it must not be used commercially.
+- **Game Over 4 is kept for later** (PO 2026-11-04): the game has no bad-ending scene yet (time up shows the level's fail scene and the time-up dialog). The team decides where it plays.
+- **Gapless loop:** mp3 can add a few milliseconds of silence at the start. If the L3 loop clicks, ask for a `.wav` copy.
+- *Add Music* sets every `bgm_*` file to Streaming + Vorbis, so long tracks don't sit decompressed in memory.
+- Originals stay outside the repo (Henry: `~/Downloads/3DGP-music-originals`).
