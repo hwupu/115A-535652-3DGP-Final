@@ -80,6 +80,9 @@ InitTestScene*.unity*
 .history/
 *.swp
 *~
+# Blender sources next to our models (Unity ignores ~ folders; see Assets/_Project/Art/README.md)
+!Source~
+!BlenderScripts~
 
 # ---- OS specific ----
 # macOS

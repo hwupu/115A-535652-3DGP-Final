@@ -29,7 +29,8 @@ namespace Project3DGP.EditorTools
             try
             {
                 var visual = root.transform.Find("Visual");
-                if (visual == null || visual.Find("EyeLeft") != null)
+                // The real model (#36, an Animator under Visual) has its own eyes: placeholder eyes only.
+                if (visual == null || visual.Find("EyeLeft") != null || visual.GetComponentInChildren<Animator>() != null)
                     return;
                 Add(visual);
                 PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);

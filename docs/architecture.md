@@ -10,7 +10,7 @@ Sources: proposal §6 (gameplay, danger system, clubs) and §7 (level independen
 | Ball | Henry | `GolfBall`, `InvalidZone`, `BallHitTarget` | `Golf/` | #14, #22 |
 | Input | Henry | `GolfInput` (+ `GolfControls.inputactions` in `Settings/Input/`) | `Controls/` | #13 |
 | Shot + clubs | Henry | `ShotController`, `AimCone`, `ClubProfile` | `Golf/` | #15, #16, #70 |
-| Golfer avatar | Henry | `GolferAvatar` (placeholder box for now) | `Player/` | #88, #36 |
+| Golfer avatar | Henry | `GolferAvatar`, `SwingImpactRelay`; rigged Tripo3D models in `Art/Characters` | `Player/` | #88, #36 |
 | Level exit | Henry | `LevelExit` (gate / portal) | `Flow/` | #38 |
 | Cross-scene data | Henry | `GameSession` | `Session/` | #89 |
 | Effects | Henry (Garden + shared) | `ShotImpactEffect`, `BallTriggerEffect`; placeholder prefabs in `Prefabs/FX` | `Effects/` | #39 |
@@ -93,6 +93,7 @@ public enum ShotPhase { Aiming, InFlight }
     public float MarkerCycleSeconds;   // control: time for the marker to go up and down once
     public float LaunchPitch;          // fixed launch angle (no pitch control in MVP)
     public GameObject ToolPrefab;      // what the avatar holds
+    public SwingStyle Swing;           // which swing clip: Club, Hammer, Tap (#36)
 }
 
 public readonly struct ShotInfo
@@ -139,10 +140,12 @@ public class GolferAvatar : MonoBehaviour
     public void PlaySwing(ClubProfile club);                    // triggered on ShotTaken
     public void PlayCelebrate(); public void PlayFail();
     public void WalkTo(Vector3 target, Action arrived);         // all goals met: walks to the open exit (#38)
+    public event Action SwingImpact;                            // the swing clip's hit frame (#36)
 }
 ```
 The avatar prefab keeps the visual in a child (`Visual/`): a **box for now**, later the Blender hamster with an Animator. Game code only calls the methods above, so replacing the model doesn't change any other script. Animation clips needed and the clip/timing handoff: see #36.
 Implementation (#88): `Prefabs/Shared/GolferAvatar.prefab` is a **variant of `Prefabs/Characters/Hamster`** (Magic > Game > Create Golfer Avatar Prefab), so the Blender model replaces the Hamster's `Visual` once and the avatar follows. The tool goes to the child named `ToolSocket` (right hand). `TeleportTo` stands at `standOffset` (left of and behind the ball, in the aim's frame) snapped to the ground; `FaceYaw` circles the ball keeping that stance. `PlaySwing`/`PlayCelebrate`/`PlayFail` set Animator triggers `Swing`/`Celebrate`/`Fail` when the model has an Animator (#36), else a small code fallback (shoulder swing, hop, lean back). The avatar has no collider (the ball passes through). `WalkTo` (#38) walks in a straight line on the ground at `walkSpeed` (1.5 m/s), facing the way it goes, and sets the Animator bool `Walking` (code fallback: a small bob). `TeleportTo` or another `WalkTo` stops the walk without calling `arrived`.
+**Model and clips (#36, ADR-0013):** `Art/Characters/Hamster` is the rigged Tripo3D hamster (Blender scripts in `Art/Characters/BlenderScripts~`); *Magic > Prefabs > Use Character Models* swaps it into the Hamster prefab's `Visual` (so the avatar follows) with `Hamster.controller`. Animator parameters set by `GolferAvatar`: triggers `Swing` (with int `Tool` = `ClubProfile.Swing`: 0 club, 1 hammer, 2 tap), `Equip` (club switched), `Celebrate`, `Fail`; bool `Walking` (`WalkTo`); every frame float `Speed` (measured m/s, teleports ignored, so explore walking and `WalkTo` both animate) and bool `Aiming` (`FaceYaw` called in the last 0.25 s). States: Idle, Walk, AimIdle, Swing_Club / Swing_Hammer / Swing_Mysterious (back to Idle when done), Equip, Flinch, Celebrate (loops), Fail (holds). The swing clips fire the animation event `OnSwingImpact` on the hit frame; `SwingImpactRelay` on the model passes it to `GolferAvatar.SwingImpact` (for hit sounds / effects; the ball still leaves on the click). `ToolSocket` sits in the `Hand_R` bone, the tool pointing along the arm. Clip list and frames: `docs/art/hamster-animation-handoff.md`.
 
 ### 4.4 Camera — Bahadir
 ```csharp
@@ -469,7 +472,7 @@ sequenceDiagram
 - No "ideal one-shot range" mark on the power meter for now (maybe later).
 - HUD: time bar visible at the upper left; menu button at the upper right; opening the menu pauses the game.
 - **HUD, menus and saving (2026-10-28, §4.8):** time bar + cat-face stage icon, no numbers. Pause dialog: Resume, Retry level, Settings, Save, Main menu, Quit. Time up: fail scene, then Retry / Main menu / Close. No result screen in L1/L2; L3 → Ending with run totals. Main menu: Start, Continue, Settings, Quit. One manual save slot (pause dialog, asks before overwriting); a new game doesn't save; Continue restarts the saved level. Henry writes the interfaces and all UI (pause dialog moved from #77); Pongpat implements them in #7, #18, #27, #44.
-- **Level 1 has no noise mechanism** (2026-10-28): clubs have no noise value, and the cat follows only the danger timer: Normal = asleep, Warning = twitching, then suspicious (eyes half open), Critical = searching (sits up, watches the ball), Failed = **awake = game over**. Code: `Levels/Garden/CatAlertMachine` (FSM, #79) and `GardenCat` (#21); the cat listens to `DangerManager.StateChanged` (rule 4).
+- **Level 1 has no noise mechanism** (2026-10-28): clubs have no noise value, and the cat follows only the danger timer: Normal = asleep, Warning = twitching, then suspicious (eyes half open), Critical = searching (sits up, watches the ball), Failed = **awake = game over**. Code: `Levels/Garden/CatAlertMachine` (FSM, #79) and `GardenCat` (#21); the cat listens to `DangerManager.StateChanged` (rule 4). With the rigged cat model (#36/#37) `GardenCat` sets the Animator int `State` (= `CatState`, one looping clip each: Asleep and Twitching sit, Suspicious sits and looks around, Searching stands and scans, Awake stands with raised paws) and turns the `Head` bone toward the ball while searching / awake.
 - **Explore mode** (Bahadir, 2026-11-01, ADR-0012): the player walks to the ball instead of teleporting (WASD, Shift sprint, Space jump); close to the ball the shot starts by itself, Q leaves it; V cycles third person / first person / free fly / ball view while walking; the timer runs while walking; the player stands still while the ball flies. Ball reset key, camera zoom and camera collision: later.
 
 ## 7. Open questions

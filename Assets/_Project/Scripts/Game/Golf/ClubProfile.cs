@@ -6,6 +6,9 @@ namespace Project3DGP.Game.Golf
     /// One club's numbers (architecture §4.2). Tunable in the Inspector, so balancing needs no code (#46).
     /// #15 ships the Standard club; #16 adds the Sledgehammer and the Mysterious tool and the switching.
     /// </summary>
+    /// <summary>Which swing clip the hamster plays for a club (#36; Animator int "Tool").</summary>
+    public enum SwingStyle { Club, Hammer, Tap }
+
     [CreateAssetMenu(menuName = "Project3DGP/Club Profile", fileName = "Club")]
     public class ClubProfile : ScriptableObject
     {
@@ -21,5 +24,7 @@ namespace Project3DGP.Game.Golf
         public float LaunchPitch = 25f;
         [Tooltip("What the avatar holds (#88).")]
         public GameObject ToolPrefab;
+        [Tooltip("Swing animation (#36): Club = golf swing, Hammer = overhead smash, Tap = small precise tap.")]
+        public SwingStyle Swing = SwingStyle.Club;
     }
 }
