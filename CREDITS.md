@@ -10,3 +10,8 @@ Third-party content used in this project. Keep in sync with `docs/assets.md` (th
 | Prince hamster (hero) 3D model | Henry (@hwupu), generated with Tripo3D AI; rigged and animated for this project | https://www.tripo3d.ai | CC BY 4.0 |
 | Princess hamster 3D model | Henry (@hwupu), generated with Tripo3D AI; rigged and animated for this project | https://www.tripo3d.ai | CC BY 4.0 |
 | Sir Grumblepaws (cat) 3D model | Henry (@hwupu), generated with Tripo3D AI; rigged and animated for this project | https://www.tripo3d.ai | CC BY 4.0 |
+| Lilita One font | Juan Montoreano | https://fonts.google.com/specimen/Lilita+One | SIL OFL 1.1 |
+| Farm Game UI - Starter 2D | maanetorn | https://assetstore.unity.com/packages/slug/318607 | Unity Asset Store EULA (not redistributed) |
+| Free Stylized Hand-Painted Skybox | BD Studios | https://assetstore.unity.com/packages/slug/265475 | Unity Asset Store EULA (not redistributed) |
+| Handpainted Grass & Ground Textures | Chromisu | https://assetstore.unity.com/packages/slug/187634 | Unity Asset Store EULA (not redistributed) |
+| Pandazole - Nature Environment Low poly Pack | Pandazole | https://assetstore.unity.com/packages/slug/212621 | Unity Asset Store EULA (not redistributed) |

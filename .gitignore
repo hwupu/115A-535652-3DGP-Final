@@ -112,5 +112,15 @@ CLAUDE.local.md
 
 # ---- Unity Asset Store packages (free AND paid): NEVER commit (license) ----
 # Import them locally into Assets/AssetStore/ (Package Manager > My Assets) and list them in docs/assets.md.
+# How to install them: docs/asset-store-packs.md.
 /[Aa]ssets/AssetStore/
 /[Aa]ssets/AssetStore.meta
+# The packs we use, in case they are still where Unity imports them (before moving them into Assets/AssetStore/).
+/[Aa]ssets/maanetorn/
+/[Aa]ssets/maanetorn.meta
+/[Aa]ssets/Free Stylized Hand-Painted Skybox/
+/[Aa]ssets/Free Stylized Hand-Painted Skybox.meta
+/[Aa]ssets/Handpainted_Grass_and_Ground_Textures/
+/[Aa]ssets/Handpainted_Grass_and_Ground_Textures.meta
+/[Aa]ssets/Pandazole_Ultimate_Pack/
+/[Aa]ssets/Pandazole_Ultimate_Pack.meta
