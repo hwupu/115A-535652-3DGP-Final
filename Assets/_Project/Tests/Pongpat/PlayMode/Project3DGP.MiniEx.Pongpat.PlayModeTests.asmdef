@@ -1,0 +1,23 @@
+{
+    "name": "Project3DGP.MiniEx.Pongpat.PlayModeTests",
+    "rootNamespace": "Project3DGP.MiniEx.Pongpat.Tests",
+    "references": [
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "Project3DGP.Core",
+        "Project3DGP.MiniEx.Pongpat"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
