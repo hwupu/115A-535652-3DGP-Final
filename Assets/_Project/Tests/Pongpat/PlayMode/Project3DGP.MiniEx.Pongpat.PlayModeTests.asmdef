@@ -5,7 +5,8 @@
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "Project3DGP.Core",
-        "Project3DGP.MiniEx.Pongpat"
+        "Project3DGP.MiniEx.Pongpat",
+        "UnityEngine.UI"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
