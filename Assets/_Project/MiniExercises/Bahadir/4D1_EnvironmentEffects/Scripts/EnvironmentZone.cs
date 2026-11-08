@@ -21,10 +21,12 @@ namespace Project3DGP.MiniEx.Bahadir.EnvEffects
         void OnTriggerStay(Collider other)
         {
             if (TryGetPlayer(other, out var player)) ApplyEffect(player);
+            else if (other.attachedRigidbody != null) ApplyEffectToBody(other.attachedRigidbody);
         }
 
         protected virtual void OnPlayerEnter(MomentumController player) { }
         protected abstract void ApplyEffect(MomentumController player);
+        protected virtual void ApplyEffectToBody(Rigidbody body) { }
 
         // The collider belongs to the player's Rigidbody, which carries the controller.
         static bool TryGetPlayer(Collider other, out MomentumController player)
