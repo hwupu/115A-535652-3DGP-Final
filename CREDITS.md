@@ -5,7 +5,7 @@ Third-party content used in this project. Keep in sync with `docs/assets.md` (th
 | Asset | Author / Publisher | Source | License |
 |-------|--------------------|--------|---------|
 | README cover image | Henry (@hwupu), generated with Google Gemini | AI-generated | Own use |
-| Character reference art (docs only) | Henry (@hwupu), generated with Google Gemini | AI-generated | AI-generated, own use |
+| Character reference art (docs only) | Google Gemini (AI-generated) | AI-generated | AI-generated, own use |
 | Pongpat 4.C.4 primitive materials (Character, Movable Cube, Boundary) | Pongpat (@empongpat) + Codex | Project Magic setup tool | Original project work; no third-party content |
 | Pongpat 4.E.2 primitive materials (Arena, Walls, Amber, Frost, Monsters, Seeds) | Pongpat (@empongpat) + Codex | Project Magic setup tool | Original project work; no third-party content |
 | Egg Shaker - 1 Throw | connermusician | https://freesound.org/s/199823/ | CC0 |
