@@ -16,3 +16,9 @@
 ## Decisions / open questions
 - The texture edits are Henry's own art decisions, made by hand in Photoshop. The AI did not review how they look in Unity.
 - No new assets, so `docs/assets.md` and `CREDITS.md` are unchanged.
+
+## Follow-up: character reference art (branch `docs/character-ref-art`)
+> i included character ref art. please push
+
+- Committed the 7 Gemini-generated images in `docs/art/` (LFS, about 3.5 MB) on a branch, because `main` takes no direct pushes.
+- Added rows to `docs/assets.md` and `CREDITS.md` (no row, no commit), using the same wording as the Gemini README cover. Assumes Henry generated the images; correct the rows if not.
