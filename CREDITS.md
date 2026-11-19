@@ -14,6 +14,10 @@ Third-party content used in this project. Keep in sync with `docs/assets.md` (th
 | Prince hamster (hero) 3D model | Henry (@hwupu), generated with Tripo3D AI; rigged and animated for this project | https://www.tripo3d.ai | CC BY 4.0 |
 | Princess hamster 3D model | Henry (@hwupu), generated with Tripo3D AI; rigged and animated for this project | https://www.tripo3d.ai | CC BY 4.0 |
 | Sir Grumblepaws (cat) 3D model | Henry (@hwupu), generated with Tripo3D AI; rigged and animated for this project | https://www.tripo3d.ai | CC BY 4.0 |
+| Golf Club And Ball 3D model (modified) | Yanez Designs | https://skfb.ly/6ARt8 | CC BY 4.0 |
+| Sledgehammer Weapon [Free Download] 3D model (modified) | scrampunk | https://skfb.ly/6vQU7 | CC BY 4.0 |
+| Cardcaptor Sakura wand 3D model (modified; fan art of CLAMP's Cardcaptor Sakura) | Akiko.Tomiyoshi | https://skfb.ly/6YvrV | CC BY 4.0 |
+| Main menu background and title lettering | Henry (@hwupu), generated with Google Gemini | AI-generated | AI-generated, own use |
 | Lilita One font | Juan Montoreano | https://fonts.google.com/specimen/Lilita+One | SIL OFL 1.1 |
 | Farm Game UI - Starter 2D | maanetorn | https://assetstore.unity.com/packages/slug/318607 | Unity Asset Store EULA (not redistributed) |
 | Platformer Kit | Kenney | https://kenney.nl/assets/platformer-kit | CC0 |

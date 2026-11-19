@@ -26,5 +26,7 @@ namespace Project3DGP.Game.Golf
         public GameObject ToolPrefab;
         [Tooltip("Swing animation (#36): Club = golf swing, Hammer = overhead smash, Tap = small precise tap.")]
         public SwingStyle Swing = SwingStyle.Club;
+        [Tooltip("Picture on the HUD club card. Empty = a coloured square.")]
+        public Sprite Icon;
     }
 }

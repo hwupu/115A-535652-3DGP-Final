@@ -10,10 +10,12 @@ namespace Project3DGP.EditorTools
     /// Magic > Level > Garden: Build Kenney Level (#74, PO 2026-11-03: Kenney look for L1): dresses L1_Garden with the
     /// Kenney Platformer Kit and Mini Forest (CC0, Create Kenney Prefabs) under Environment/Kenney.
     ///   Ground    17 x 17 grass blocks (4.16 m, top at y = 0) on a 3.125 m grid: they overlap ~1 m, so the rounded
-    ///             corners leave no holes. Each block has a box collider. The old terrain is switched off (not deleted).
+    ///             corners leave no holes. Each block has a box collider. The old terrain and the placeholder fences
+    ///             (Environment/Boundary) are switched off (not deleted).
     ///   Border    a raised wall of tall blocks all around (2 to 4 m high), with colliders: the ball bounces back.
     ///   Plateaus  a few raised areas (1 or 2 m, one box collider each) away from the fairway, tee, cup and hazards.
-    ///   Pond      the blocks under Gameplay/InvalidZones/Pond sit 1 m lower, and the pond moves down 1 m with them.
+    ///   Pond      the blocks under Gameplay/InvalidZones/Pond sit 1 m lower, and the pond moves down 1 m with them;
+    ///             its water and trigger then grow to fill the basin.
     ///   Decor     a dirt trail along Environment/Course/FairwayPath (tee > bends > cup; the bends are markers created
     ///             once: move them and rebuild), trees, hedges, rocks, barrels and crates along the edge, flowers,
     ///             grass and stones off the fairway (no colliders), a sign at the tee, floating islands around.
@@ -35,6 +37,10 @@ namespace Project3DGP.EditorTools
         const float BlockHalf = Block / 2f;
         const float BlockHeight = 2f, LowHeight = 1f, TallHeight = 4f;
         const float PondDrop = 1f;
+        // Pond prefab child Visual/Water and the root trigger, in the pond's own space (Henry's L1 values).
+        static readonly Vector3 PondPrefabWaterScale = new(8f, 0.02f, 8f);
+        static readonly Vector3 PondWaterScale = new(10.38f, 1.68f, 19.58f);
+        static readonly Vector3 PondTriggerSize = new(9.59f, 2.34f, 19.05f);
         const float FairwayHalfWidth = 3f;
         const int Seed = 2026;
 
@@ -244,14 +250,15 @@ namespace Project3DGP.EditorTools
 
             void HideTerrain()
             {
-                foreach (var path in new[] { LevelSkeleton.TerrainPath, "Environment/Course/Ground" })
+                // The placeholder fences (Environment/Boundary) go too: the Kenney border keeps the ball in (Henry, 2026-11-19).
+                foreach (var path in new[] { LevelSkeleton.TerrainPath, "Environment/Course/Ground", "Environment/Boundary" })
                 {
                     var go = LevelSkeleton.Find(_scene, path);
                     if (go != null && go.activeSelf)
                     {
                         Undo.RecordObject(go, "Hide " + go.name);
                         go.SetActive(false);
-                        MagicMenuUtil.Log($"Switched off {path} (the Kenney blocks are the ground now)");
+                        MagicMenuUtil.Log($"Switched off {path} (the Kenney blocks and border replace it)");
                     }
                 }
             }
@@ -273,6 +280,26 @@ namespace Project3DGP.EditorTools
                     Undo.RecordObject(pond.transform, "Lower Pond");
                     pond.transform.position += Vector3.down * PondDrop;
                     MagicMenuUtil.Log($"Lowered the pond by {PondDrop} m into its basin");
+                }
+                FillBasin(pond);
+            }
+
+            // Henry's L1 tuning (2026-11-19): the water fills the basin up to just below the ground (thick, wider,
+            // longer), and the InvalidZone trigger grows with it. Only while the pond still has the prefab sizes.
+            static void FillBasin(GameObject pond)
+            {
+                var water = pond.transform.Find("Visual/Water");
+                if (water != null && water.localScale == PondPrefabWaterScale)
+                {
+                    Undo.RecordObject(water, "Fill Pond Basin");
+                    water.localScale = PondWaterScale;
+                    MagicMenuUtil.Log($"Pond water scaled to {PondWaterScale} (fills the basin)");
+                }
+                if (pond.TryGetComponent(out BoxCollider zone) && zone.isTrigger && zone.size == PondInvalidZone.TriggerSize)
+                {
+                    Undo.RecordObject(zone, "Fill Pond Basin");
+                    zone.size = PondTriggerSize;
+                    MagicMenuUtil.Log($"Pond trigger resized to {PondTriggerSize}");
                 }
             }
 

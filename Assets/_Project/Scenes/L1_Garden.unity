@@ -6513,7 +6513,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2109358221366077994, guid: 49a000c8baf2e4a399b14ed5835586a2, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 22.5
+      value: 25.44
       objectReference: {fileID: 0}
     - target: {fileID: 2109358221366077994, guid: 49a000c8baf2e4a399b14ed5835586a2, type: 3}
       propertyPath: m_LocalRotation.w
@@ -29363,8 +29363,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 14, y: 0}
-  m_SizeDelta: {x: 48, y: 48}
+  m_AnchoredPosition: {x: 10, y: 0}
+  m_SizeDelta: {x: 60, y: 60}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &782929608
 MonoBehaviour:
@@ -29388,7 +29388,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: 0}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -30742,7 +30742,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &811561424
 Transform:
   m_ObjectHideFlags: 0
@@ -31760,8 +31760,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 14, y: 0}
-  m_SizeDelta: {x: 48, y: 48}
+  m_AnchoredPosition: {x: 10, y: 0}
+  m_SizeDelta: {x: 60, y: 60}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &844624961
 MonoBehaviour:
@@ -31785,7 +31785,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: 0}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -37133,6 +37133,30 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 171814717}
     m_Modifications:
+    - target: {fileID: 3718828268055896916, guid: 7c110beede76e47f696e8c326118d5b0, type: 3}
+      propertyPath: m_Size.x
+      value: 9.59
+      objectReference: {fileID: 0}
+    - target: {fileID: 3718828268055896916, guid: 7c110beede76e47f696e8c326118d5b0, type: 3}
+      propertyPath: m_Size.y
+      value: 2.34
+      objectReference: {fileID: 0}
+    - target: {fileID: 3718828268055896916, guid: 7c110beede76e47f696e8c326118d5b0, type: 3}
+      propertyPath: m_Size.z
+      value: 19.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 7873678393903542486, guid: 7c110beede76e47f696e8c326118d5b0, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 10.38
+      objectReference: {fileID: 0}
+    - target: {fileID: 7873678393903542486, guid: 7c110beede76e47f696e8c326118d5b0, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.68
+      objectReference: {fileID: 0}
+    - target: {fileID: 7873678393903542486, guid: 7c110beede76e47f696e8c326118d5b0, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 19.58
+      objectReference: {fileID: 0}
     - target: {fileID: 8465474485208009497, guid: 7c110beede76e47f696e8c326118d5b0, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.6
@@ -55670,11 +55694,11 @@ RectTransform:
   - {fileID: 751424887}
   m_Father: {fileID: 871624051}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0.5}
-  m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -40, y: -50}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -40, y: -406}
   m_SizeDelta: {x: 280, y: 294}
-  m_Pivot: {x: 1, y: 0.5}
+  m_Pivot: {x: 1, y: 1}
 --- !u!114 &1456004306
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -78796,8 +78820,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 14, y: 0}
-  m_SizeDelta: {x: 48, y: 48}
+  m_AnchoredPosition: {x: 10, y: 0}
+  m_SizeDelta: {x: 60, y: 60}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &2065571705
 MonoBehaviour:
@@ -78821,7 +78845,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: 0}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1

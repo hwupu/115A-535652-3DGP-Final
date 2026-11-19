@@ -18,7 +18,7 @@ namespace Project3DGP.Game.UI
         [SerializeField] ShotController shot;
         [Tooltip("Card i shows club slot i (key i + 1). Extra cards are hidden.")]
         [SerializeField] List<SelectableCard> cards = new();
-        [Tooltip("Colour of each card's icon square, by slot (placeholder until there are club icons).")]
+        [Tooltip("Colour of each card's icon square, by slot, for clubs without an Icon sprite.")]
         [SerializeField] Color[] iconColors = { new(0.3f, 0.55f, 0.95f), new(0.9f, 0.3f, 0.25f), new(0.6f, 0.4f, 0.9f) };
 
         [Header("Highlight sound")]
@@ -75,7 +75,7 @@ namespace Project3DGP.Game.UI
                 var visible = i < _shownCount && clubs[i] != null;
                 cards[i].gameObject.SetActive(visible);
                 if (visible)
-                    cards[i].SetContent($"{i + 1}  {clubs[i].DisplayName}", Details(clubs[i]), IconColor(i));
+                    cards[i].SetContent($"{i + 1}  {clubs[i].DisplayName}", Details(clubs[i]), clubs[i].Icon, IconColor(i));
             }
             _selected = -1;
             Highlight(clubs != null ? IndexOf(shot.CurrentClub) : -1, playSound: false);
