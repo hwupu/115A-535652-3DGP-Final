@@ -17,3 +17,4 @@ Short records (Context, Decision, Consequences) of major decisions. Number seque
 | 0011 | "Magic" Editor menu; one tool per function, create-only-missing | Accepted |
 | 0012 | Explore mode: the player walks to the ball (amends architecture §3) | Accepted |
 | 0013 | AI-generated character models (Tripo3D), rigged and animated by script | Accepted |
+| 0014 | Animated characters in UI screens via off-screen RenderTexture stages | Accepted |

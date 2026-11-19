@@ -1,13 +1,19 @@
-# Blender 5.2 headless: add animation clips to <Name>_rig.blend, export FBX + base colour texture, render a contact sheet.
-# Usage: blender -b --factory-startup --python anim.py -- <Name> <work_dir> <out_dir> [sheet]
+# Blender 5.2+ headless: add animation clips to <Name>_rig.blend, export FBX + base colour texture, render a contact sheet.
+# Usage: blender -b --factory-startup --python anim.py -- <Name> <work_dir> <out_dir> [sheet[:Clip,Clip]]
+# <work_dir> holds <Name>_rig.blend (from rig.py) or, to only redo the clips, a copy of Source~/<Name>.blend: its old
+# actions are replaced and the texture step is skipped (the .blend keeps no image; the JPG in Unity stays).
 import bpy, sys, os, math
 import numpy as np
 from mathutils import Vector, Quaternion
 
 argv = sys.argv[sys.argv.index("--") + 1:]
 name, work, out = argv[0], argv[1], argv[2]
-want_sheet = len(argv) > 3 and argv[3] == "sheet"
-bpy.ops.wm.open_mainfile(filepath=os.path.join(work, name + "_rig.blend"))
+want_sheet = len(argv) > 3 and argv[3].startswith("sheet")
+sheet_only = argv[3].split(":", 1)[1].split(",") if want_sheet and ":" in argv[3] else None
+rig_blend = os.path.join(work, name + "_rig.blend")
+bpy.ops.wm.open_mainfile(filepath=rig_blend if os.path.exists(rig_blend) else os.path.join(work, name + ".blend"))
+for old in list(bpy.data.actions):   # a saved Source~ blend: rebuild every clip
+    bpy.data.actions.remove(old)
 scene = bpy.context.scene
 scene.render.fps = 24
 rig = bpy.data.objects[name + "Rig"]
@@ -106,6 +112,33 @@ if name == "Hamster":
     clip("Fail", [(1, DOWN), (8, SCARED), (12, merge(SCARED, {"Chest": [("Z", 3)]})), (16, merge(SCARED, {"Chest": [("Z", -3)]})), (20, merge(SCARED, {"Chest": [("Z", 3)]})), (24, SCARED)], loop=False)
     clip("Flinch", [(1, DOWN), (4, merge(DOWN, {"Spine": [("X", -10)], "Head": [("X", -12)], "UpperArm_R": [("Z", 25)], "UpperArm_L": [("Z", -25)]})), (12, DOWN)], loop=False)
 
+    # ---- Ending (#141) ----
+    # Victory: hop, right fist pump; hop, left fist pump; crouch, big jump with both arms up. Loops.
+    CROUCH = {"Hips": [("loc", (0, 0, -0.035))], "Leg_L": [("X", -15)], "Leg_R": [("X", -15)], "Chest": [("X", 10)]}
+    FIST_R = arms([("Y", 30), ("Z", 10)], [("Y", -ARM_DOWN), ("Z", -8)], [("Y", 65)])   # arm out to the side, forearm up (the wide head hides an arm raised straight)
+    FIST_L = arms([("Y", ARM_DOWN), ("Z", 8)], [("Y", -30), ("Z", -10)], None, [("Y", -65)])
+    def hop(up, lean, turn):
+        return {"Hips": [("loc", (0, 0, up)), ("Y", lean)], "Chest": [("Z", turn)], "Head": [("X", -12), ("Y", lean)]}
+    clip("Victory", [
+        (1, DOWN), (5, merge(DOWN, CROUCH)),
+        (10, merge(FIST_R, hop(0.08, 8, 12))), (15, merge(FIST_R, hop(-0.012, 4, 12))),
+        (19, merge(DOWN, CROUCH)),
+        (24, merge(FIST_L, hop(0.08, -8, -12))), (29, merge(FIST_L, hop(-0.012, -4, -12))),
+        (33, merge(DOWN, CROUCH, {"Chest": [("X", 4)]})),
+        (39, merge(UP, {"Hips": [("loc", (0, 0, 0.15))], "Head": [("X", -18)], "Leg_L": [("X", 12)], "Leg_R": [("X", 12)]})),
+        (44, merge(UP, CROUCH)), (49, DOWN)])
+
+    # Defeat: shock, knees give way, plops down sitting, head hung (once, holds) -> DefeatLoop: sobbing, slow head shake.
+    SIT_DROP = -0.10
+    SIT = {"Leg_L": [("X", -78), ("Z", 12)], "Leg_R": [("X", -78), ("Z", -12)], "Foot_L": [("X", 15)], "Foot_R": [("X", 15)]}
+    def slump(sob=0.0, shake=0.0, drop=0.0):
+        return merge(SIT, arms([("Y", -78 + 2 * sob), ("Z", 30)]),
+                     {"Spine": [("X", 8)], "Chest": [("X", 6 + 3 * sob)], "Head": [("X", 14 + 2 * sob), ("Z", shake)], "Hips": [("loc", (0, 0.02, SIT_DROP + drop))]})
+    SHOCK = merge(arms([("Y", -30), ("Z", 40)], None, [("Z", 30)], [("Z", -30)]), {"Spine": [("X", -10)], "Head": [("X", -12)], "Hips": [("loc", (0, 0.01, 0.01))]})
+    BUCKLE = merge(arms([("Y", -60), ("Z", 25)]), {"Hips": [("loc", (0, 0.01, -0.05))], "Leg_L": [("X", -40)], "Leg_R": [("X", -40)], "Spine": [("X", 10)], "Head": [("X", 12)]})
+    clip("Defeat", [(1, DOWN), (5, SHOCK), (11, SHOCK), (16, BUCKLE), (21, slump(drop=-0.015)), (25, slump()), (30, slump())], loop=False)
+    clip("DefeatLoop", [(f, slump(math.sin((f - 1) / 12 * 2 * math.pi), 10 * math.sin((f - 1) / 48 * 2 * math.pi))) for f in range(1, 50, 3)])
+
 if name == "Princess":
     def sway(f, n=72):
         a = math.sin(f / n * 2 * math.pi)
@@ -118,6 +151,15 @@ if name == "Princess":
     CLIPS[:] = [c for c in CLIPS if c[0] != "Celebrate"]
     SCARED = merge(arms([("Y", -25), ("Z", 75)], [("Y", 25), ("Z", -75)], [("Z", 70)], [("Z", -70)]), {"Spine": [("X", -6)], "Head": [("X", 8)], "Leg_L": [("Z", -6)], "Leg_R": [("Z", 6)]})
     clip("Scared", [(1 + i * 2, merge(SCARED, {"Chest": [("Z", 2.5 if i % 2 else -2.5)], "Tail_1": [("X", -20)]})) for i in range(13)])
+
+    # Ending (#141): happy bounce on the spot, arms up in a V waving, swaying side to side, tail wagging.
+    def joy(f):
+        p = (f - 1) / 48
+        sway, wave = math.sin(p * 2 * math.pi), math.sin(p * 4 * math.pi)
+        return merge(arms([("Y", 32), ("Z", 10 + 15 * wave)], [("Y", -32), ("Z", -10 + 15 * wave)], [("Y", 55)], [("Y", -55)]),
+                     {"Hips": [("loc", (0, 0, 0.05 * abs(wave)))], "Spine": [("Y", 9 * sway)], "Head": [("X", -10), ("Y", 12 * sway)],
+                      "Chest": [("X", -4)], "Tail_1": [("Z", 25 * wave)], "Tail_2": [("Z", 25 * math.sin(p * 4 * math.pi - 0.8))]})
+    clip("Victory", [(f, joy(f)) for f in range(1, 50, 3)])
 
 if name == "Cat":
     # rest: A-pose arms ~35 deg down. SIT lowers the hips onto the ground, legs forward.
@@ -201,14 +243,17 @@ if link:
         n = n.inputs[0].links[0].from_node
     img = n.image if n.type == 'TEX_IMAGE' else None
 if img is None:
-    img = next(i for i in bpy.data.images if "base" in i.filepath.lower())
+    img = next((i for i in bpy.data.images if "base" in i.filepath.lower()), None)
 os.makedirs(out, exist_ok=True)
-img.scale(2048, 2048)
-scene.render.image_settings.file_format = 'JPEG'
-scene.render.image_settings.quality = 88
-tex_path = os.path.join(out, name + "_BaseColor.jpg")
-img.save_render(tex_path, scene=scene)
-print("TEX", tex_path, os.path.getsize(tex_path))
+if img is not None:
+    img.scale(2048, 2048)
+    scene.render.image_settings.file_format = 'JPEG'
+    scene.render.image_settings.quality = 88
+    tex_path = os.path.join(out, name + "_BaseColor.jpg")
+    img.save_render(tex_path, scene=scene)
+    print("TEX", tex_path, os.path.getsize(tex_path))
+else:
+    print("TEX skipped (no image in the .blend; keep the existing _BaseColor.jpg)")
 
 bpy.ops.object.select_all(action='DESELECT')
 rig.select_set(True); mesh.select_set(True)
@@ -244,13 +289,16 @@ if want_sheet:
     cam.location = (d * 0.6, -d * 0.8, H * 0.6); cam.rotation_euler = (math.radians(88), 0, math.radians(37))
     tiles = []
     for cname, loop, keys, events in CLIPS:
+        if sheet_only and cname not in sheet_only:
+            continue
         rig.animation_data.action = bpy.data.actions[cname]
         frames = [fr for fr, _ in keys]
-        picks = sorted(set([frames[0], frames[len(frames) // 3], frames[2 * len(frames) // 3], frames[-1]] + list(events.values())))[:4]
+        n = 6 if sheet_only else 4
+        picks = sorted(set([frames[i * (len(frames) - 1) // (n - 1)] for i in range(n)] + list(events.values())))[:n]
         row = []
         for fr in picks:
             scene.frame_set(fr)
-            p = f"/tmp/tripo/sheet_tmp.png"
+            p = os.path.join(out, "sheet_tmp.png")
             scene.render.filepath = p
             scene.render.image_settings.file_format = 'PNG'
             bpy.ops.render.render(write_still=True)
@@ -258,11 +306,11 @@ if want_sheet:
             a = np.array(im.pixels[:]).reshape(im.size[1], im.size[0], 4)
             bpy.data.images.remove(im)
             row.append(a)
-        while len(row) < 4:
+        while len(row) < n:
             row.append(np.ones_like(row[0]))
         tiles.append(np.concatenate(row, axis=1))
     sheet = np.concatenate(tiles[::-1], axis=0)   # pixels are bottom-up
     img = bpy.data.images.new("sheet", sheet.shape[1], sheet.shape[0], alpha=True)
     img.pixels = sheet.ravel()
-    img.filepath_raw = f"/tmp/tripo/sheet_{name}.png"; img.file_format = 'PNG'; img.save()
-    print("SHEET", img.filepath_raw, [c[0] for c in CLIPS])
+    img.filepath_raw = os.path.join(out, f"sheet_{name}.png"); img.file_format = 'PNG'; img.save()
+    print("SHEET", img.filepath_raw, [c[0] for c in CLIPS if not sheet_only or c[0] in sheet_only])
