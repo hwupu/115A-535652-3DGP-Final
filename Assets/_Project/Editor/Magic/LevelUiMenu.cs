@@ -16,7 +16,8 @@ namespace Project3DGP.EditorTools
     ///                  ClubPanel: the usable clubs on the right, current one highlighted + sound (#78)
     ///                  Minimap: upper right (#78), from Cameras/Minimap Camera following the ball, with icons for
     ///                  ball, avatar, cup, exit and each object under Gameplay/Hazards (run again after adding hazards)
-    ///   UI/Menus       LevelMenus: pause, save confirm, settings and time-up dialogs
+    ///   UI/Menus       LevelMenus: pause, save confirm, settings and time-up dialogs; the hamster's Defeat above the
+    ///                  time-up dialog (UI/DefeatStage, CharacterStageMenu, #141)
     ///   UI/EventSystem if the scene has none (Input System UI module)
     /// Both connect to the level's ILevelFlow (LevelManager, #27) at Start; until it is in the scene the timer and
     /// strokes stay hidden and the menu does nothing (try it in Magic > Game > Open UI Test Area).
@@ -102,6 +103,7 @@ namespace Project3DGP.EditorTools
                 MagicMenuUtil.Log("Added UI/Menus (pause, save confirm, settings, time-up dialogs)");
                 added++;
             }
+            added += CharacterStageMenu.AddDefeatStage(scene);   // the hamster's Defeat above the time-up dialog (#141)
 
             var eventSystem = GameUiBuilder.EnsureEventSystem(ui.transform);
             if (eventSystem != null)

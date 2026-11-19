@@ -19,6 +19,8 @@ $B -b --factory-startup --python anim.py -- Hamster work out sheet              
 ```
 Same for `Princess princess_hamster` and `Cat sir_grumblepaws`. Copy `out/<Name>.fbx` and `<Name>.blend` (to `Source~`) back. If you change clips, update the clip table in `Editor/Magic/CharacterModelsMenu.cs` and, for an FBX that is already set up, clear its clip list in the Import Settings (or re-run on a fresh FBX) so the tool configures it again.
 
+**Only clips changed (no `src/` needed, any OS):** copy `Source~/<Name>.blend` into an empty `work` folder and run `anim.py -- <Name> work out sheet:Victory,Defeat` (the optional `:Clip,...` limits the contact sheet `out/sheet_<Name>.png` to those clips, 6 frames each). The script rebuilds every clip from the saved blend and skips the texture (the blend keeps no image; the JPG in Unity stays). Windows: `B` = `"C:\Program Files\Blender Foundation\Blender 5.3\blender.exe"`. **New clips** only need a row in the clip table of `CharacterModelsMenu.cs`: *Use Character Models* adds the clips missing from a configured FBX's list (the existing clips keep their Inspector settings) and the missing ending states to an existing controller.
+
 `rig.py`: imports the Tripo FBX, decimates to 15 000 triangles (flat shaded), scales to the game height with the feet at the origin, places the bones from landmarks measured on the mesh (`CONFIGS`: hip, neck, head top, shoulder, foot, tail and ear regions, in height units), skins with Blender's automatic (heat) weights, fills any unweighted vertex from the nearest bone, limits to 4 influences. `anim.py`: keys each clip as poses (rotations in the armature's rest axes), exports.
 
 ## Conventions
@@ -29,7 +31,7 @@ Same for `Princess princess_hamster` and `Cat sir_grumblepaws`. Copy `out/<Name>
 - `ToolSocket` (hamster): made by the Magic tool under `Hand_R`, the tool pointing along the arm.
 
 ## Clips (frames at 24 fps, Blender frame 1 = Unity frame 0)
-**Hamster** (Animator: triggers `Swing` + int `Tool`, `Equip`, `Celebrate`, `Fail`, `Flinch`; float `Speed`; bools `Aiming`, `Walking`)
+**Hamster** (Animator: triggers `Swing` + int `Tool`, `Equip`, `Celebrate`, `Fail`, `Flinch`, `Victory`, `Defeat`; float `Speed`; bools `Aiming`, `Walking`)
 
 | Clip | Frames | Loop | Notes |
 |---|---|---|---|
@@ -43,10 +45,16 @@ Same for `Princess princess_hamster` and `Cat sir_grumblepaws`. Copy `out/<Name>
 | Celebrate | 1–37 | yes | jump, arms up |
 | Fail | 1–24 | no | scared lean back, hands up; holds the last pose |
 | Flinch | 1–12 | no | optional (wind / cat reaction), trigger `Flinch` |
+| Victory | 1–49 | yes | **Ending** (#141): hop + right fist pump (10), hop + left fist pump (24), crouch, big jump with both arms up (39); trigger `Victory` |
+| Defeat | 1–30 | no | **time-up dialog** (#141): shock (5–11), knees give way (16), plops down sitting, head hung (21–30); trigger `Defeat`, then DefeatLoop |
+| DefeatLoop | 1–49 | yes | sitting slumped, sobbing (4 per loop), slow head shake |
 
 The ball leaves on the click (ShotController); the clip's impact frame is 0.33–0.63 s later. `GolferAvatar.SwingImpact` fires on that frame for hit sounds / effects.
+The arms are short and the head is wide: a paw raised straight up hides behind the head, so the fist pumps raise the arm sideways and bend the forearm up.
 
-**Princess** (triggers `Wave`, `Cheer`; bool `Scared`; float `Speed`): Idle 1–73 loop (sway, tail) · Walk 1–17 loop · Wave 1–56 once · Cheer 1–37 loop · Scared 1–25 loop (trembling, hands to face). No game code drives her yet.
+**Princess** (triggers `Wave`, `Cheer`, `Victory`; bool `Scared`; float `Speed`): Idle 1–73 loop (sway, tail) · Walk 1–17 loop · Wave 1–56 once · Cheer 1–37 loop · Scared 1–25 loop (trembling, hands to face) · Victory 1–49 loop (**Ending**, #141: paws up in a V waving, four little bounces, sways side to side, tail wagging; her hands cannot meet, so no clapping). Only the Ending stage drives her.
+
+**Ending and time-up dialog (#141):** `UI/CharacterStageView` on a RawImage shows an off-screen stage (prefab instances of `Characters/Hamster` / `Princess`, a key light and a camera 500 m below the scene, rendering into `UI/Stages/*.renderTexture`). While the RawImage is active the stage is too; each actor's Animator is rebound and gets its trigger (`Victory` / `Defeat`). The Animators use unscaled time. *Magic > Scenes > Add Ending Victory Stage* and *Magic > Level > Add Time-Up Defeat Stage* (also run by *Add HUD and Menus*) build them.
 
 **Cat** (int `State` = `CatState`, set by `GardenCat`; 0.4 s blends): Asleep 1–97 (sitting, head drooped, slow breathing) · Twitching 1–49 (sitting, ear flicks, tail swish) · Suspicious 1–97 (sitting up, looks left / right) · Searching 1–97 (standing, crouched, scanning) · Awake 1–49 (standing, paws raised and shaking, tail up). All loop. `GardenCat` adds a head turn toward the ball while searching / awake.
 

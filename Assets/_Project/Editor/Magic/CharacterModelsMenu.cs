@@ -14,17 +14,20 @@ namespace Project3DGP.EditorTools
     /// (Blender scripts in Art/Characters/BlenderScripts~) replace the placeholder looks. For each of Hamster,
     /// Princess and Cat, only what is missing:
     ///   1. FBX import settings: Generic rig, axis conversion baked, clips named and looped, swing impact events
-    ///      (only while the FBX has no clip list yet, so later Inspector tweaks stay).
+    ///      (only while the FBX has no clip list yet, so later Inspector tweaks stay; after that only the clips
+    ///      missing from the list are added, e.g. the ending clips of #141).
     ///   2. Material  Art/Characters/X/X.mat (URP Lit, the base colour texture).
-    ///   3. Animator controller  Art/Characters/X/X.controller (states and parameters below).
+    ///   3. Animator controller  Art/Characters/X/X.controller (states and parameters below). An existing controller
+    ///      only gets the ending states it is missing (#141).
     ///   4. Prefabs/Characters/X.prefab: the placeholder "Visual" child is replaced by the model, named "Visual",
     ///      with the Animator using the controller. Hamster: a "ToolSocket" in the right hand and a SwingImpactRelay.
     ///      Cat: the box collider is fitted to the new body. Prefabs already using the model are skipped.
     ///   5. Club profiles: Sledgehammer swings like a hammer, Mysterious taps (only if still the default).
     /// GolferAvatar (a variant of Hamster) and every placed cat follow the prefabs. No scene is touched.
     ///   Hamster  Idle, Walk (Speed), AimIdle (Aiming), Swing_Club / Swing_Hammer / Swing_Mysterious (trigger Swing +
-    ///            int Tool = ClubProfile.Swing), Equip, Celebrate, Fail, Flinch (triggers); bool Walking (WalkTo)
-    ///   Princess Idle, Walk (Speed), Wave, Cheer (triggers), Scared (bool)
+    ///            int Tool = ClubProfile.Swing), Equip, Celebrate, Fail, Flinch (triggers); bool Walking (WalkTo);
+    ///            ending (#141, CharacterStageView): Victory (loops), Defeat (once, then DefeatLoop) (triggers, Any State)
+    ///   Princess Idle, Walk (Speed), Wave, Cheer (triggers), Scared (bool); ending: Victory (loops, trigger, Any State)
     ///   Cat      Asleep, Twitching, Suspicious, Searching, Awake (int State = CatState)
     /// </summary>
     public static class CharacterModelsMenu
@@ -46,9 +49,13 @@ namespace Project3DGP.EditorTools
                 new Clip("Idle", true), new Clip("Walk", true), new Clip("AimIdle", true), new Clip("Celebrate", true),
                 new Clip("Swing_Club", false, "OnSwingImpact", 10), new Clip("Swing_Hammer", false, "OnSwingImpact", 16),
                 new Clip("Swing_Mysterious", false, "OnSwingImpact", 9), new Clip("Equip", false), new Clip("Fail", false),
-                new Clip("Flinch", false),
+                new Clip("Flinch", false), new Clip("Victory", true), new Clip("Defeat", false), new Clip("DefeatLoop", true),
             },
-            ["Princess"] = new[] { new Clip("Idle", true), new Clip("Walk", true), new Clip("Wave", false), new Clip("Cheer", true), new Clip("Scared", true) },
+            ["Princess"] = new[]
+            {
+                new Clip("Idle", true), new Clip("Walk", true), new Clip("Wave", false), new Clip("Cheer", true), new Clip("Scared", true),
+                new Clip("Victory", true),
+            },
             ["Cat"] = new[] { new Clip("Asleep", true), new Clip("Twitching", true), new Clip("Suspicious", true), new Clip("Searching", true), new Clip("Awake", true) },
         };
 
@@ -84,7 +91,7 @@ namespace Project3DGP.EditorTools
             var importer = (ModelImporter)AssetImporter.GetAtPath(fbxPath);
             if (importer.clipAnimations.Length > 0)
             {
-                MagicMenuUtil.Log($"Skipped (configured) import settings of {fbxPath}");
+                AddMissingClips(name, fbxPath, importer);
                 return;
             }
             importer.globalScale = 1f;
@@ -99,27 +106,46 @@ namespace Project3DGP.EditorTools
             importer.AddRemap(new AssetImporter.SourceAssetIdentifier(typeof(Material), name + "_Mat"), material);
             importer.SaveAndReimport();   // the takes are known only after an import with animation on
 
-            var table = Clips[name].ToDictionary(c => c.Name);
-            var clips = new List<ModelImporterClipAnimation>();
-            foreach (var take in importer.defaultClipAnimations)
-            {
-                // Blender names the takes "<Rig>|<Action>".
-                var clipName = take.takeName.Contains('|') ? take.takeName.Substring(take.takeName.LastIndexOf('|') + 1) : take.takeName;
-                take.name = clipName;
-                if (table.TryGetValue(clipName, out var spec))
-                {
-                    take.loopTime = spec.Loop;
-                    if (spec.Event != null)
-                    {
-                        var length = Mathf.Max(1f, take.lastFrame - take.firstFrame);
-                        take.events = new[] { new AnimationEvent { functionName = spec.Event, time = Mathf.Clamp01((spec.EventFrame - 1 - take.firstFrame) / length) } };
-                    }
-                }
-                clips.Add(take);
-            }
+            var clips = importer.defaultClipAnimations.Select(take => ConfigureTake(name, take)).ToList();
             importer.clipAnimations = clips.ToArray();
             importer.SaveAndReimport();
             MagicMenuUtil.Log($"Import settings of {fbxPath}: Generic rig, {clips.Count} clips ({string.Join(", ", clips.Select(c => c.name))})");
+        }
+
+        // A configured FBX re-exported with new clips (#141): append the takes of the clip table that its list lacks.
+        static void AddMissingClips(string name, string fbxPath, ModelImporter importer)
+        {
+            var have = new HashSet<string>(importer.clipAnimations.Select(c => c.name));
+            var table = Clips[name].Select(c => c.Name).ToHashSet();
+            var added = importer.defaultClipAnimations.Where(t => table.Contains(TakeClipName(t)) && !have.Contains(TakeClipName(t)))
+                .Select(t => ConfigureTake(name, t)).ToList();
+            if (added.Count == 0)
+            {
+                MagicMenuUtil.Log($"Skipped (configured) import settings of {fbxPath}");
+                return;
+            }
+            importer.clipAnimations = importer.clipAnimations.Concat(added).ToArray();
+            importer.SaveAndReimport();
+            MagicMenuUtil.Log($"Import settings of {fbxPath}: added clips {string.Join(", ", added.Select(c => c.name))}");
+        }
+
+        // Blender names the takes "<Rig>|<Action>".
+        static string TakeClipName(ModelImporterClipAnimation take) =>
+            take.takeName.Contains('|') ? take.takeName.Substring(take.takeName.LastIndexOf('|') + 1) : take.takeName;
+
+        static ModelImporterClipAnimation ConfigureTake(string name, ModelImporterClipAnimation take)
+        {
+            take.name = TakeClipName(take);
+            var spec = Clips[name].FirstOrDefault(c => c.Name == take.name);
+            if (spec == null)
+                return take;
+            take.loopTime = spec.Loop;
+            if (spec.Event != null)
+            {
+                var length = Mathf.Max(1f, take.lastFrame - take.firstFrame);
+                take.events = new[] { new AnimationEvent { functionName = spec.Event, time = Mathf.Clamp01((spec.EventFrame - 1 - take.firstFrame) / length) } };
+            }
+            return take;
         }
 
         // ---------- 2. material ----------
@@ -150,11 +176,14 @@ namespace Project3DGP.EditorTools
         static AnimatorController EnsureController(string name)
         {
             var path = $"{ArtFolder}/{name}/{name}.controller";
-            var existing = AssetDatabase.LoadAssetAtPath<AnimatorController>(path);
-            if (existing != null)
-                return existing;
             var clips = AssetDatabase.LoadAllAssetsAtPath($"{ArtFolder}/{name}/{name}.fbx").OfType<AnimationClip>()
                 .Where(c => !c.name.StartsWith("__preview__")).ToDictionary(c => c.name);
+            var existing = AssetDatabase.LoadAssetAtPath<AnimatorController>(path);
+            if (existing != null)
+            {
+                AddEndingStates(existing, name, clips);
+                return existing;
+            }
             var controller = AnimatorController.CreateAnimatorControllerAtPath(path);
             var sm = controller.layers[0].stateMachine;
             AnimatorState State(string clip, Vector2 at)
@@ -175,7 +204,48 @@ namespace Project3DGP.EditorTools
             }
             EditorUtility.SetDirty(controller);
             MagicMenuUtil.Log("Created " + path);
+            AddEndingStates(controller, name, clips);
             return controller;
+        }
+
+        // Ending (#141), played by CharacterStageView: Any State -> the clip on its trigger; Defeat goes on to DefeatLoop.
+        static readonly Dictionary<string, (string Trigger, string Then)[]> EndingStates = new()
+        {
+            ["Hamster"] = new[] { ("Victory", (string)null), ("Defeat", "DefeatLoop") },
+            ["Princess"] = new[] { ("Victory", (string)null) },
+        };
+
+        static void AddEndingStates(AnimatorController c, string name, Dictionary<string, AnimationClip> clips)
+        {
+            if (!EndingStates.TryGetValue(name, out var specs))
+                return;
+            var sm = c.layers[0].stateMachine;
+            for (var i = 0; i < specs.Length; i++)
+            {
+                var (trigger, then) = specs[i];
+                if (sm.states.Any(s => s.state.name == trigger))
+                    continue;
+                if (!clips.TryGetValue(trigger, out var clip) || (then != null && !clips.ContainsKey(then)))
+                {
+                    MagicMenuUtil.Log($"{name}: no clip {trigger}{(then != null ? " / " + then : "")} in the FBX (export it with BlenderScripts~/anim.py)");
+                    continue;
+                }
+                if (c.parameters.All(p => p.name != trigger))
+                    c.AddParameter(trigger, AnimatorControllerParameterType.Trigger);
+                var state = sm.AddState(trigger, new Vector3(1200f, i * 100f, 0f));
+                state.motion = clip;
+                var t = sm.AddAnyStateTransition(state);
+                Setup(t, 0.15f, (AnimatorConditionMode.If, trigger, 0f));
+                t.canTransitionToSelf = false;
+                if (then != null)
+                {
+                    var next = sm.AddState(then, new Vector3(1450f, i * 100f, 0f));
+                    next.motion = clips[then];
+                    ExitTo(state, next);
+                }
+                EditorUtility.SetDirty(c);
+                MagicMenuUtil.Log($"{name}.controller: added the {trigger} state{(then != null ? " (then " + then + ")" : "")}, trigger {trigger}");
+            }
         }
 
         delegate AnimatorState StateMaker(string clip, Vector2 at);
