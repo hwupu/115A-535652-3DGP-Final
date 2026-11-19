@@ -94,6 +94,7 @@ public enum ShotPhase { Aiming, InFlight }
     public float LaunchPitch;          // fixed launch angle (no pitch control in MVP)
     public GameObject ToolPrefab;      // what the avatar holds
     public SwingStyle Swing;           // which swing clip: Club, Hammer, Tap (#36)
+    public Sprite Icon;                // HUD club card picture; empty = coloured square
 }
 
 public readonly struct ShotInfo

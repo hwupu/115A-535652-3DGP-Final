@@ -18,5 +18,6 @@ MonoBehaviour:
   AimConeDegrees: 10
   MarkerCycleSeconds: 1.6
   LaunchPitch: 25
-  Noise: 0.3
   ToolPrefab: {fileID: 3651444966866723572, guid: 16cf99d6f4442441b8fe2a16a196fd1d, type: 3}
+  Swing: 0
+  Icon: {fileID: 21300000, guid: 44ed6578961675e438ec40d15e7e7ee2, type: 3}

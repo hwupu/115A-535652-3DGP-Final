@@ -36,6 +36,22 @@ namespace Project3DGP.Core.UI
             if (icon != null) icon.color = iconColor;
         }
 
+        /// <summary>
+        /// Same, with a picture: an icon Image shows <paramref name="sprite"/> in its own colours (aspect kept).
+        /// No sprite (or the icon isn't an Image) = the plain <paramref name="fallbackColor"/> square.
+        /// </summary>
+        public void SetContent(string titleText, string detailsText, Sprite sprite, Color fallbackColor)
+        {
+            SetContent(titleText, detailsText, sprite != null ? Color.white : fallbackColor);
+            if (icon is Image image)
+            {
+                image.sprite = sprite;
+                image.preserveAspect = sprite != null;
+            }
+            else if (sprite != null && icon != null)
+                icon.color = fallbackColor;
+        }
+
         public void SetSelected(bool selected)
         {
             // Highlight = yellow frame + slightly bigger. The scale change is animated in Update.

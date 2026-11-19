@@ -20,3 +20,4 @@ MonoBehaviour:
   LaunchPitch: 20
   ToolPrefab: {fileID: 3732620834592174636, guid: ffc34b854d8644ab9ae8291c3db5da24, type: 3}
   Swing: 1
+  Icon: {fileID: 21300000, guid: 4a6f25085fab77942b995bcce3652c53, type: 3}

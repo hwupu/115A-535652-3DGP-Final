@@ -129,13 +129,27 @@ namespace Project3DGP.EditorTools
             return view;
         }
 
+        // Upper-right column (#78): the minimap under the menu button, the club cards right under the minimap.
+        // Both anchor to the top right, so they never overlap whatever the screen's aspect ratio.
+        const float RightMargin = 40f, MinimapTop = 110f, MinimapSize = 280f, ColumnGap = 16f;
+        public const float ClubCardWidth = 280f, ClubCardHeight = 90f, ClubCardGap = 12f;
+        public const string GameTitle = "Hole in One for Her Heart";
+
+        /// <summary>Puts the club panel (<paramref name="count"/> cards) under the minimap, upper right.</summary>
+        public static void PlaceClubPanel(RectTransform panel, int count)
+        {
+            var height = count * ClubCardHeight + (count - 1) * ClubCardGap;
+            Place(panel, new Vector2(1f, 1f), new Vector2(-RightMargin, -(MinimapTop + MinimapSize + ColumnGap)),
+                new Vector2(ClubCardWidth, height));
+        }
+
         /// <summary>
         /// The minimap frame (#78), upper right under the menu button: a RawImage showing the minimap camera's texture.
         /// Returns the frame (a "Minimap" child of the canvas; register Undo for it).
         /// </summary>
         public static GameObject BuildMinimapFrame(GameObject canvas, Texture texture)
         {
-            var frame = NewRect("Minimap", canvas.transform, new Vector2(1f, 1f), new Vector2(-40f, -110f), new Vector2(280f, 280f));
+            var frame = NewRect("Minimap", canvas.transform, new Vector2(1f, 1f), new Vector2(-RightMargin, -MinimapTop), new Vector2(MinimapSize, MinimapSize));
             var border = frame.gameObject.AddComponent<Image>();
             border.color = new Color(1f, 1f, 1f, 0.8f);
             border.raycastTarget = false;
@@ -146,14 +160,14 @@ namespace Project3DGP.EditorTools
         }
 
         /// <summary>
-        /// The club cards (#78), right side, centred: one card per club slot (<paramref name="count"/>), with the
+        /// The club cards (#78), upper right under the minimap: one card per club slot (<paramref name="count"/>), with the
         /// select sound. Returns the ClubPanelView (on a "ClubPanel" child of the canvas; register Undo for it).
         /// </summary>
         public static ClubPanelView BuildClubPanel(GameObject canvas, int count, AudioClip selectSound)
         {
-            const float cardWidth = 280f, cardHeight = 90f, gap = 12f;
-            var height = count * cardHeight + (count - 1) * gap;
-            var root = NewRect("ClubPanel", canvas.transform, new Vector2(1f, 0.5f), new Vector2(-40f, -50f), new Vector2(cardWidth, height));
+            var root = new GameObject("ClubPanel", typeof(RectTransform)).GetComponent<RectTransform>();
+            root.SetParent(canvas.transform, false);
+            PlaceClubPanel(root, count);
             var audio = root.gameObject.AddComponent<AudioSource>();
             audio.playOnAwake = false;
             var view = root.gameObject.AddComponent<ClubPanelView>();
@@ -163,7 +177,7 @@ namespace Project3DGP.EditorTools
             list.arraySize = count;
             for (var i = 0; i < count; i++)
             {
-                var card = ClubCard(root, i, new Vector2(0f, -i * (cardHeight + gap)), new Vector2(cardWidth, cardHeight));
+                var card = ClubCard(root, i, new Vector2(0f, -i * (ClubCardHeight + ClubCardGap)), new Vector2(ClubCardWidth, ClubCardHeight));
                 list.GetArrayElementAtIndex(i).objectReferenceValue = card;
             }
             so.FindProperty("audioSource").objectReferenceValue = audio;
@@ -181,7 +195,8 @@ namespace Project3DGP.EditorTools
             var background = Stretch("Background", frame, 4f).gameObject.AddComponent<Image>();
             background.color = new Color(0.08f, 0.08f, 0.12f, 0.9f);
             background.raycastTarget = false;
-            var icon = NewRect("Icon", frame, new Vector2(0f, 0.5f), new Vector2(14f, 0f), new Vector2(48f, 48f)).gameObject.AddComponent<Image>();
+            var icon = NewRect("Icon", frame, new Vector2(0f, 0.5f), new Vector2(10f, 0f), new Vector2(60f, 60f)).gameObject.AddComponent<Image>();
+            icon.preserveAspect = true;   // club pictures (ClubProfile.Icon) keep their shape
             icon.raycastTarget = false;
             var title = Label("Title", frame, "Club", 24, TextAnchor.UpperLeft);
             Place(title.rectTransform, new Vector2(0f, 1f), new Vector2(76f, -10f), new Vector2(196f, 30f));
@@ -275,8 +290,9 @@ namespace Project3DGP.EditorTools
         {
             var canvas = NewCanvas("MainMenu", 0);
             Background(canvas.transform, new Color(0.35f, 0.6f, 0.4f));
-            var title = Label("Title", canvas.transform, "Hamster Golf", 96, TextAnchor.MiddleCenter);   // the game title is TBD
+            var title = Label("Title", canvas.transform, GameTitle, 96, TextAnchor.MiddleCenter);
             Place(title.rectTransform, new Vector2(0.5f, 1f), new Vector2(0f, -80f), new Vector2(1400f, 160f));
+            ApplyMainMenuArt(canvas.transform);
 
             var view = canvas.AddComponent<MainMenuView>();
             var menu = Dialog(canvas.transform, "Menu", "", out var box,
@@ -350,6 +366,87 @@ namespace Project3DGP.EditorTools
             EditorUtility.SetDirty(story);
             panel.gameObject.SetActive(false);
             return story;
+        }
+
+        public const string MainMenuBackgroundPath = "Assets/_Project/UI/MainMenu/MainMenu_Background.jpg";
+        public const string MainMenuTitlePath = "Assets/_Project/UI/MainMenu/Title.png";
+
+        /// <summary>
+        /// Main menu art (Henry, 2026-11-19) on a main menu canvas: the painted garden fills the "Background" (stretched
+        /// to the screen; it is 16:9) and the lettered title picture ("TitleImage", on the "Title" text's rect) replaces the text,
+        /// which is switched off, not deleted. Each part only if it isn't there yet; returns how many it changed.
+        /// Undo-recorded when called from a menu.
+        /// </summary>
+        public static int ApplyMainMenuArt(Transform canvas)
+        {
+            var changed = 0;
+            var backgroundSprite = ImportSprite(MainMenuBackgroundPath);
+            var background = canvas.Find("Background");
+            var backgroundRect = background as RectTransform;
+            if (backgroundSprite != null && backgroundRect != null && background.TryGetComponent(out Image backgroundImage)
+                && (backgroundImage.sprite != backgroundSprite || backgroundRect.anchorMax != Vector2.one
+                    || background.GetComponent<AspectRatioFitter>() != null))
+            {
+                Undo.RecordObject(backgroundImage, "Main Menu Background");
+                backgroundImage.sprite = backgroundSprite;
+                backgroundImage.color = Color.white;
+                backgroundImage.preserveAspect = false;
+                // Stretched over the whole screen. The painting is 16:9, so a 16:9 screen shows it undistorted.
+                // (An AspectRatioFitter crop leaves the saved rect at size 0 until it re-runs: a blank menu in edit mode.)
+                if (background.TryGetComponent(out AspectRatioFitter fitter))
+                    Undo.DestroyObjectImmediate(fitter);
+                Undo.RecordObject(backgroundRect, "Main Menu Background");
+                backgroundRect.anchorMin = Vector2.zero;
+                backgroundRect.anchorMax = Vector2.one;
+                backgroundRect.anchoredPosition = Vector2.zero;
+                backgroundRect.sizeDelta = Vector2.zero;
+                MagicMenuUtil.Log($"Main menu background = {MainMenuBackgroundPath}, stretched to the screen");
+                changed++;
+            }
+
+            var titleSprite = ImportSprite(MainMenuTitlePath);
+            var title = canvas.Find("Title");
+            if (titleSprite != null && title != null && canvas.Find("TitleImage") == null)
+            {
+                var rect = NewRect("TitleImage", canvas, Vector2.zero, Vector2.zero, Vector2.zero);
+                var source = (RectTransform)title;
+                rect.anchorMin = source.anchorMin;
+                rect.anchorMax = source.anchorMax;
+                rect.pivot = source.pivot;
+                rect.anchoredPosition = source.anchoredPosition;
+                rect.sizeDelta = source.sizeDelta;
+                rect.SetSiblingIndex(title.GetSiblingIndex() + 1);
+                var image = rect.gameObject.AddComponent<Image>();
+                image.sprite = titleSprite;
+                image.preserveAspect = true;
+                image.raycastTarget = false;
+                Undo.RegisterCreatedObjectUndo(rect.gameObject, "Main Menu Title Image");
+                Undo.RecordObject(title.gameObject, "Hide Title Text");
+                title.gameObject.SetActive(false);   // kept: Apply Game Title still updates it
+                MagicMenuUtil.Log($"Main menu title picture = {MainMenuTitlePath} (the Title text is switched off)");
+                changed++;
+            }
+            return changed;
+        }
+
+        // A UI picture: imported as a single sprite, no mipmaps, transparency kept.
+        static Sprite ImportSprite(string path)
+        {
+            if (AssetImporter.GetAtPath(path) is not TextureImporter importer)
+            {
+                MagicMenuUtil.Log($"Missing {path}");
+                return null;
+            }
+            if (importer.textureType != TextureImporterType.Sprite)
+            {
+                importer.textureType = TextureImporterType.Sprite;
+                importer.spriteImportMode = SpriteImportMode.Single;
+                importer.mipmapEnabled = false;
+                importer.alphaIsTransparency = true;
+                importer.SaveAndReimport();
+                MagicMenuUtil.Log($"{path}: imported as a sprite");
+            }
+            return AssetDatabase.LoadAssetAtPath<Sprite>(path);
         }
 
         static void Background(Transform canvas, Color color)

@@ -19,7 +19,7 @@ namespace Project3DGP.EditorTools
         static readonly (string Name, string Prefab, string Parent, Vector3 Position, float Yaw, Vector3 Scale)[] Layout =
         {
             ("Cup", "Course/Cup", "Gameplay/Goal", new Vector3(18f, 0f, 18f), 0f, Vector3.one),
-            ("Gate", "Course/Gate", "Gameplay", new Vector3(18f, 0f, 22.5f), 0f, Vector3.one),
+            ("Gate", "Course/Gate", "Gameplay", new Vector3(18f, 0f, 25.44f), 0f, Vector3.one),
             ("Pond", "Course/Pond", "Gameplay/InvalidZones", new Vector3(8f, 0.02f, 12f), 0f, new Vector3(0.6f, 1f, 0.5f)),
             ("Cat", "Characters/Cat", "Gameplay/Hazards", new Vector3(-2f, 0f, 6f), 200f, Vector3.one),
 

@@ -9,7 +9,8 @@ Models we make ourselves (Blender). Each counts for Form B "Art work" (>= 1 per 
 | Hamster hero | `Characters/Hamster/` | `Prefabs/Characters/Hamster.prefab` | Henry |
 | Hamster princess | `Characters/Princess/` | `Prefabs/Characters/Princess.prefab` | Henry |
 | Sir Grumblepaws (cat) | `Characters/Cat/` | `Prefabs/Characters/Cat.prefab` | Henry |
-| Standard club, Sledgehammer, Mysterious | `Tools/` | `Prefabs/Tools/*.prefab` | Henry |
+
+> **Tools and golf ball (2026-11-19):** all three tools and the ball are Sketchfab models (third-party, credited in `docs/assets.md`), not hand-made, so they don't count for the table above. `Tools/BlenderScripts~/golf_club_and_ball.py` splits "Golf Club and Ball" into `Tools/StandardClub/` and `Ball/`; `tool_models.py` makes `Tools/Sledgehammer/` and `Tools/Mysterious/` (the wand only); `tool_icons.py` renders the club card icons into `UI/ClubIcons/`. *Magic > Prefabs > Use Tool and Ball Models* swaps them into `Prefabs/Tools/*.prefab` and `Prefabs/Shared/GolfBall.prefab`.
 
 ## Files
 - **Unity files** (in the model's folder): `Hamster.fbx`, textures as `.png`. Both go through Git LFS automatically.
