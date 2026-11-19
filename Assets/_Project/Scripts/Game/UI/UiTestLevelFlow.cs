@@ -14,7 +14,7 @@ namespace Project3DGP.Game.UI
     /// #18, #27). The timer runs down from totalSeconds; S = a shot (+1 stroke, costs shotCost seconds),
     /// F = time up now, X = 40 XP (GameSession, for the XP bar, #78). It never loads scenes (Retry resets, Main menu only logs). Not for level scenes.
     /// </summary>
-    public class UiTestLevelFlow : MonoBehaviour, ILevelFlow, IDangerTimer, IStrokeCounter
+    public class UiTestLevelFlow : MonoBehaviour, ILevelFlow, IDangerTimer, IStrokeCounter, ILevelCheats
     {
         [SerializeField] float totalSeconds = 60f;
         [SerializeField] float shotCost = 5f;
@@ -82,6 +82,9 @@ namespace Project3DGP.Game.UI
         }
 
         /// <summary>Sets the time left; updates the stage, and fails the level at 0.</summary>
+        /// <summary>GodKeys F6 (#143): same as F here.</summary>
+        public void ForceFail() => SetRemaining(0f);
+
         public void SetRemaining(float seconds)
         {
             if (Phase != LevelPhase.Playing)

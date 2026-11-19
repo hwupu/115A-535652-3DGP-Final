@@ -33,6 +33,7 @@ namespace Project3DGP.Game.Player
         GameObject _tool;            // the instantiated ToolPrefab in the hand
         Animator _animator;          // from the Blender model, once it exists (#36)
         Transform _visual, _shoulder;
+        Quaternion _visualRotation = Quaternion.identity;   // the model's own turn (Use Character Models turns it 180°)
         Coroutine _fallback;         // the running code animation, if any
         Coroutine _walk;             // the running WalkTo, if any
         Vector3 _ballPosition;       // from the last TeleportTo: FaceYaw walks around this point
@@ -53,6 +54,8 @@ namespace Project3DGP.Game.Player
         void Awake()
         {
             _visual = transform.Find("Visual");
+            if (_visual != null)
+                _visualRotation = _visual.localRotation;
             _animator = GetComponentInChildren<Animator>();
             if (toolSocket == null)
                 toolSocket = FindDeep(transform, "ToolSocket");
@@ -228,7 +231,7 @@ namespace Project3DGP.Game.Player
             if (_shoulder != null)
                 _shoulder.localRotation = Quaternion.identity;
             if (_visual != null)
-                _visual.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+                _visual.SetLocalPositionAndRotation(Vector3.zero, _visualRotation);
         }
 
         // Shoulder back (slow), through (fast), then back to rest: same idea as mini-exercise 4.A.1, about the
@@ -273,7 +276,7 @@ namespace Project3DGP.Game.Player
                 yield break;
             for (var t = 0f; t < 0.4f; t += Time.deltaTime)
             {
-                _visual.localRotation = Quaternion.Euler(Mathf.Lerp(0f, -20f, t / 0.4f), 0f, 0f);
+                _visual.localRotation = _visualRotation * Quaternion.Euler(Mathf.Lerp(0f, -20f, t / 0.4f), 0f, 0f);
                 yield return null;
             }
         }

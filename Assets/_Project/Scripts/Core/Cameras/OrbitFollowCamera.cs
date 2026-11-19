@@ -18,6 +18,9 @@ namespace Project3DGP.Core.Cameras
         [SerializeField] float mouseSensitivity = 0.2f;
         [SerializeField] float zoomSensitivity = 0.01f;
 
+        /// <summary>What the camera orbits and follows (e.g. switch from the ball to the player).</summary>
+        public Transform Target { get => target; set => target = value; }
+
         // LateUpdate runs after every Update, so the target has already moved this frame -> no jitter.
         void LateUpdate()
         {
