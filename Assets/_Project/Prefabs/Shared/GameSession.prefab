@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3531659467399244475}
   - component: {fileID: 4737706907476477379}
+  - component: {fileID: 3496206831079635564}
   m_Layer: 0
   m_Name: GameSession
   m_TagString: Untagged
@@ -66,3 +67,18 @@ MonoBehaviour:
     Skill: {fileID: 11400000, guid: 7ea24797ef5f1458fb1e6b17f39e89da, type: 2}
   xpPerLevelFinished: 100
   xpPerSecondLeft: 1
+--- !u!114 &3496206831079635564
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1397490973314178574}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd294018fd13aa54ba21627d74a07068, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project3DGP.Game::Project3DGP.Game.Flow.GodKeys
+  goalKey: 98
+  timeUpKey: 99
+  victoryKey: 100

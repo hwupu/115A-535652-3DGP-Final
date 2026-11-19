@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Project3DGP.Core.Motion;
 using UnityEngine;
 
@@ -40,6 +41,8 @@ namespace Project3DGP.Game.Golf
         float _lastSampleTime = float.NegativeInfinity;
         Vector3 _lastRestPosition;    // where the ball last stopped: always safe, the fallback
         int _invalidZonesInside;      // InvalidZone triggers we are in right now
+        bool _scripted;               // FlyTo: moved by script, physics checks off
+        Coroutine _flight;
 
         public Vector3 Position => transform.position;
         public Vector3 Velocity => IsAtRest ? Vector3.zero : _body.linearVelocity;
@@ -72,6 +75,7 @@ namespace Project3DGP.Game.Golf
         /// <summary>Shoots the ball with this velocity (m/s). Called by ShotController only.</summary>
         public void Hit(Vector3 velocity)
         {
+            CancelFlight();
             IsAtRest = false;
             _body.isKinematic = false;
             // Continuous collision: a fast ball can't tunnel through a thin wall between two physics steps.
@@ -80,6 +84,39 @@ namespace Project3DGP.Game.Golf
             _body.linearVelocity = velocity;
             rest.Begin();
             Launched?.Invoke();
+        }
+
+        /// <summary>
+        /// Scripted shot (GodKeys F5 demo, #143; called by ShotController.TakeScriptedShot): after delay seconds the
+        /// ball flies a parabola (apex metres above the straight line) to target in seconds, with no physics
+        /// (nothing in the way, no zones), lands exactly there and stops (CameToRest), then landed is called.
+        /// </summary>
+        public void FlyTo(Vector3 target, float delay, float seconds, float apex, Action landed = null)
+        {
+            if (_flight != null)
+                StopCoroutine(_flight);
+            Freeze();
+            IsAtRest = false;
+            _scripted = true;
+            _flight = StartCoroutine(Fly(transform.position, target, delay, Mathf.Max(0.1f, seconds), apex, landed));
+        }
+
+        IEnumerator Fly(Vector3 from, Vector3 to, float delay, float seconds, float apex, Action landed)
+        {
+            if (delay > 0f)
+                yield return new WaitForSeconds(delay);
+            Launched?.Invoke();
+            for (var t = 0f; t < seconds; t += Time.fixedDeltaTime)
+            {
+                var k = t / seconds;
+                _body.MovePosition(Vector3.Lerp(from, to, k) + Vector3.up * (4f * apex * k * (1f - k)));
+                yield return new WaitForFixedUpdate();
+            }
+            _body.position = to;
+            transform.position = to;
+            _flight = null;
+            Stop();
+            landed?.Invoke();
         }
 
         /// <summary>Extra force from the level: wind (Desert), ice, traps. Ignored at rest (PO).</summary>
@@ -100,7 +137,7 @@ namespace Project3DGP.Game.Golf
 
         void FixedUpdate()
         {
-            if (IsAtRest)
+            if (IsAtRest || _scripted)
                 return;
 
             if (_body.position.y < killHeight)
@@ -115,12 +152,21 @@ namespace Project3DGP.Game.Golf
 
         void Stop()
         {
+            CancelFlight();
             Freeze();
             IsAtRest = true;
             _invalidZonesInside = 0;
             _lastRestPosition = transform.position;
             _historyCount = 0;   // the stop position is the new fallback; start a fresh history
             CameToRest?.Invoke();
+        }
+
+        void CancelFlight()
+        {
+            if (_flight != null)
+                StopCoroutine(_flight);
+            _flight = null;
+            _scripted = false;
         }
 
         // Kinematic = physics no longer moves it (no rolling away, no wind) until the next Hit.
@@ -143,7 +189,7 @@ namespace Project3DGP.Game.Golf
 
         void OnCollisionEnter(Collision collision)
         {
-            if (!IsAtRest)
+            if (!IsAtRest && !_scripted)
                 Collided?.Invoke(collision);
         }
 
@@ -151,7 +197,7 @@ namespace Project3DGP.Game.Golf
         // every 0.1 s in a small ring buffer (the oldest sample is overwritten).
         void OnCollisionStay(Collision collision)
         {
-            if (IsAtRest || _invalidZonesInside > 0 || Time.time - _lastSampleTime < SampleInterval)
+            if (IsAtRest || _scripted || _invalidZonesInside > 0 || Time.time - _lastSampleTime < SampleInterval)
                 return;
             for (var i = 0; i < collision.contactCount; i++)
             {
@@ -182,7 +228,7 @@ namespace Project3DGP.Game.Golf
 
         void OnTriggerEnter(Collider other)
         {
-            if (IsAtRest || !other.TryGetComponent<InvalidZone>(out _))
+            if (IsAtRest || _scripted || !other.TryGetComponent<InvalidZone>(out _))
                 return;
             _invalidZonesInside++;
             GoOutOfBounds();

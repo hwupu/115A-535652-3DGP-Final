@@ -101,7 +101,8 @@ namespace Project3DGP.Game.Golf
 
         void Update()
         {
-            _marker.Tick(Time.deltaTime);
+            if (InputEnabled)   // input off (walking to the exit, game over, demo shot): the meter waits
+                _marker.Tick(Time.deltaTime);
             // Read here, not in OnShoot: the Input System UI module can't answer during input callbacks.
             _pointerOverUi = EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
         }
@@ -149,6 +150,32 @@ namespace Project3DGP.Game.Golf
             SetPhase(ShotPhase.InFlight);
             ball.Hit(velocity);
             ShotTaken?.Invoke(new ShotInfo(CurrentClub, aimYaw, power, velocity));
+        }
+
+        /// <summary>
+        /// Dev cheat (GodKeys F5 demo, #143): a perfect shot into target with the current club. Same events as a
+        /// click (ShotTaken: swing, sound, stroke); the ball leaves after launchDelay (the swing's impact) and flies a
+        /// scripted arc (GolfBall.FlyTo), then comes to rest there and landed is called. Ignores InputEnabled.
+        /// False if no shot is possible now (ball moving, no club).
+        /// </summary>
+        public bool TakeScriptedShot(Vector3 target, float launchDelay, Action landed = null)
+        {
+            if (Phase != ShotPhase.Aiming || !ball.IsAtRest || CurrentClub == null)
+                return false;
+            var from = ball.Position;
+            var flat = target - from;
+            flat.y = 0f;
+            var distance = flat.magnitude;
+            var seconds = Mathf.Clamp(distance / 12f, 0.8f, 3.5f);   // about 12 m/s across the ground
+            var apex = Mathf.Clamp(distance * 0.3f, 1.5f, 12f);
+            var aimYaw = Mathf.Atan2(flat.x, flat.z) * Mathf.Rad2Deg;
+            var velocity = (target - from) / seconds + Vector3.up * (4f * apex / seconds);   // the arc's launch velocity
+
+            _marker.Stop();
+            SetPhase(ShotPhase.InFlight);
+            ball.FlyTo(target, launchDelay, seconds, apex, landed);
+            ShotTaken?.Invoke(new ShotInfo(CurrentClub, aimYaw, 1f, velocity));
+            return true;
         }
 
         void OnBallCameToRest()

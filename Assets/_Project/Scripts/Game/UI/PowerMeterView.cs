@@ -7,7 +7,8 @@ namespace Project3DGP.Game.UI
     /// <summary>
     /// The vertical power meter on the left of the HUD (#15, architecture §4.8). Reads ShotController, never
     /// writes: the bar shows PowerMarker01, the label the club and the speed under the marker.
-    /// After the click the bar stays frozen at the chosen power (dimmed) until the next shot.
+    /// After the click the bar stays frozen at the chosen power (dimmed) until the next shot; while shot input is off
+    /// (walking to the exit, game over) it is frozen and dimmed too.
     /// </summary>
     public class PowerMeterView : MonoBehaviour
     {
@@ -24,7 +25,7 @@ namespace Project3DGP.Game.UI
                 bar.SetLabel($"{club.DisplayName}\n{ShotMath.Speed(club, shot.PowerMarker01):0} m/s");
             var fill = bar.FillGraphic;
             if (fill != null)
-                fill.color = shot.Phase == ShotPhase.Aiming ? aimingColor : frozenColor;
+                fill.color = shot.Phase == ShotPhase.Aiming && shot.InputEnabled ? aimingColor : frozenColor;
         }
     }
 }

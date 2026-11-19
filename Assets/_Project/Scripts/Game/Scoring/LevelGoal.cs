@@ -38,6 +38,13 @@ namespace Project3DGP.Game.Scoring
             Reached?.Invoke(this);
         }
 
+        /// <summary>Dev cheat (GodKeys, #143): met now, as if the ball reached it, even while not accepting.</summary>
+        public void ForceMet()
+        {
+            Accepting = true;
+            MarkMet();
+        }
+
         /// <summary>Show that the goal is met (light up, flip the lever, ...).</summary>
         protected virtual void OnMet() { }
 

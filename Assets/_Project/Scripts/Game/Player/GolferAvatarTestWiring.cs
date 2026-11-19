@@ -18,8 +18,9 @@ namespace Project3DGP.Game.Player
     /// Test keys (Input System): C = PlayCelebrate, X = PlayFail, G = open the exit (as if all goals were met).
     /// TEMP(#27): also a minimal ILevelFlow, so the HUD menu button, Esc and the pause dialog work in the levels:
     /// pause (timeScale 0, shot input off), Retry (reloads the scene), Main menu (loads MainMenu). No timer or strokes.
+    /// ILevelCheats: GodKeys F6 fails the level (LevelFailed -> cat wakes up in L1, then the time-up dialog).
     /// </summary>
-    public class GolferAvatarTestWiring : MonoBehaviour, ILevelFlow
+    public class GolferAvatarTestWiring : MonoBehaviour, ILevelFlow, ILevelCheats
     {
         [SerializeField] ShotController shot;
         [SerializeField] GolfBall ball;
@@ -31,14 +32,27 @@ namespace Project3DGP.Game.Player
         [SerializeField] bool teleportToBall = true;
 
         // ---------- TEMP(#27) ILevelFlow: LevelManager does all of this ----------
-        public LevelPhase Phase => exit != null && exit.IsOpen ? LevelPhase.Completed : LevelPhase.Playing;
+        public LevelPhase Phase => _failed ? LevelPhase.Failed : exit != null && exit.IsOpen ? LevelPhase.Completed : LevelPhase.Playing;
         public IDangerTimer Danger => null;     // DangerManager (#7)
         public IStrokeCounter Strokes => null;  // ScoreKeeper (#18)
         public bool IsPaused { get; private set; }
         public event Action<bool> PausedChanged;
         public event Action LevelStarted { add { } remove { } }
         public event Action<LevelResult> LevelCompleted { add { } remove { } }
-        public event Action LevelFailed { add { } remove { } }
+        public event Action LevelFailed;
+
+        bool _failed;
+
+        /// <summary>GodKeys F6 (#143): time up now; GardenCatTestKeys wakes the cat, LevelMenus shows the time-up dialog.</summary>
+        public void ForceFail()
+        {
+            if (Phase != LevelPhase.Playing)
+                return;
+            SetPaused(false);
+            _failed = true;
+            shot.InputEnabled = false;
+            LevelFailed?.Invoke();
+        }
 
         public void SetPaused(bool paused)
         {
@@ -94,7 +108,8 @@ namespace Project3DGP.Game.Player
 
         void Update()
         {
-            if ((teleportToBall || shot.InputEnabled) && shot.Phase == ShotPhase.Aiming && ball.IsAtRest && !avatar.IsWalking && (exit == null || !exit.IsOpen))
+            // Only while the player can shoot: input off (pause, game over, GodKeys demo shot) keeps the avatar's own facing.
+            if (shot.InputEnabled && shot.Phase == ShotPhase.Aiming && ball.IsAtRest && !avatar.IsWalking && (exit == null || !exit.IsOpen))
                 avatar.FaceYaw(shot.AimYaw);   // TEMP(#19): CameraRig.AimYaw
 
             var keyboard = UnityEngine.InputSystem.Keyboard.current;
